@@ -88,7 +88,7 @@ describe('Sidebar', () => {
       isAdminOrModerator: true,
       isSuperAdmin: false,
     }));
-    renderSidebar('/admin/players');
+    renderSidebar('/admin/wrestlers');
 
     expect(screen.getByText('nav.admin')).toBeInTheDocument();
 
@@ -98,8 +98,8 @@ describe('Sidebar', () => {
     expect(screen.getByText('admin.panel.groups.contentSocial')).toBeInTheDocument();
     expect(screen.getByText('admin.panel.groups.system')).toBeInTheDocument();
 
-    // League Setup auto-expands because route is /admin/players
-    expect(screen.getByText('admin.panel.tabs.managePlayers')).toBeInTheDocument();
+    // League Setup auto-expands because route is /admin/wrestlers
+    expect(screen.getByText('admin.panel.tabs.manageWrestlers')).toBeInTheDocument();
     expect(screen.getByText('admin.panel.tabs.divisions')).toBeInTheDocument();
 
     // Items in other collapsed sub-groups should not be visible

@@ -4,14 +4,14 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 
 // --- Hoisted mocks ---
-const { mockGetH2HPlayers, mockGetH2H } = vi.hoisted(() => ({
-  mockGetH2HPlayers: vi.fn(),
+const { mockGetH2HWrestlers, mockGetH2H } = vi.hoisted(() => ({
+  mockGetH2HWrestlers: vi.fn(),
   mockGetH2H: vi.fn(),
 }));
 
 vi.mock('../../../services/api', () => ({
   statisticsApi: {
-    getHeadToHeadPlayers: mockGetH2HPlayers,
+    getHeadToHeadWrestlers: mockGetH2HWrestlers,
     getHeadToHead: mockGetH2H,
   },
   seasonsApi: {
@@ -24,17 +24,17 @@ vi.mock('react-i18next', () => ({
     t: (key: string) => {
       const map: Record<string, string> = {
         'statistics.headToHead.title': 'Head to Head',
-        'statistics.headToHead.player1': 'Player 1',
-        'statistics.headToHead.player2': 'Player 2',
+        'statistics.headToHead.wrestler1': 'Wrestler 1',
+        'statistics.headToHead.wrestler2': 'Wrestler 2',
         'statistics.headToHead.statComparison': 'Stat Comparison',
         'statistics.headToHead.headToHeadRecord': 'Head-to-Head Record',
         'statistics.headToHead.recentResults': 'Recent Results',
         'statistics.headToHead.statisticalEdge': 'Statistical Edge',
         'statistics.headToHead.advantages': 'advantages',
-        'statistics.headToHead.noHistory': 'No match history between these players.',
-        'statistics.headToHead.selectDifferent': 'Select two different players',
-        'statistics.headToHead.player1Win': 'P1 Win',
-        'statistics.headToHead.player2Win': 'P2 Win',
+        'statistics.headToHead.noHistory': 'No match history between these wrestlers.',
+        'statistics.headToHead.selectDifferent': 'Select two different wrestlers',
+        'statistics.headToHead.wrestler1Win': 'P1 Win',
+        'statistics.headToHead.wrestler2Win': 'P2 Win',
         'statistics.labels.wins': 'Wins',
         'statistics.labels.losses': 'Losses',
         'statistics.labels.winPercentage': 'Win %',
@@ -45,7 +45,7 @@ vi.mock('react-i18next', () => ({
         'statistics.labels.draws': 'Draws',
         'statistics.labels.totalMatches': 'total matches',
         'statistics.labels.championshipMatches': 'championship matches',
-        'statistics.nav.playerStats': 'Player Stats',
+        'statistics.nav.wrestlerStats': 'Wrestler Stats',
         'statistics.nav.leaderboards': 'Leaderboards',
         'statistics.nav.taleOfTape': 'Tale of the Tape',
         'common.loading': 'Loading...',
@@ -62,14 +62,14 @@ vi.mock('../SeasonSelector.css', () => ({}));
 import HeadToHeadComparison from '../HeadToHeadComparison';
 
 // --- Test data ---
-const mockPlayers = [
-  { playerId: 'p1', name: 'John Cena', wrestlerName: 'The Champ' },
-  { playerId: 'p2', name: 'The Rock', wrestlerName: 'The Great One' },
-  { playerId: 'p3', name: 'Undertaker', wrestlerName: 'The Deadman' },
+const mockWrestlers = [
+  { wrestlerId: 'p1', name: 'John Cena', wrestlerName: 'The Champ' },
+  { wrestlerId: 'p2', name: 'The Rock', wrestlerName: 'The Great One' },
+  { wrestlerId: 'p3', name: 'Undertaker', wrestlerName: 'The Deadman' },
 ];
 
 const baseStat = {
-  playerId: 'p1',
+  wrestlerId: 'p1',
   statType: 'overall' as const,
   matchesPlayed: 30,
   winPercentage: 60.0,
@@ -84,15 +84,15 @@ const baseStat = {
 };
 
 const mockH2HResponse = {
-  players: mockPlayers,
-  player1Stats: { ...baseStat, playerId: 'p1', wins: 20, losses: 8, draws: 2 },
-  player2Stats: { ...baseStat, playerId: 'p2', wins: 15, losses: 12, draws: 3, winPercentage: 50.0, longestWinStreak: 4, championshipWins: 1 },
+  wrestlers: mockWrestlers,
+  wrestler1Stats: { ...baseStat, wrestlerId: 'p1', wins: 20, losses: 8, draws: 2 },
+  wrestler2Stats: { ...baseStat, wrestlerId: 'p2', wins: 15, losses: 12, draws: 3, winPercentage: 50.0, longestWinStreak: 4, championshipWins: 1 },
   headToHead: {
     matchupKey: 'p1#p2',
-    player1Id: 'p1',
-    player2Id: 'p2',
-    player1Wins: 5,
-    player2Wins: 3,
+    wrestler1Id: 'p1',
+    wrestler2Id: 'p2',
+    wrestler1Wins: 5,
+    wrestler2Wins: 3,
     draws: 1,
     totalMatches: 9,
     championshipMatches: 2,
@@ -117,8 +117,8 @@ describe('HeadToHeadComparison', () => {
     vi.clearAllMocks();
   });
 
-  it('selects two players and shows H2H record with comparison stats', async () => {
-    mockGetH2HPlayers.mockResolvedValue({ players: mockPlayers });
+  it('selects two wrestlers and shows H2H record with comparison stats', async () => {
+    mockGetH2HWrestlers.mockResolvedValue({ wrestlers: mockWrestlers });
     mockGetH2H.mockResolvedValue(mockH2HResponse);
 
     renderComponent();
@@ -146,7 +146,7 @@ describe('HeadToHeadComparison', () => {
   });
 
   it('displays recent results with winner names and badges', async () => {
-    mockGetH2HPlayers.mockResolvedValue({ players: mockPlayers });
+    mockGetH2HWrestlers.mockResolvedValue({ wrestlers: mockWrestlers });
     mockGetH2H.mockResolvedValue(mockH2HResponse);
 
     renderComponent();
@@ -166,10 +166,10 @@ describe('HeadToHeadComparison', () => {
     expect(screen.getByText('P2 Win')).toBeInTheDocument();
   });
 
-  it('shows message when same player is selected for both slots', async () => {
+  it('shows message when same wrestler is selected for both slots', async () => {
     const user = userEvent.setup();
 
-    mockGetH2HPlayers.mockResolvedValue({ players: mockPlayers });
+    mockGetH2HWrestlers.mockResolvedValue({ wrestlers: mockWrestlers });
     // The initial auto-select will pick p1 and p2, triggering an H2H call
     mockGetH2H.mockResolvedValue(mockH2HResponse);
 
@@ -180,11 +180,11 @@ describe('HeadToHeadComparison', () => {
     });
 
     const selects = screen.getAllByRole('combobox');
-    // Change player 2 to same as player 1
+    // Change wrestler 2 to same as wrestler 1
     await user.selectOptions(selects[1]!, 'p1');
 
     await waitFor(() => {
-      expect(screen.getByText('Select two different players')).toBeInTheDocument();
+      expect(screen.getByText('Select two different wrestlers')).toBeInTheDocument();
     });
   });
 });

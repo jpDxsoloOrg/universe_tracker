@@ -58,13 +58,13 @@
     "devLoginTitle": "Dev-Anmeldung",
     "devLoginSubtitle": "Wähle eine Rolle zur Anmeldung (nur für Entwicklung)",
     "signInAsAdmin": "Als Admin anmelden",
-    "loadingPlayers": "Spieler werden geladen...",
-    "noPlayersFound": "Keine Spieler gefunden. Zuerst Testdaten anlegen."
+    "loadingWrestlers": "Wrestler werden geladen...",
+    "noWrestlersFound": "Keine Wrestler gefunden. Zuerst Testdaten anlegen."
   },
   "emptyState": {
     "checkBackSoon": "Schau bald wieder vorbei",
     "createFirstChampionship": "Erstelle deine erste Meisterschaft",
-    "createFirstPlayer": "Füge deinen ersten Spieler hinzu",
+    "createFirstWrestler": "Füge deinen ersten Wrestler hinzu",
     "createFirstTournament": "Erstelle dein erstes Turnier",
     "createFirstDivision": "Erstelle deine erste Division",
     "goToAdmin": "Zum Admin"
@@ -183,7 +183,7 @@
       "adminMatchConfig": "Admin: Match-Konfiguration",
       "adminSeasonAwards": "Admin: Saison-Auszeichnungen",
       "adminDivisions": "Admin: Divisionen",
-      "adminManagePlayers": "Admin: Spieler verwalten",
+      "adminManageWrestlers": "Admin: Wrestler verwalten",
       "adminSeasons": "Admin: Saisons",
       "adminChampionships": "Admin: Meisterschaften",
       "adminEvents": "Admin: Events",
@@ -204,7 +204,7 @@
     "title": "Liga-Tabelle",
     "pageTitle": "Tabelle",
     "loading": "Tabelle wird geladen...",
-    "noPlayers": "Es wurden noch keine Spieler zur Liga hinzugefügt.",
+    "noWrestlers": "Es wurden noch keine Wrestler zur Liga hinzugefügt.",
     "season": "Saison",
     "allTime": "Gesamt",
     "showingFor": "Tabelle anzeigen für",
@@ -213,7 +213,7 @@
     "table": {
       "rank": "Rang",
       "image": "Bild",
-      "player": "Spieler",
+      "wrestler": "Wrestler",
       "wrestler": "Wrestler",
       "division": "Division",
       "wins": "Siege",
@@ -287,7 +287,7 @@
     "title": "Kampf-Suche",
     "filtersLabel": "Kampffilter",
     "filters": {
-      "player": "Spieler",
+      "wrestler": "Wrestler",
       "matchType": "Kampftyp",
       "stipulation": "Stipulation",
       "status": "Status",
@@ -343,7 +343,7 @@
     "summaryGapValue": "{{count}} Pkt",
     "table": {
       "rank": "Rang",
-      "player": "Spieler",
+      "wrestler": "Wrestler",
       "w": "S",
       "l": "N",
       "d": "U",
@@ -354,7 +354,7 @@
     "panel": {
       "title": "Admin-Bereich",
       "tabs": {
-        "managePlayers": "Spieler verwalten",
+        "manageWrestlers": "Wrestler verwalten",
         "divisions": "Divisionen",
         "stipulations": "Stipulationen",
         "matchConfig": "Match-Konfiguration",
@@ -390,8 +390,8 @@
       "chooseSeason": "-- Saison wählen --",
       "createAward": "Auszeichnung erstellen",
       "awardName": "Name der Auszeichnung",
-      "awardPlayer": "Spieler",
-      "choosePlayer": "-- Spieler wählen --",
+      "awardWrestler": "Wrestler",
+      "chooseWrestler": "-- Wrestler wählen --",
       "description": "Beschreibung",
       "value": "Wert",
       "createSuccess": "Auszeichnung erfolgreich erstellt!",
@@ -401,7 +401,7 @@
   },
   "statistics": {
     "nav": {
-      "playerStats": "Spieler-Statistiken",
+      "wrestlerStats": "Wrestler-Statistiken",
       "headToHead": "Direktvergleich",
       "leaderboards": "Ranglisten",
       "records": "Rekordbuch",
@@ -444,10 +444,10 @@
       "intercontinental": "Intercontinental-Meisterschaft",
       "tag": "Tag-Team-Meisterschaft"
     },
-    "playerStats": {
-      "title": "Spieler-Statistiken",
-      "selectPlayer": "Spieler auswählen",
-      "noData": "Keine Statistikdaten für diesen Spieler verfügbar.",
+    "wrestlerStats": {
+      "title": "Wrestler-Statistiken",
+      "selectWrestler": "Wrestler auswählen",
+      "noData": "Keine Statistikdaten für diesen Wrestler verfügbar.",
       "streaks": "Serien & Rekorde",
       "matchTypeBreakdown": "Aufschlüsselung nach Kampftyp",
       "winRateByMatchType": "Siegquote nach Kampftyp",
@@ -458,15 +458,15 @@
     },
     "headToHead": {
       "title": "Direktvergleich",
-      "player1": "Spieler 1",
-      "player2": "Spieler 2",
-      "selectDifferent": "Bitte wählen Sie zwei verschiedene Spieler zum Vergleich.",
+      "wrestler1": "Wrestler 1",
+      "wrestler2": "Wrestler 2",
+      "selectDifferent": "Bitte wählen Sie zwei verschiedene Wrestler zum Vergleich.",
       "statComparison": "Statistischer Vergleich",
       "headToHeadRecord": "Direktvergleich-Bilanz",
-      "noHistory": "Keine Direktvergleich-Historie zwischen diesen Spielern.",
+      "noHistory": "Keine Direktvergleich-Historie zwischen diesen Wrestlern.",
       "recentResults": "Letzte Ergebnisse",
-      "player1Win": "S1 Sieg",
-      "player2Win": "S2 Sieg",
+      "wrestler1Win": "W1 Sieg",
+      "wrestler2Win": "W2 Sieg",
       "statisticalEdge": "Statistischer Vorteil",
       "advantages": "Vorteile"
     },
@@ -496,7 +496,7 @@
       },
       "setOn": "Aufgestellt am",
       "activeThreats": "Aktive Bedrohungen",
-      "activeThreatsDesc": "Diese Rekorde werden derzeit herausgefordert. Behalten Sie diese Spieler im Auge!",
+      "activeThreatsDesc": "Diese Rekorde werden derzeit herausgefordert. Behalten Sie diese Wrestler im Auge!",
       "currentHolder": "Aktueller Halter",
       "challenger": "Herausforderer"
     },
@@ -537,7 +537,7 @@
       "intense": "Intensiv 💥",
       "historic": "Historisch 👑"
     },
-    "noRivalries": "Noch keine Rivalitäten. Rivalitäten erscheinen, wenn zwei Spieler mindestens 3 Mal gegeneinander angetreten sind.",
+    "noRivalries": "Noch keine Rivalitäten. Rivalitäten erscheinen, wenn zwei Wrestler mindestens 3 Mal gegeneinander angetreten sind.",
     "viewHeadToHead": "Direktvergleich anzeigen"
   },
   "events": {
@@ -667,7 +667,7 @@
     "currentChampion": "Aktueller Champion",
     "rankings": "Rangliste",
     "noContenders": "Noch keine Herausforderer eingestuft",
-    "noContendersHint": "Spieler benötigen mindestens {{minMatches}} Kämpfe im Bewertungszeitraum",
+    "noContendersHint": "Wrestler benötigen mindestens {{minMatches}} Kämpfe im Bewertungszeitraum",
     "lastCalculated": "Zuletzt berechnet",
     "rankingPeriod": "Bewertungszeitraum",
     "days": "Tage",
@@ -685,7 +685,7 @@
     "rankingScore": "Ranglistenpunkte",
     "myStatus": {
       "title": "Mein Herausforderer-Status",
-      "subtitle": "Meisterschafts-Herausforderer-Status für {{playerName}}",
+      "subtitle": "Meisterschafts-Herausforderer-Status für {{wrestlerName}}",
       "progressToTop": "Fortschritt zu #1",
       "pathToTitle": "Weg zum Titel",
       "matchesNeeded": "Benötigte Kämpfe zur Qualifikation",
@@ -706,7 +706,7 @@
       "includeDraws": "Unentschieden in Rangliste einbeziehen",
       "includeDrawsHint": "Wenn aktiviert, werden Unentschieden teilweise zur Ranglistenpunktzahl gezählt",
       "divisionRestricted": "Auf Division beschränkt",
-      "divisionRestrictedHint": "Wenn aktiviert, können nur Spieler derselben Division antreten",
+      "divisionRestrictedHint": "Wenn aktiviert, können nur Wrestler derselben Division antreten",
       "save": "Konfiguration speichern",
       "recalculate": "Rangliste neu berechnen",
       "saveSuccess": "Konfiguration für {{championship}} gespeichert",

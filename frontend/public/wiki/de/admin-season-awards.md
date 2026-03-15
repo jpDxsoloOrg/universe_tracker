@@ -13,7 +13,7 @@ Nutze **Saison-Auszeichnungen**, um automatisch erzeugte Awards zu prüfen und e
 
 1. Saison auswählen.
 2. **Award erstellen** klicken.
-3. Name, Spieler und optional Beschreibung eingeben.
+3. Name, Wrestler und optional Beschreibung eingeben.
 4. Speichern und prüfen, ob der Award in der Liste erscheint.
 
 ## Custom Award löschen

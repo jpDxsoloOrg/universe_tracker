@@ -15,7 +15,7 @@ vi.mock('../../../lib/dynamodb', () => ({
   },
   TableNames: {
     EVENTS: 'Events', MATCHES: 'Matches',
-    PLAYERS: 'Players', CHAMPIONSHIPS: 'Championships',
+    WRESTLERS: 'Wrestlers', CHAMPIONSHIPS: 'Championships',
   },
 }));
 
@@ -72,7 +72,7 @@ describe('getEvent', () => {
     expect(body.enrichedMatches).toEqual([]);
   });
 
-  it('returns enriched match data with player names and championship info', async () => {
+  it('returns enriched match data with wrestler names and championship info', async () => {
     mockGet
       .mockResolvedValueOnce({
         Item: {
@@ -81,7 +81,7 @@ describe('getEvent', () => {
         },
       })
       .mockResolvedValueOnce({
-        Item: { playerId: 'p1', name: 'John Cena', currentWrestler: 'John Cena' },
+        Item: { wrestlerId: 'p1', name: 'John Cena' },
       })
       .mockResolvedValueOnce({
         Item: { championshipId: 'c1', name: 'World Championship' },
@@ -106,7 +106,7 @@ describe('getEvent', () => {
     expect(match.notes).toBe('Title match');
     expect(match.matchData.matchFormat).toBe('singles');
     expect(match.matchData.participants).toHaveLength(1);
-    expect(match.matchData.participants[0].playerName).toBe('John Cena');
+    expect(match.matchData.participants[0].wrestlerName).toBe('John Cena');
     expect(match.matchData.participants[0].wrestlerName).toBe('John Cena');
     expect(match.matchData.isChampionship).toBe(true);
     expect(match.matchData.championshipName).toBe('World Championship');
@@ -145,7 +145,7 @@ describe('getEvent', () => {
     expect(body.enrichedMatches[0].matchId).toBe('m-gone');
   });
 
-  it('uses Unknown Player/Wrestler when player not found', async () => {
+  it('uses Unknown Wrestler/Wrestler when wrestler not found', async () => {
     mockGet
       .mockResolvedValueOnce({
         Item: {
@@ -166,7 +166,7 @@ describe('getEvent', () => {
 
     expect(result!.statusCode).toBe(200);
     const participant = JSON.parse(result!.body).enrichedMatches[0].matchData.participants[0];
-    expect(participant.playerName).toBe('Unknown Player');
+    expect(participant.wrestlerName).toBe('Unknown Wrestler');
     expect(participant.wrestlerName).toBe('Unknown Wrestler');
   });
 

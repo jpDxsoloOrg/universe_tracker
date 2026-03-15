@@ -14,9 +14,9 @@ const client = new DynamoDBClient({
 
 const tables = [
   {
-    TableName: `universe-tracker-api-players-${STAGE}`,
-    KeySchema: [{ AttributeName: 'playerId', KeyType: 'HASH' }],
-    AttributeDefinitions: [{ AttributeName: 'playerId', AttributeType: 'S' }],
+    TableName: `universe-tracker-api-wrestlers-${STAGE}`,
+    KeySchema: [{ AttributeName: 'wrestlerId', KeyType: 'HASH' }],
+    AttributeDefinitions: [{ AttributeName: 'wrestlerId', AttributeType: 'S' }],
     BillingMode: 'PAY_PER_REQUEST',
   },
   {
@@ -76,18 +76,18 @@ const tables = [
     TableName: `universe-tracker-api-season-standings-${STAGE}`,
     KeySchema: [
       { AttributeName: 'seasonId', KeyType: 'HASH' },
-      { AttributeName: 'playerId', KeyType: 'RANGE' },
+      { AttributeName: 'wrestlerId', KeyType: 'RANGE' },
     ],
     AttributeDefinitions: [
       { AttributeName: 'seasonId', AttributeType: 'S' },
-      { AttributeName: 'playerId', AttributeType: 'S' },
+      { AttributeName: 'wrestlerId', AttributeType: 'S' },
     ],
     BillingMode: 'PAY_PER_REQUEST',
     GlobalSecondaryIndexes: [
       {
-        IndexName: 'PlayerIndex',
+        IndexName: 'WrestlerIndex',
         KeySchema: [
-          { AttributeName: 'playerId', KeyType: 'HASH' },
+          { AttributeName: 'wrestlerId', KeyType: 'HASH' },
           { AttributeName: 'seasonId', KeyType: 'RANGE' },
         ],
         Projection: { ProjectionType: 'ALL' },
@@ -142,11 +142,11 @@ const tables = [
     TableName: `universe-tracker-api-contender-rankings-${STAGE}`,
     KeySchema: [
       { AttributeName: 'championshipId', KeyType: 'HASH' },
-      { AttributeName: 'playerId', KeyType: 'RANGE' },
+      { AttributeName: 'wrestlerId', KeyType: 'RANGE' },
     ],
     AttributeDefinitions: [
       { AttributeName: 'championshipId', AttributeType: 'S' },
-      { AttributeName: 'playerId', AttributeType: 'S' },
+      { AttributeName: 'wrestlerId', AttributeType: 'S' },
       { AttributeName: 'rank', AttributeType: 'N' },
     ],
     BillingMode: 'PAY_PER_REQUEST',
@@ -164,11 +164,11 @@ const tables = [
   {
     TableName: `universe-tracker-api-ranking-history-${STAGE}`,
     KeySchema: [
-      { AttributeName: 'playerId', KeyType: 'HASH' },
+      { AttributeName: 'wrestlerId', KeyType: 'HASH' },
       { AttributeName: 'weekKey', KeyType: 'RANGE' },
     ],
     AttributeDefinitions: [
-      { AttributeName: 'playerId', AttributeType: 'S' },
+      { AttributeName: 'wrestlerId', AttributeType: 'S' },
       { AttributeName: 'weekKey', AttributeType: 'S' },
       { AttributeName: 'championshipId', AttributeType: 'S' },
     ],

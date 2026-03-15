@@ -4,7 +4,7 @@ Die Liga ist in Saisons organisiert, also in getrennte Wettbewerbsperioden.
 
 ## Was sind Saisons?
 
-Saisons ermöglichen der Liga, Tabellen pro Wettbewerbsperiode getrennt zu führen. So können Sie sehen, wie Spieler in einer bestimmten Saison abgeschnitten haben, sowie ihre Gesamtbilanz.
+Saisons ermöglichen der Liga, Tabellen pro Wettbewerbsperiode getrennt zu führen. So können Sie sehen, wie Wrestler in einer bestimmten Saison abgeschnitten haben, sowie ihre Gesamtbilanz.
 
 ## Saison-Tabellen anzeigen
 

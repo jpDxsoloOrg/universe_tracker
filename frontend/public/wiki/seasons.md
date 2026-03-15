@@ -4,7 +4,7 @@ The league is organized into seasons, which are distinct competitive periods.
 
 ## What Are Seasons?
 
-Seasons allow the league to track standings separately for each competitive period. This means you can view how players performed in a specific season, as well as their all-time record.
+Seasons allow the league to track standings separately for each competitive period. This means you can view how wrestlers performed in a specific season, as well as their all-time record.
 
 ## Viewing Season Standings
 

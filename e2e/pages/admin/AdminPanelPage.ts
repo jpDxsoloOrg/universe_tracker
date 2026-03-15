@@ -5,7 +5,7 @@ import { selectors } from '../../config/selectors';
 type AdminTab = 'players' | 'divisions' | 'schedule' | 'results' | 'championships' | 'tournaments' | 'seasons' | 'help' | 'danger';
 
 const tabRoutes: Record<AdminTab, string> = {
-  players: '/admin/players',
+  players: '/admin/wrestlers',
   divisions: '/admin/divisions',
   schedule: '/admin/schedule',
   results: '/admin/results',

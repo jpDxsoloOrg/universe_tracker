@@ -1,21 +1,21 @@
-# Managing Players
+# Managing Wrestlers
 
-The **Manage Players** page allows you to edit and delete players in the league. Admins do not add wrestlers here; use this screen to update details, assign divisions, and remove players.
+The **Manage Wrestlers** page allows you to edit and delete wrestlers in the league. Admins do not add wrestlers here; use this screen to update details, assign divisions, and remove wrestlers.
 
-## Editing a Player
+## Editing a Wrestler
 
-1. Find the player in the players table
+1. Find the wrestler in the wrestlers table
 2. Click the **Edit** button next to their name
-3. Update the player name, wrestler, division, or image
+3. Update the wrestler name, division, or image
 4. Click **Save** to confirm changes
 
-## Deleting a Player
+## Deleting a Wrestler
 
-1. Find the player in the players table
+1. Find the wrestler in the wrestlers table
 2. Click the **Delete** button next to their name
 3. Confirm the action in the dialog
 
-**Note:** You cannot delete a player who is currently a champion. Remove their championship first by having them lose a title match or editing the championship.
+**Note:** You cannot delete a wrestler who is currently a champion. Remove their championship first by having them lose a title match or editing the championship.
 
 ## Image Upload Guidelines
 

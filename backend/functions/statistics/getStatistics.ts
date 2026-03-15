@@ -20,10 +20,9 @@ interface MatchRecord {
   matchOfTheNight?: boolean;
 }
 
-interface PlayerRecord {
-  playerId: string;
+interface WrestlerRecord {
+  wrestlerId: string;
   name: string;
-  currentWrestler: string;
   wins: number;
   losses: number;
   draws: number;
@@ -79,7 +78,7 @@ function categorizeMatch(match: MatchRecord): string {
 
 function computeStreaks(
   matches: MatchRecord[],
-  playerId: string
+  wrestlerId: string
 ): { currentWinStreak: number; longestWinStreak: number; longestLossStreak: number } {
   // Sort by date ascending
   const sorted = [...matches].sort(
@@ -93,8 +92,8 @@ function computeStreaks(
   let tempLossStreak = 0;
 
   for (const match of sorted) {
-    const isWin = match.winners?.includes(playerId);
-    const isLoss = match.losers?.includes(playerId);
+    const isWin = match.winners?.includes(wrestlerId);
+    const isLoss = match.losers?.includes(wrestlerId);
 
     if (isWin) {
       tempWinStreak++;
@@ -116,9 +115,9 @@ function computeStreaks(
   return { currentWinStreak, longestWinStreak, longestLossStreak };
 }
 
-function computePlayerStatistics(
+function computeWrestlerStatistics(
   matches: MatchRecord[],
-  playerId: string,
+  wrestlerId: string,
   statType: string
 ): {
   wins: number;
@@ -137,10 +136,10 @@ function computePlayerStatistics(
   let filtered: MatchRecord[];
 
   if (statType === 'overall') {
-    filtered = matches.filter((m) => m.participants.includes(playerId));
+    filtered = matches.filter((m) => m.participants.includes(wrestlerId));
   } else {
     filtered = matches.filter(
-      (m) => m.participants.includes(playerId) && categorizeMatch(m) === statType
+      (m) => m.participants.includes(wrestlerId) && categorizeMatch(m) === statType
     );
   }
 
@@ -153,8 +152,8 @@ function computePlayerStatistics(
   let championshipLosses = 0;
 
   for (const match of completed) {
-    const isWin = match.winners?.includes(playerId);
-    const isLoss = match.losers?.includes(playerId);
+    const isWin = match.winners?.includes(wrestlerId);
+    const isLoss = match.losers?.includes(wrestlerId);
 
     if (isWin) {
       wins++;
@@ -170,7 +169,7 @@ function computePlayerStatistics(
   const matchesPlayed = wins + losses + draws;
   const winPercentage = matchesPlayed > 0 ? (wins / matchesPlayed) * 100 : 0;
 
-  const streaks = computeStreaks(completed, playerId);
+  const streaks = computeStreaks(completed, wrestlerId);
 
   const dates = completed
     .map((m) => m.date)
@@ -196,59 +195,58 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const seasonId = event.queryStringParameters?.seasonId;
 
     if (!section) {
-      return badRequest('Missing required query parameter: section (player-stats, head-to-head, leaderboards, records, championship-stats, achievements, match-ratings)');
+      return badRequest('Missing required query parameter: section (wrestler-stats, head-to-head, leaderboards, records, championship-stats, achievements, match-ratings)');
     }
 
     // Load common data
-    const [playersResult, matchesResult] = await Promise.all([
-      dynamoDb.scanAll({ TableName: TableNames.PLAYERS }),
+    const [wrestlersResult, matchesResult] = await Promise.all([
+      dynamoDb.scanAll({ TableName: TableNames.WRESTLERS }),
       dynamoDb.scanAll({ TableName: TableNames.MATCHES }),
     ]);
 
-    // Only include players who have a wrestler assigned (exclude Fantasy-only users)
-    const players = (playersResult as unknown as PlayerRecord[]).filter((p) => p.currentWrestler);
+    const wrestlers = wrestlersResult as unknown as WrestlerRecord[];
     const allMatches = matchesResult as unknown as MatchRecord[];
     const allCompletedMatches = allMatches.filter((m) => m.status === 'completed');
     const completedMatches = seasonId ? allCompletedMatches.filter((m) => m.seasonId === seasonId) : allCompletedMatches;
 
     switch (section) {
-      case 'player-stats': {
-        const playerId = event.queryStringParameters?.playerId;
+      case 'wrestler-stats': {
+        const wrestlerId = event.queryStringParameters?.wrestlerId;
 
-        // Return player list for dropdowns + stats for specific player
-        const playerList = players.map((p) => ({
-          playerId: p.playerId,
+        // Return wrestler list for dropdowns + stats for specific wrestler
+        const wrestlerList = wrestlers.map((p) => ({
+          wrestlerId: p.wrestlerId,
           name: p.name,
-          wrestlerName: p.currentWrestler,
+          wrestlerName: p.name,
         }));
 
-        if (!playerId) {
-          return success({ players: playerList });
+        if (!wrestlerId) {
+          return success({ wrestlers: wrestlerList });
         }
 
         const statTypes = ['overall', 'singles', 'tag', 'ladder', 'cage'] as const;
         const stats = statTypes.map((statType) => ({
-          playerId,
+          wrestlerId,
           statType,
-          ...computePlayerStatistics(completedMatches, playerId, statType),
+          ...computeWrestlerStatistics(completedMatches, wrestlerId, statType),
           updatedAt: new Date().toISOString(),
         }));
 
-        // Championship stats for this player
+        // Championship stats for this wrestler
         const champHistoryItems = await dynamoDb.scanAll({
           TableName: TableNames.CHAMPIONSHIP_HISTORY,
         });
         const champHistory = champHistoryItems as unknown as ChampionshipHistoryRecord[];
 
-        const playerChampHistory = champHistory.filter((h) => {
+        const wrestlerChampHistory = champHistory.filter((h) => {
           const champ = h.champion;
-          if (Array.isArray(champ)) return champ.includes(playerId);
-          return champ === playerId;
+          if (Array.isArray(champ)) return champ.includes(wrestlerId);
+          return champ === wrestlerId;
         });
 
         // Group by championship
         const champGroups: Record<string, ChampionshipHistoryRecord[]> = {};
-        for (const h of playerChampHistory) {
+        for (const h of wrestlerChampHistory) {
           if (!champGroups[h.championshipId]) champGroups[h.championshipId] = [];
           champGroups[h.championshipId].push(h);
         }
@@ -263,8 +261,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           const championship = championships.find((c) => c.championshipId === champId);
           const currentChamp = championship?.currentChampion;
           const isCurrentlyHolding = Array.isArray(currentChamp)
-            ? currentChamp.includes(playerId)
-            : currentChamp === playerId;
+            ? currentChamp.includes(wrestlerId)
+            : currentChamp === wrestlerId;
 
           const reignDays = reigns.map((r) => {
             if (r.daysHeld != null) return r.daysHeld;
@@ -282,7 +280,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           const dates = reigns.map((r) => r.wonDate).sort();
 
           return {
-            playerId,
+            wrestlerId,
             championshipId: champId,
             championshipName: championship?.name || champId,
             totalReigns: reigns.length,
@@ -298,42 +296,42 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           };
         });
 
-        // Achievements for this player
-        const playerAchievements = computeAchievements(
-          playerId,
+        // Achievements for this wrestler
+        const wrestlerAchievements = computeAchievements(
+          wrestlerId,
           stats,
           championshipStats,
           completedMatches,
           champHistory,
           championships,
-          players
+          wrestlers
         );
 
         return success({
-          players: playerList,
+          wrestlers: wrestlerList,
           statistics: stats,
           championshipStats,
-          achievements: playerAchievements,
+          achievements: wrestlerAchievements,
         });
       }
 
       case 'head-to-head': {
-        const player1Id = event.queryStringParameters?.player1Id;
-        const player2Id = event.queryStringParameters?.player2Id;
+        const wrestler1Id = event.queryStringParameters?.wrestler1Id;
+        const wrestler2Id = event.queryStringParameters?.wrestler2Id;
 
-        const playerList = players.map((p) => ({
-          playerId: p.playerId,
+        const wrestlerList = wrestlers.map((p) => ({
+          wrestlerId: p.wrestlerId,
           name: p.name,
-          wrestlerName: p.currentWrestler,
+          wrestlerName: p.name,
         }));
 
-        if (!player1Id || !player2Id) {
-          return success({ players: playerList });
+        if (!wrestler1Id || !wrestler2Id) {
+          return success({ wrestlers: wrestlerList });
         }
 
-        // Get matches where both players participated
+        // Get matches where both wrestlers participated
         const h2hMatches = completedMatches.filter(
-          (m) => m.participants.includes(player1Id) && m.participants.includes(player2Id)
+          (m) => m.participants.includes(wrestler1Id) && m.participants.includes(wrestler2Id)
         );
 
         let p1Wins = 0;
@@ -343,8 +341,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
         for (const match of h2hMatches) {
           if (match.isChampionship) championshipMatches++;
-          const p1Won = match.winners?.includes(player1Id);
-          const p2Won = match.winners?.includes(player2Id);
+          const p1Won = match.winners?.includes(wrestler1Id);
+          const p2Won = match.winners?.includes(wrestler2Id);
           if (p1Won) p1Wins++;
           else if (p2Won) p2Wins++;
           else h2hDraws++;
@@ -360,27 +358,27 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           date: m.date,
         }));
 
-        // Also get overall stats for both players
+        // Also get overall stats for both wrestlers
         const p1Stats = {
-          playerId: player1Id,
+          wrestlerId: wrestler1Id,
           statType: 'overall' as const,
-          ...computePlayerStatistics(completedMatches, player1Id, 'overall'),
+          ...computeWrestlerStatistics(completedMatches, wrestler1Id, 'overall'),
           updatedAt: new Date().toISOString(),
         };
 
         const p2Stats = {
-          playerId: player2Id,
+          wrestlerId: wrestler2Id,
           statType: 'overall' as const,
-          ...computePlayerStatistics(completedMatches, player2Id, 'overall'),
+          ...computeWrestlerStatistics(completedMatches, wrestler2Id, 'overall'),
           updatedAt: new Date().toISOString(),
         };
 
         const headToHead = h2hMatches.length > 0 ? {
-          matchupKey: `${player1Id}-vs-${player2Id}`,
-          player1Id,
-          player2Id,
-          player1Wins: p1Wins,
-          player2Wins: p2Wins,
+          matchupKey: `${wrestler1Id}-vs-${wrestler2Id}`,
+          wrestler1Id,
+          wrestler2Id,
+          wrestler1Wins: p1Wins,
+          wrestler2Wins: p2Wins,
           draws: h2hDraws,
           totalMatches: h2hMatches.length,
           lastMatchDate: sorted[0]?.date,
@@ -391,24 +389,24 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         } : null;
 
         return success({
-          players: playerList,
+          wrestlers: wrestlerList,
           headToHead,
-          player1Stats: p1Stats,
-          player2Stats: p2Stats,
+          wrestler1Stats: p1Stats,
+          wrestler2Stats: p2Stats,
         });
       }
 
       case 'leaderboards': {
-        const playerList = players.map((p) => ({
-          playerId: p.playerId,
+        const wrestlerList = wrestlers.map((p) => ({
+          wrestlerId: p.wrestlerId,
           name: p.name,
-          wrestlerName: p.currentWrestler,
+          wrestlerName: p.name,
         }));
 
-        // Compute overall stats for all players
-        const allPlayerStats = players.map((p) => ({
+        // Compute overall stats for all wrestlers
+        const allWrestlerStats = wrestlers.map((p) => ({
           ...p,
-          ...computePlayerStatistics(completedMatches, p.playerId, 'overall'),
+          ...computeWrestlerStatistics(completedMatches, p.wrestlerId, 'overall'),
         }));
 
         // Championship history for longest reign
@@ -418,56 +416,52 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         const champHistory = champHistoryItems as unknown as ChampionshipHistoryRecord[];
 
         // Most wins
-        const mostWins = [...allPlayerStats]
+        const mostWins = [...allWrestlerStats]
           .sort((a, b) => b.wins - a.wins)
           .map((p, i) => ({
-            playerId: p.playerId,
-            playerName: p.name,
-            wrestlerName: p.currentWrestler,
+            wrestlerId: p.wrestlerId,
+            wrestlerName: p.name,
             value: p.wins,
             rank: i + 1,
           }));
 
         // Best win percentage (min 1 match)
-        const bestWinPercentage = [...allPlayerStats]
+        const bestWinPercentage = [...allWrestlerStats]
           .filter((p) => p.matchesPlayed > 0)
           .sort((a, b) => b.winPercentage - a.winPercentage)
           .map((p, i) => ({
-            playerId: p.playerId,
-            playerName: p.name,
-            wrestlerName: p.currentWrestler,
+            wrestlerId: p.wrestlerId,
+            wrestlerName: p.name,
             value: p.winPercentage,
             rank: i + 1,
           }));
 
         // Longest streak
-        const longestStreak = [...allPlayerStats]
+        const longestStreak = [...allWrestlerStats]
           .sort((a, b) => b.longestWinStreak - a.longestWinStreak)
           .map((p, i) => ({
-            playerId: p.playerId,
-            playerName: p.name,
-            wrestlerName: p.currentWrestler,
+            wrestlerId: p.wrestlerId,
+            wrestlerName: p.name,
             value: p.longestWinStreak,
             rank: i + 1,
           }));
 
         // Most championships
-        const mostChampionships = [...allPlayerStats]
+        const mostChampionships = [...allWrestlerStats]
           .sort((a, b) => b.championshipWins - a.championshipWins)
           .map((p, i) => ({
-            playerId: p.playerId,
-            playerName: p.name,
-            wrestlerName: p.currentWrestler,
+            wrestlerId: p.wrestlerId,
+            wrestlerName: p.name,
             value: p.championshipWins,
             rank: i + 1,
           }));
 
         // Longest reign
-        const playerLongestReign: { playerId: string; name: string; currentWrestler: string; longestReign: number }[] = players.map((p) => {
+        const wrestlerLongestReign: { wrestlerId: string; name: string; longestReign: number }[] = wrestlers.map((p) => {
           const reigns = champHistory.filter((h) => {
             const champ = h.champion;
-            if (Array.isArray(champ)) return champ.includes(p.playerId);
-            return champ === p.playerId;
+            if (Array.isArray(champ)) return champ.includes(p.wrestlerId);
+            return champ === p.wrestlerId;
           });
 
           const now = new Date();
@@ -479,25 +473,23 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           });
 
           return {
-            playerId: p.playerId,
+            wrestlerId: p.wrestlerId,
             name: p.name,
-            currentWrestler: p.currentWrestler,
             longestReign: reignDays.length > 0 ? Math.max(...reignDays) : 0,
           };
         });
 
-        const longestReignLeaderboard = [...playerLongestReign]
+        const longestReignLeaderboard = [...wrestlerLongestReign]
           .sort((a, b) => b.longestReign - a.longestReign)
           .map((p, i) => ({
-            playerId: p.playerId,
-            playerName: p.name,
-            wrestlerName: p.currentWrestler,
+            wrestlerId: p.wrestlerId,
+            wrestlerName: p.name,
             value: p.longestReign,
             rank: i + 1,
           }));
 
         return success({
-          players: playerList,
+          wrestlers: wrestlerList,
           leaderboards: {
             mostWins,
             bestWinPercentage,
@@ -509,10 +501,10 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       }
 
       case 'records': {
-        // Compute stats for all players
-        const allPlayerStats = players.map((p) => ({
+        // Compute stats for all wrestlers
+        const allWrestlerStats = wrestlers.map((p) => ({
           ...p,
-          ...computePlayerStatistics(completedMatches, p.playerId, 'overall'),
+          ...computeWrestlerStatistics(completedMatches, p.wrestlerId, 'overall'),
         }));
 
         const champHistoryItems = await dynamoDb.scanAll({
@@ -522,21 +514,21 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
         const now = new Date();
 
-        // Per-match-type stats for all players
+        // Per-match-type stats for all wrestlers
         const matchTypes = ['singles', 'tag', 'ladder', 'cage'] as const;
-        const allMatchTypeStats = players.flatMap((p) =>
+        const allMatchTypeStats = wrestlers.flatMap((p) =>
           matchTypes.map((mt) => ({
             ...p,
             matchType: mt,
-            ...computePlayerStatistics(completedMatches, p.playerId, mt),
+            ...computeWrestlerStatistics(completedMatches, p.wrestlerId, mt),
           }))
         );
 
         // Overall records
-        const mostWinsPlayer = [...allPlayerStats].sort((a, b) => b.wins - a.wins)[0];
-        const highestWinPctPlayer = [...allPlayerStats].filter((p) => p.matchesPlayed >= 5).sort((a, b) => b.winPercentage - a.winPercentage)[0];
-        const mostMatchesPlayer = [...allPlayerStats].sort((a, b) => b.matchesPlayed - a.matchesPlayed)[0];
-        const fewestLossesPlayer = [...allPlayerStats].filter((p) => p.matchesPlayed >= 10).sort((a, b) => a.losses - b.losses)[0];
+        const mostWinsWrestler = [...allWrestlerStats].sort((a, b) => b.wins - a.wins)[0];
+        const highestWinPctWrestler = [...allWrestlerStats].filter((p) => p.matchesPlayed >= 5).sort((a, b) => b.winPercentage - a.winPercentage)[0];
+        const mostMatchesWrestler = [...allWrestlerStats].sort((a, b) => b.matchesPlayed - a.matchesPlayed)[0];
+        const fewestLossesWrestler = [...allWrestlerStats].filter((p) => p.matchesPlayed >= 10).sort((a, b) => a.losses - b.losses)[0];
 
         // Championship records
         const allReignDays = champHistory.map((r) => {
@@ -544,43 +536,43 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           return { ...r, days };
         });
 
-        const playerChampWins = players.map((p) => ({
+        const wrestlerChampWins = wrestlers.map((p) => ({
           ...p,
-          champWins: allPlayerStats.find((s) => s.playerId === p.playerId)?.championshipWins || 0,
+          champWins: allWrestlerStats.find((s) => s.wrestlerId === p.wrestlerId)?.championshipWins || 0,
         }));
-        const mostChampWinsPlayer = [...playerChampWins].sort((a, b) => b.champWins - a.champWins)[0];
+        const mostChampWinsWrestler = [...wrestlerChampWins].sort((a, b) => b.champWins - a.champWins)[0];
 
         const longestReignRecord = allReignDays.length > 0 ? [...allReignDays].sort((a, b) => b.days - a.days)[0] : undefined;
-        const longestReignPlayer = longestReignRecord ? players.find((p) => {
+        const longestReignWrestler = longestReignRecord ? wrestlers.find((p) => {
           const champ = longestReignRecord.champion;
-          if (Array.isArray(champ)) return champ.includes(p.playerId);
-          return champ === p.playerId;
+          if (Array.isArray(champ)) return champ.includes(p.wrestlerId);
+          return champ === p.wrestlerId;
         }) : undefined;
 
-        const totalDefensesByPlayer = players.map((p) => {
+        const totalDefensesByWrestler = wrestlers.map((p) => {
           const reigns = champHistory.filter((h) => {
             const champ = h.champion;
-            if (Array.isArray(champ)) return champ.includes(p.playerId);
-            return champ === p.playerId;
+            if (Array.isArray(champ)) return champ.includes(p.wrestlerId);
+            return champ === p.wrestlerId;
           });
           return { ...p, totalDefenses: reigns.reduce((sum, r) => sum + (r.defenses || 0), 0) };
         });
-        const mostDefensesPlayer = [...totalDefensesByPlayer].sort((a, b) => b.totalDefenses - a.totalDefenses)[0];
+        const mostDefensesWrestler = [...totalDefensesByWrestler].sort((a, b) => b.totalDefenses - a.totalDefenses)[0];
 
         const mostDefensesInReign = allReignDays.length > 0 ? [...champHistory].sort((a, b) => (b.defenses || 0) - (a.defenses || 0))[0] : undefined;
-        const mostDefensesInReignPlayer = mostDefensesInReign ? players.find((p) => {
+        const mostDefensesInReignWrestler = mostDefensesInReign ? wrestlers.find((p) => {
           const champ = mostDefensesInReign.champion;
-          if (Array.isArray(champ)) return champ.includes(p.playerId);
-          return champ === p.playerId;
+          if (Array.isArray(champ)) return champ.includes(p.wrestlerId);
+          return champ === p.wrestlerId;
         }) : undefined;
 
         // Streak records
-        const longestWinStreakPlayer = [...allPlayerStats].sort((a, b) => b.longestWinStreak - a.longestWinStreak)[0];
-        const longestActiveStreakPlayer = [...allPlayerStats].sort((a, b) => b.currentWinStreak - a.currentWinStreak)[0];
-        const longestLossStreakPlayer = [...allPlayerStats].sort((a, b) => b.longestLossStreak - a.longestLossStreak)[0];
+        const longestWinStreakWrestler = [...allWrestlerStats].sort((a, b) => b.longestWinStreak - a.longestWinStreak)[0];
+        const longestActiveStreakWrestler = [...allWrestlerStats].sort((a, b) => b.currentWinStreak - a.currentWinStreak)[0];
+        const longestLossStreakWrestler = [...allWrestlerStats].sort((a, b) => b.longestLossStreak - a.longestLossStreak)[0];
 
         // Unbeaten streak (wins + draws without a loss) - approximate with win streak for now
-        const longestUnbeatenPlayer = longestWinStreakPlayer;
+        const longestUnbeatenWrestler = longestWinStreakWrestler;
 
         // Match type records
         const mostSinglesWins = [...allMatchTypeStats].filter((s) => s.matchType === 'singles').sort((a, b) => b.wins - a.wins)[0];
@@ -588,11 +580,11 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         const bestCageRecord = [...allMatchTypeStats].filter((s) => s.matchType === 'cage' && s.matchesPlayed >= 3).sort((a, b) => b.winPercentage - a.winPercentage)[0];
         const mostLadderWins = [...allMatchTypeStats].filter((s) => s.matchType === 'ladder').sort((a, b) => b.wins - a.wins)[0];
 
-        function makeRecord(name: string, player: PlayerRecord | undefined, value: number | string, desc: string) {
+        function makeRecord(name: string, wrestler: WrestlerRecord | undefined, value: number | string, desc: string) {
           return {
             recordName: name,
-            holderName: player?.name || 'N/A',
-            wrestlerName: player?.currentWrestler || 'N/A',
+            holderName: wrestler?.name || 'N/A',
+            wrestlerName: wrestler?.name || 'N/A',
             value,
             date: new Date().toISOString().split('T')[0],
             description: desc,
@@ -601,22 +593,22 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
         const records: Record<string, ReturnType<typeof makeRecord>[]> = {
           overall: [
-            makeRecord('Most Career Wins', mostWinsPlayer, mostWinsPlayer?.wins || 0, 'All-time leader in total victories across all match types'),
-            makeRecord('Highest Win Percentage', highestWinPctPlayer, highestWinPctPlayer ? `${highestWinPctPlayer.winPercentage}%` : '0%', 'Best winning percentage among players with 5+ matches'),
-            makeRecord('Most Matches Played', mostMatchesPlayer, mostMatchesPlayer?.matchesPlayed || 0, 'Total matches competed in across all types'),
-            makeRecord('Fewest Losses (10+ matches)', fewestLossesPlayer, fewestLossesPlayer?.losses || 0, 'Fewest losses among players with 10+ matches played'),
+            makeRecord('Most Career Wins', mostWinsWrestler, mostWinsWrestler?.wins || 0, 'All-time leader in total victories across all match types'),
+            makeRecord('Highest Win Percentage', highestWinPctWrestler, highestWinPctWrestler ? `${highestWinPctWrestler.winPercentage}%` : '0%', 'Best winning percentage among wrestlers with 5+ matches'),
+            makeRecord('Most Matches Played', mostMatchesWrestler, mostMatchesWrestler?.matchesPlayed || 0, 'Total matches competed in across all types'),
+            makeRecord('Fewest Losses (10+ matches)', fewestLossesWrestler, fewestLossesWrestler?.losses || 0, 'Fewest losses among wrestlers with 10+ matches played'),
           ],
           championships: [
-            makeRecord('Most Championship Wins', mostChampWinsPlayer, mostChampWinsPlayer?.champWins || 0, 'Most championship victories across all titles'),
-            makeRecord('Longest Single Reign', longestReignPlayer, longestReignRecord ? `${longestReignRecord.days} days` : '0 days', 'Longest consecutive championship reign'),
-            makeRecord('Most Title Defenses', mostDefensesPlayer, mostDefensesPlayer?.totalDefenses || 0, 'Most successful title defenses across all reigns'),
-            makeRecord('Most Defenses in Single Reign', mostDefensesInReignPlayer, mostDefensesInReign?.defenses || 0, 'Most title defenses during a single championship reign'),
+            makeRecord('Most Championship Wins', mostChampWinsWrestler, mostChampWinsWrestler?.champWins || 0, 'Most championship victories across all titles'),
+            makeRecord('Longest Single Reign', longestReignWrestler, longestReignRecord ? `${longestReignRecord.days} days` : '0 days', 'Longest consecutive championship reign'),
+            makeRecord('Most Title Defenses', mostDefensesWrestler, mostDefensesWrestler?.totalDefenses || 0, 'Most successful title defenses across all reigns'),
+            makeRecord('Most Defenses in Single Reign', mostDefensesInReignWrestler, mostDefensesInReign?.defenses || 0, 'Most title defenses during a single championship reign'),
           ],
           streaks: [
-            makeRecord('Longest Win Streak', longestWinStreakPlayer, longestWinStreakPlayer?.longestWinStreak || 0, 'Most consecutive victories without a loss or draw'),
-            makeRecord('Longest Active Win Streak', longestActiveStreakPlayer, longestActiveStreakPlayer?.currentWinStreak || 0, 'Current longest active winning streak'),
-            makeRecord('Longest Loss Streak', longestLossStreakPlayer, longestLossStreakPlayer?.longestLossStreak || 0, 'Most consecutive losses (a record nobody wants)'),
-            makeRecord('Longest Unbeaten Streak', longestUnbeatenPlayer, longestUnbeatenPlayer?.longestWinStreak || 0, 'Most consecutive matches without a loss (wins + draws)'),
+            makeRecord('Longest Win Streak', longestWinStreakWrestler, longestWinStreakWrestler?.longestWinStreak || 0, 'Most consecutive victories without a loss or draw'),
+            makeRecord('Longest Active Win Streak', longestActiveStreakWrestler, longestActiveStreakWrestler?.currentWinStreak || 0, 'Current longest active winning streak'),
+            makeRecord('Longest Loss Streak', longestLossStreakWrestler, longestLossStreakWrestler?.longestLossStreak || 0, 'Most consecutive losses (a record nobody wants)'),
+            makeRecord('Longest Unbeaten Streak', longestUnbeatenWrestler, longestUnbeatenWrestler?.longestWinStreak || 0, 'Most consecutive matches without a loss (wins + draws)'),
           ],
           matchTypes: [
             makeRecord('Most Singles Wins', mostSinglesWins, mostSinglesWins?.wins || 0, 'Most victories in singles competition'),
@@ -627,38 +619,38 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         };
 
         // Active threats - find runner-ups
-        const activeThreats: { recordName: string; currentHolder: string; currentValue: number | string; threatPlayer: string; threatValue: number | string; gapDescription: string }[] = [];
+        const activeThreats: { recordName: string; currentHolder: string; currentValue: number | string; threatWrestler: string; threatValue: number | string; gapDescription: string }[] = [];
 
-        const sortedByWins = [...allPlayerStats].sort((a, b) => b.wins - a.wins);
+        const sortedByWins = [...allWrestlerStats].sort((a, b) => b.wins - a.wins);
         if (sortedByWins.length >= 2) {
           activeThreats.push({
             recordName: 'Most Career Wins',
-            currentHolder: `${sortedByWins[0].name} (${sortedByWins[0].currentWrestler})`,
+            currentHolder: sortedByWins[0].name,
             currentValue: sortedByWins[0].wins,
-            threatPlayer: `${sortedByWins[1].name} (${sortedByWins[1].currentWrestler})`,
+            threatWrestler: sortedByWins[1].name,
             threatValue: sortedByWins[1].wins,
             gapDescription: `${sortedByWins[0].wins - sortedByWins[1].wins} wins behind`,
           });
         }
 
-        if (longestActiveStreakPlayer && longestActiveStreakPlayer.currentWinStreak > 0) {
+        if (longestActiveStreakWrestler && longestActiveStreakWrestler.currentWinStreak > 0) {
           activeThreats.push({
             recordName: 'Longest Win Streak',
-            currentHolder: `${longestWinStreakPlayer.name} (${longestWinStreakPlayer.currentWrestler})`,
-            currentValue: longestWinStreakPlayer.longestWinStreak,
-            threatPlayer: `${longestActiveStreakPlayer.name} (${longestActiveStreakPlayer.currentWrestler})`,
-            threatValue: `${longestActiveStreakPlayer.currentWinStreak} active`,
-            gapDescription: `Currently on a ${longestActiveStreakPlayer.currentWinStreak}-match streak`,
+            currentHolder: longestWinStreakWrestler.name,
+            currentValue: longestWinStreakWrestler.longestWinStreak,
+            threatWrestler: longestActiveStreakWrestler.name,
+            threatValue: `${longestActiveStreakWrestler.currentWinStreak} active`,
+            gapDescription: `Currently on a ${longestActiveStreakWrestler.currentWinStreak}-match streak`,
           });
         }
 
-        const sortedByChampWins = [...playerChampWins].sort((a, b) => b.champWins - a.champWins);
+        const sortedByChampWins = [...wrestlerChampWins].sort((a, b) => b.champWins - a.champWins);
         if (sortedByChampWins.length >= 2 && sortedByChampWins[0].champWins > 0) {
           activeThreats.push({
             recordName: 'Most Championship Wins',
-            currentHolder: `${sortedByChampWins[0].name} (${sortedByChampWins[0].currentWrestler})`,
+            currentHolder: sortedByChampWins[0].name,
             currentValue: sortedByChampWins[0].champWins,
-            threatPlayer: `${sortedByChampWins[1].name} (${sortedByChampWins[1].currentWrestler})`,
+            threatWrestler: sortedByChampWins[1].name,
             threatValue: sortedByChampWins[1].champWins,
             gapDescription: `${sortedByChampWins[0].champWins - sortedByChampWins[1].champWins} title win(s) behind`,
           });
@@ -668,23 +660,23 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       }
 
       case 'achievements': {
-        const playerId = event.queryStringParameters?.playerId;
+        const wrestlerId = event.queryStringParameters?.wrestlerId;
 
-        const playerList = players.map((p) => ({
-          playerId: p.playerId,
+        const wrestlerList = wrestlers.map((p) => ({
+          wrestlerId: p.wrestlerId,
           name: p.name,
-          wrestlerName: p.currentWrestler,
+          wrestlerName: p.name,
         }));
 
-        if (!playerId) {
-          return success({ players: playerList, allAchievements: getAllAchievementDefinitions() });
+        if (!wrestlerId) {
+          return success({ wrestlers: wrestlerList, allAchievements: getAllAchievementDefinitions() });
         }
 
         const statTypes = ['overall', 'singles', 'tag', 'ladder', 'cage'] as const;
         const stats = statTypes.map((statType) => ({
-          playerId,
+          wrestlerId,
           statType,
-          ...computePlayerStatistics(completedMatches, playerId, statType),
+          ...computeWrestlerStatistics(completedMatches, wrestlerId, statType),
           updatedAt: new Date().toISOString(),
         }));
 
@@ -698,14 +690,14 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         });
         const championships = championshipsResult as unknown as ChampionshipRecord[];
 
-        const playerChampHistory = champHistory.filter((h) => {
+        const wrestlerChampHistory = champHistory.filter((h) => {
           const champ = h.champion;
-          if (Array.isArray(champ)) return champ.includes(playerId);
-          return champ === playerId;
+          if (Array.isArray(champ)) return champ.includes(wrestlerId);
+          return champ === wrestlerId;
         });
 
         const champGroups: Record<string, ChampionshipHistoryRecord[]> = {};
-        for (const h of playerChampHistory) {
+        for (const h of wrestlerChampHistory) {
           if (!champGroups[h.championshipId]) champGroups[h.championshipId] = [];
           champGroups[h.championshipId].push(h);
         }
@@ -715,8 +707,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           const championship = championships.find((c) => c.championshipId === champId);
           const currentChamp = championship?.currentChampion;
           const isCurrentlyHolding = Array.isArray(currentChamp)
-            ? currentChamp.includes(playerId)
-            : currentChamp === playerId;
+            ? currentChamp.includes(wrestlerId)
+            : currentChamp === wrestlerId;
 
           const reignDays = reigns.map((r) => {
             if (r.daysHeld != null) return r.daysHeld;
@@ -726,7 +718,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           });
 
           return {
-            playerId,
+            wrestlerId,
             championshipId: champId,
             totalReigns: reigns.length,
             totalDaysHeld: reignDays.reduce((a, b) => a + b, 0),
@@ -738,20 +730,20 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           };
         });
 
-        const playerAchievements = computeAchievements(
-          playerId,
+        const wrestlerAchievements = computeAchievements(
+          wrestlerId,
           stats,
           championshipStats,
           completedMatches,
           champHistory,
           championships,
-          players
+          wrestlers
         );
 
         return success({
-          players: playerList,
+          wrestlers: wrestlerList,
           allAchievements: getAllAchievementDefinitions(),
-          achievements: playerAchievements,
+          achievements: wrestlerAchievements,
         });
       }
 
@@ -772,23 +764,23 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           losers: m.losers,
         }));
 
-        const playerRatingSums = new Map<string, { sum: number; count: number }>();
+        const wrestlerRatingSums = new Map<string, { sum: number; count: number }>();
         for (const m of ratedMatches) {
           const rating = m.starRating ?? 0;
           for (const pid of m.participants) {
-            const cur = playerRatingSums.get(pid) ?? { sum: 0, count: 0 };
-            playerRatingSums.set(pid, { sum: cur.sum + rating, count: cur.count + 1 });
+            const cur = wrestlerRatingSums.get(pid) ?? { sum: 0, count: 0 };
+            wrestlerRatingSums.set(pid, { sum: cur.sum + rating, count: cur.count + 1 });
           }
         }
-        const playerAverageRatings = Array.from(playerRatingSums.entries()).map(([playerId, { sum, count }]) => ({
-          playerId,
+        const wrestlerAverageRatings = Array.from(wrestlerRatingSums.entries()).map(([wrestlerId, { sum, count }]) => ({
+          wrestlerId,
           averageRating: Math.round((sum / count) * 10) / 10,
           matchCount: count,
         })).sort((a, b) => b.averageRating - a.averageRating);
 
         return success({
           highestRatedMatches,
-          playerAverageRatings,
+          wrestlerAverageRatings,
         });
       }
 
@@ -834,13 +826,12 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           return true;
         });
 
-        const leaderboard = players
+        const leaderboard = wrestlers
           .map((p) => {
-            const stats = computePlayerStatistics(filteredMatches, p.playerId, 'overall');
+            const stats = computeWrestlerStatistics(filteredMatches, p.wrestlerId, 'overall');
             return {
-              playerId: p.playerId,
-              playerName: p.name,
-              wrestlerName: p.currentWrestler,
+              wrestlerId: p.wrestlerId,
+              wrestlerName: p.name,
               wins: stats.wins,
               losses: stats.losses,
               draws: stats.draws,
@@ -868,7 +859,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       }
 
       default:
-        return badRequest(`Unknown section: ${section}. Valid sections: player-stats, head-to-head, leaderboards, records, achievements, match-ratings, match-types`);
+        return badRequest(`Unknown section: ${section}. Valid sections: wrestler-stats, head-to-head, leaderboards, records, achievements, match-ratings, match-types`);
     }
   } catch (err) {
     console.error('Error computing statistics:', err);
@@ -900,15 +891,15 @@ function getAllAchievementDefinitions() {
 }
 
 function computeAchievements(
-  playerId: string,
+  wrestlerId: string,
   stats: { statType: string; wins: number; matchesPlayed: number; longestWinStreak: number; longestLossStreak: number; championshipWins: number }[],
   championshipStats: { championshipId: string; totalReigns: number; longestReign: number; totalDaysHeld: number }[],
   completedMatches: MatchRecord[],
   allChampHistory: ChampionshipHistoryRecord[],
   allChampionships: ChampionshipRecord[],
-  _players: PlayerRecord[]
+  _wrestlers: WrestlerRecord[]
 ) {
-  const earned: { playerId: string; achievementId: string; achievementName: string; achievementType: string; description: string; earnedAt: string; icon: string; metadata?: Record<string, unknown> }[] = [];
+  const earned: { wrestlerId: string; achievementId: string; achievementName: string; achievementType: string; description: string; earnedAt: string; icon: string; metadata?: Record<string, unknown> }[] = [];
   const overall = stats.find((s) => s.statType === 'overall');
   const cageStats = stats.find((s) => s.statType === 'cage');
   const now = new Date().toISOString().split('T')[0];
@@ -917,44 +908,44 @@ function computeAchievements(
 
   // a1: First Victory - win >= 1
   if (overall.wins >= 1) {
-    earned.push({ playerId, achievementId: 'a1', achievementName: 'First Victory', achievementType: 'milestone', description: 'Win your first match', earnedAt: now, icon: '🏆' });
+    earned.push({ wrestlerId, achievementId: 'a1', achievementName: 'First Victory', achievementType: 'milestone', description: 'Win your first match', earnedAt: now, icon: '🏆' });
   }
 
   // a2: Double Digits - 10 wins
   if (overall.wins >= 10) {
-    earned.push({ playerId, achievementId: 'a2', achievementName: 'Double Digits', achievementType: 'milestone', description: 'Reach 10 wins', earnedAt: now, icon: '🔟' });
+    earned.push({ wrestlerId, achievementId: 'a2', achievementName: 'Double Digits', achievementType: 'milestone', description: 'Reach 10 wins', earnedAt: now, icon: '🔟' });
   }
 
   // a3: Half Century - 50 wins
   if (overall.wins >= 50) {
-    earned.push({ playerId, achievementId: 'a3', achievementName: 'Half Century', achievementType: 'milestone', description: 'Reach 50 wins', earnedAt: now, icon: '5️⃣' });
+    earned.push({ wrestlerId, achievementId: 'a3', achievementName: 'Half Century', achievementType: 'milestone', description: 'Reach 50 wins', earnedAt: now, icon: '5️⃣' });
   }
 
   // a4/a5: Century Mark / Iron Man - 100 matches
   if (overall.matchesPlayed >= 100) {
-    earned.push({ playerId, achievementId: 'a4', achievementName: 'Century Mark', achievementType: 'milestone', description: 'Play 100 matches', earnedAt: now, icon: '💯' });
-    earned.push({ playerId, achievementId: 'a5', achievementName: 'Iron Man', achievementType: 'milestone', description: 'Play 100 matches', earnedAt: now, icon: '💯' });
+    earned.push({ wrestlerId, achievementId: 'a4', achievementName: 'Century Mark', achievementType: 'milestone', description: 'Play 100 matches', earnedAt: now, icon: '💯' });
+    earned.push({ wrestlerId, achievementId: 'a5', achievementName: 'Iron Man', achievementType: 'milestone', description: 'Play 100 matches', earnedAt: now, icon: '💯' });
   }
 
   // a18: Best in the World - 10+ win streak
   if (overall.longestWinStreak >= 10) {
-    earned.push({ playerId, achievementId: 'a18', achievementName: 'Best in the World', achievementType: 'milestone', description: 'Achieve a 10+ win streak', earnedAt: now, icon: '🌍', metadata: { streakLength: overall.longestWinStreak } });
+    earned.push({ wrestlerId, achievementId: 'a18', achievementName: 'Best in the World', achievementType: 'milestone', description: 'Achieve a 10+ win streak', earnedAt: now, icon: '🌍', metadata: { streakLength: overall.longestWinStreak } });
   }
 
   // a6: Unstoppable Force - 15 match win streak
   if (overall.longestWinStreak >= 15) {
-    earned.push({ playerId, achievementId: 'a6', achievementName: 'Unstoppable Force', achievementType: 'record', description: 'Win 15 matches in a row', earnedAt: now, icon: '🔥' });
+    earned.push({ wrestlerId, achievementId: 'a6', achievementName: 'Unstoppable Force', achievementType: 'record', description: 'Win 15 matches in a row', earnedAt: now, icon: '🔥' });
   }
 
   // a7: Dominant Champion - 180+ day reign
   const hasLongReign = championshipStats.some((cs) => cs.longestReign >= 180);
   if (hasLongReign) {
-    earned.push({ playerId, achievementId: 'a7', achievementName: 'Dominant Champion', achievementType: 'record', description: 'Hold a championship for 180+ days', earnedAt: now, icon: '👑' });
+    earned.push({ wrestlerId, achievementId: 'a7', achievementName: 'Dominant Champion', achievementType: 'record', description: 'Hold a championship for 180+ days', earnedAt: now, icon: '👑' });
   }
 
   // a8: Title Collector - 9+ championship wins
   if (overall.championshipWins >= 9) {
-    earned.push({ playerId, achievementId: 'a8', achievementName: 'Title Collector', achievementType: 'record', description: 'Win championships 9 or more times', earnedAt: now, icon: '🎖️' });
+    earned.push({ wrestlerId, achievementId: 'a8', achievementName: 'Title Collector', achievementType: 'record', description: 'Win championships 9 or more times', earnedAt: now, icon: '🎖️' });
   }
 
   // a9: Grand Slam - hold every championship at least once
@@ -966,27 +957,27 @@ function computeAchievements(
     const heldChampionships = new Set(championshipStats.filter((cs) => cs.totalReigns > 0).map((cs) => cs.championshipId));
     const hasAll = activeChampionships.every((c) => heldChampionships.has(c.championshipId));
     if (hasAll) {
-      earned.push({ playerId, achievementId: 'a9', achievementName: 'Grand Slam', achievementType: 'record', description: 'Hold every championship at least once', earnedAt: now, icon: '🏅' });
+      earned.push({ wrestlerId, achievementId: 'a9', achievementName: 'Grand Slam', achievementType: 'record', description: 'Hold every championship at least once', earnedAt: now, icon: '🏅' });
     }
   }
 
   // a12: Cage Master - 5+ cage match wins
   if (cageStats && cageStats.wins >= 5) {
-    earned.push({ playerId, achievementId: 'a12', achievementName: 'Cage Master', achievementType: 'special', description: 'Win 5+ cage matches', earnedAt: now, icon: '🔒' });
+    earned.push({ wrestlerId, achievementId: 'a12', achievementName: 'Cage Master', achievementType: 'special', description: 'Win 5+ cage matches', earnedAt: now, icon: '🔒' });
   }
 
   // a13: Deadman Walking - win after losing 4 in a row
   if (overall.longestLossStreak >= 4 && overall.wins > 0) {
     // Check if there's a win after a 4+ loss streak
-    const playerMatches = completedMatches
-      .filter((m) => m.participants.includes(playerId))
+    const wrestlerMatches = completedMatches
+      .filter((m) => m.participants.includes(wrestlerId))
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     let lossStreak = 0;
     let hadComebackAfterFour = false;
-    for (const m of playerMatches) {
-      if (m.losers?.includes(playerId)) {
+    for (const m of wrestlerMatches) {
+      if (m.losers?.includes(wrestlerId)) {
         lossStreak++;
-      } else if (m.winners?.includes(playerId)) {
+      } else if (m.winners?.includes(wrestlerId)) {
         if (lossStreak >= 4) hadComebackAfterFour = true;
         lossStreak = 0;
       } else {
@@ -994,7 +985,7 @@ function computeAchievements(
       }
     }
     if (hadComebackAfterFour) {
-      earned.push({ playerId, achievementId: 'a13', achievementName: 'Deadman Walking', achievementType: 'special', description: 'Win a match after losing 4 in a row', earnedAt: now, icon: '💀' });
+      earned.push({ wrestlerId, achievementId: 'a13', achievementName: 'Deadman Walking', achievementType: 'special', description: 'Win a match after losing 4 in a row', earnedAt: now, icon: '💀' });
     }
   }
 
@@ -1003,13 +994,13 @@ function computeAchievements(
     allChampHistory
       .filter((h) => {
         const champ = h.champion;
-        if (Array.isArray(champ)) return champ.includes(playerId);
-        return champ === playerId;
+        if (Array.isArray(champ)) return champ.includes(wrestlerId);
+        return champ === wrestlerId;
       })
       .map((h) => h.championshipId)
   );
   if (uniqueChampionships.size >= 3) {
-    earned.push({ playerId, achievementId: 'a15', achievementName: 'Peoples Champion', achievementType: 'special', description: 'Win 3 different championships', earnedAt: now, icon: '🎤' });
+    earned.push({ wrestlerId, achievementId: 'a15', achievementName: 'Peoples Champion', achievementType: 'special', description: 'Win 3 different championships', earnedAt: now, icon: '🎤' });
   }
 
   return earned;

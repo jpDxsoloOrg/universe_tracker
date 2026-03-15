@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { statisticsApi, seasonsApi } from '../../services/api';
-import type { StatsPlayer, HeadToHeadResponse } from '../../services/api';
+import type { StatsWrestler, HeadToHeadResponse } from '../../services/api';
 import type { Season } from '../../types';
 import Skeleton from '../ui/Skeleton';
 import SeasonSelector from './SeasonSelector';
@@ -18,32 +18,32 @@ interface StatRow {
 
 function TaleOfTheTape() {
   const { t } = useTranslation();
-  const [players, setPlayers] = useState<StatsPlayer[]>([]);
-  const [player1Id, setPlayer1Id] = useState('');
-  const [player2Id, setPlayer2Id] = useState('');
+  const [wrestlers, setWrestlers] = useState<StatsWrestler[]>([]);
+  const [wrestler1Id, setWrestler1Id] = useState('');
+  const [wrestler2Id, setWrestler2Id] = useState('');
   const [data, setData] = useState<HeadToHeadResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [selectedSeasonId, setSelectedSeasonId] = useState('');
 
-  // Load player list and seasons on mount
+  // Load wrestler list and seasons on mount
   useEffect(() => {
     const abortController = new AbortController();
     const fetchData = async () => {
       try {
-        const [playersResult, seasonsResult] = await Promise.all([
-          statisticsApi.getHeadToHeadPlayers(abortController.signal),
+        const [wrestlersResult, seasonsResult] = await Promise.all([
+          statisticsApi.getHeadToHeadWrestlers(abortController.signal),
           seasonsApi.getAll(abortController.signal),
         ]);
-        setPlayers(playersResult.players);
+        setWrestlers(wrestlersResult.wrestlers);
         setSeasons(seasonsResult);
-        if (playersResult.players.length >= 2 && playersResult.players[0] && playersResult.players[1]) {
-          setPlayer1Id(playersResult.players[0].playerId);
-          setPlayer2Id(playersResult.players[1].playerId);
+        if (wrestlersResult.wrestlers.length >= 2 && wrestlersResult.wrestlers[0] && wrestlersResult.wrestlers[1]) {
+          setWrestler1Id(wrestlersResult.wrestlers[0].wrestlerId);
+          setWrestler2Id(wrestlersResult.wrestlers[1].wrestlerId);
         }
       } catch (err: unknown) {
         if (err instanceof Error && err.name !== 'AbortError') {
-          console.error('Failed to load players', err);
+          console.error('Failed to load wrestlers', err);
         }
       } finally {
         setLoading(false);
@@ -53,9 +53,9 @@ function TaleOfTheTape() {
     return () => abortController.abort();
   }, []);
 
-  // Load comparison data when players or season change
+  // Load comparison data when wrestlers or season change
   useEffect(() => {
-    if (!player1Id || !player2Id || player1Id === player2Id) {
+    if (!wrestler1Id || !wrestler2Id || wrestler1Id === wrestler2Id) {
       setData(null);
       return;
     }
@@ -64,7 +64,7 @@ function TaleOfTheTape() {
       setLoading(true);
       try {
         const result = await statisticsApi.getHeadToHead(
-          player1Id, player2Id, selectedSeasonId || undefined, abortController.signal
+          wrestler1Id, wrestler2Id, selectedSeasonId || undefined, abortController.signal
         );
         setData(result);
       } catch (err: unknown) {
@@ -77,18 +77,18 @@ function TaleOfTheTape() {
     };
     fetchData();
     return () => abortController.abort();
-  }, [player1Id, player2Id, selectedSeasonId]);
+  }, [wrestler1Id, wrestler2Id, selectedSeasonId]);
 
-  const player1 = useMemo(() => players.find((p) => p.playerId === player1Id), [players, player1Id]);
-  const player2 = useMemo(() => players.find((p) => p.playerId === player2Id), [players, player2Id]);
+  const wrestler1 = useMemo(() => wrestlers.find((p) => p.wrestlerId === wrestler1Id), [wrestlers, wrestler1Id]);
+  const wrestler2 = useMemo(() => wrestlers.find((p) => p.wrestlerId === wrestler2Id), [wrestlers, wrestler2Id]);
 
-  const p1Stats = data?.player1Stats;
-  const p2Stats = data?.player2Stats;
+  const p1Stats = data?.wrestler1Stats;
+  const p2Stats = data?.wrestler2Stats;
   const h2h = data?.headToHead;
 
-  const isSwapped = h2h ? h2h.player1Id !== player1Id : false;
-  const p1H2HWins = h2h ? (isSwapped ? h2h.player2Wins : h2h.player1Wins) : 0;
-  const p2H2HWins = h2h ? (isSwapped ? h2h.player1Wins : h2h.player2Wins) : 0;
+  const isSwapped = h2h ? h2h.wrestler1Id !== wrestler1Id : false;
+  const p1H2HWins = h2h ? (isSwapped ? h2h.wrestler2Wins : h2h.wrestler1Wins) : 0;
+  const p2H2HWins = h2h ? (isSwapped ? h2h.wrestler1Wins : h2h.wrestler2Wins) : 0;
 
   const statRows: StatRow[] = useMemo(() => {
     if (!p1Stats || !p2Stats) return [];
@@ -163,7 +163,7 @@ function TaleOfTheTape() {
     );
   }
 
-  if (loading && players.length === 0) {
+  if (loading && wrestlers.length === 0) {
     return (
       <div className="tale-of-tape">
         <h2>{t('statistics.taleOfTape.title')}</h2>
@@ -177,48 +177,48 @@ function TaleOfTheTape() {
       <div className="tot-header">
         <h2>{t('statistics.taleOfTape.title')}</h2>
         <div className="tot-nav-links">
-          <Link to="/stats">{t('statistics.nav.playerStats')}</Link>
+          <Link to="/stats">{t('statistics.nav.wrestlerStats')}</Link>
           <Link to="/stats/head-to-head">{t('statistics.nav.headToHead')}</Link>
           <Link to="/stats/leaderboards">{t('statistics.nav.leaderboards')}</Link>
         </div>
       </div>
 
-      {/* Player Dropdowns */}
+      {/* Wrestler Dropdowns */}
       <div className="tot-selectors">
         <div className="tot-corner tot-corner-left">
           <select
-            value={player1Id}
-            onChange={(e) => setPlayer1Id(e.target.value)}
+            value={wrestler1Id}
+            onChange={(e) => setWrestler1Id(e.target.value)}
           >
-            {players.map((p) => (
-              <option key={p.playerId} value={p.playerId}>
+            {wrestlers.map((p) => (
+              <option key={p.wrestlerId} value={p.wrestlerId}>
                 {p.name} ({p.wrestlerName})
               </option>
             ))}
           </select>
           <div className="tot-corner-name">
-            {player1?.name}
+            {wrestler1?.name}
           </div>
-          <div className="tot-corner-wrestler">{player1?.wrestlerName}</div>
+          <div className="tot-corner-wrestler">{wrestler1?.wrestlerName}</div>
         </div>
 
         <div className="tot-vs-badge">{t('common.vs')}</div>
 
         <div className="tot-corner tot-corner-right">
           <select
-            value={player2Id}
-            onChange={(e) => setPlayer2Id(e.target.value)}
+            value={wrestler2Id}
+            onChange={(e) => setWrestler2Id(e.target.value)}
           >
-            {players.map((p) => (
-              <option key={p.playerId} value={p.playerId}>
+            {wrestlers.map((p) => (
+              <option key={p.wrestlerId} value={p.wrestlerId}>
                 {p.name} ({p.wrestlerName})
               </option>
             ))}
           </select>
           <div className="tot-corner-name">
-            {player2?.name}
+            {wrestler2?.name}
           </div>
-          <div className="tot-corner-wrestler">{player2?.wrestlerName}</div>
+          <div className="tot-corner-wrestler">{wrestler2?.wrestlerName}</div>
         </div>
       </div>
 
@@ -228,8 +228,8 @@ function TaleOfTheTape() {
         onSeasonChange={setSelectedSeasonId}
       />
 
-      {player1Id === player2Id ? (
-        <div className="tot-same-player">{t('statistics.headToHead.selectDifferent')}</div>
+      {wrestler1Id === wrestler2Id ? (
+        <div className="tot-same-wrestler">{t('statistics.headToHead.selectDifferent')}</div>
       ) : loading ? (
         <Skeleton variant="block" count={4} />
       ) : (
@@ -238,9 +238,9 @@ function TaleOfTheTape() {
           {p1Stats && p2Stats && (
             <div className="tot-card tot-tape-card">
               <div className="tot-tape-header">
-                <span className="tot-tape-p1">{player1?.wrestlerName}</span>
+                <span className="tot-tape-p1">{wrestler1?.wrestlerName}</span>
                 <span className="tot-tape-title">{t('statistics.taleOfTape.comparison')}</span>
-                <span className="tot-tape-p2">{player2?.wrestlerName}</span>
+                <span className="tot-tape-p2">{wrestler2?.wrestlerName}</span>
               </div>
               <div className="tot-tape-divider" />
               {statRows.map((row) => renderTapeRow(row))}
@@ -252,17 +252,17 @@ function TaleOfTheTape() {
             <div className="tot-card tot-h2h-card">
               <h3>{t('statistics.headToHead.headToHeadRecord')}</h3>
               <div className="tot-h2h-summary">
-                <div className="tot-h2h-player">
-                  <span className="tot-h2h-name">{player1?.name}</span>
+                <div className="tot-h2h-wrestler">
+                  <span className="tot-h2h-name">{wrestler1?.name}</span>
                   <span className="tot-h2h-wins">{p1H2HWins}</span>
                 </div>
                 <div className="tot-h2h-center">
                   <span className="tot-h2h-draws">{h2h.draws} {t('statistics.labels.draws')}</span>
                   <span className="tot-h2h-total">{h2h.totalMatches} {t('statistics.labels.totalMatches')}</span>
                 </div>
-                <div className="tot-h2h-player">
+                <div className="tot-h2h-wrestler">
                   <span className="tot-h2h-wins">{p2H2HWins}</span>
-                  <span className="tot-h2h-name">{player2?.name}</span>
+                  <span className="tot-h2h-name">{wrestler2?.name}</span>
                 </div>
               </div>
             </div>
@@ -273,25 +273,25 @@ function TaleOfTheTape() {
             <div className="tot-card tot-advantages-card">
               <h3>{t('statistics.taleOfTape.advantagesSummary')}</h3>
               <div className="tot-adv-row">
-                <div className={`tot-adv-player ${p1Advantages > p2Advantages ? 'tot-adv-leader' : ''}`}>
+                <div className={`tot-adv-wrestler ${p1Advantages > p2Advantages ? 'tot-adv-leader' : ''}`}>
                   <span className="tot-adv-count">{p1Advantages}</span>
-                  <span className="tot-adv-name">{player1?.name}</span>
+                  <span className="tot-adv-name">{wrestler1?.name}</span>
                 </div>
                 <div className="tot-adv-middle">
                   <span className="tot-adv-tied">
                     {statRows.length - p1Advantages - p2Advantages} {t('statistics.taleOfTape.tied')}
                   </span>
                 </div>
-                <div className={`tot-adv-player ${p2Advantages > p1Advantages ? 'tot-adv-leader' : ''}`}>
+                <div className={`tot-adv-wrestler ${p2Advantages > p1Advantages ? 'tot-adv-leader' : ''}`}>
                   <span className="tot-adv-count">{p2Advantages}</span>
-                  <span className="tot-adv-name">{player2?.name}</span>
+                  <span className="tot-adv-name">{wrestler2?.name}</span>
                 </div>
               </div>
               <div className="tot-adv-verdict">
                 {p1Advantages > p2Advantages
-                  ? `${player1?.name} (${player1?.wrestlerName}) ${t('statistics.taleOfTape.hasTheEdge')}`
+                  ? `${wrestler1?.name} (${wrestler1?.wrestlerName}) ${t('statistics.taleOfTape.hasTheEdge')}`
                   : p2Advantages > p1Advantages
-                    ? `${player2?.name} (${player2?.wrestlerName}) ${t('statistics.taleOfTape.hasTheEdge')}`
+                    ? `${wrestler2?.name} (${wrestler2?.wrestlerName}) ${t('statistics.taleOfTape.hasTheEdge')}`
                     : t('statistics.taleOfTape.evenlyMatched')}
               </div>
             </div>

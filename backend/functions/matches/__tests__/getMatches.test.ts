@@ -115,20 +115,20 @@ describe('getMatches', () => {
     expect(callArgs.ExpressionAttributeValues).toBeUndefined();
   });
 
-  it('filters by playerId using contains on participants', async () => {
+  it('filters by wrestlerId using contains on participants', async () => {
     mockScan.mockResolvedValue({ Items: [] });
 
     const event = makeEvent({
-      queryStringParameters: { playerId: 'p1' },
+      queryStringParameters: { wrestlerId: 'p1' },
     });
 
     await getMatches(event, ctx, cb);
 
     expect(mockScan).toHaveBeenCalledWith(
       expect.objectContaining({
-        FilterExpression: 'contains(#participants, :playerId)',
+        FilterExpression: 'contains(#participants, :wrestlerId)',
         ExpressionAttributeNames: expect.objectContaining({ '#participants': 'participants' }),
-        ExpressionAttributeValues: expect.objectContaining({ ':playerId': 'p1' }),
+        ExpressionAttributeValues: expect.objectContaining({ ':wrestlerId': 'p1' }),
       }),
     );
   });
@@ -338,7 +338,7 @@ describe('getMatches', () => {
     const event = makeEvent({
       queryStringParameters: {
         status: 'completed',
-        playerId: 'p1',
+        wrestlerId: 'p1',
         matchType: 'Singles',
         seasonId: 's1',
       },
@@ -349,7 +349,7 @@ describe('getMatches', () => {
     const callArgs = mockScan.mock.calls[0][0];
     const filterExpr = callArgs.FilterExpression as string;
     expect(filterExpr).toContain('#status = :status');
-    expect(filterExpr).toContain('contains(#participants, :playerId)');
+    expect(filterExpr).toContain('contains(#participants, :wrestlerId)');
     expect(filterExpr).toContain('#seasonId = :seasonId');
     expect(filterExpr.split(' AND ')).toHaveLength(3);
   });

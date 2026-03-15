@@ -71,7 +71,7 @@
   margin-top: 1.2rem;
 }
 
-.h2h-same-player {
+.h2h-same-wrestler {
   text-align: center;
   color: #bbb;
   padding: 3rem;
@@ -93,7 +93,7 @@
 }
 
 /* Stat Bars */
-.h2h-player-names {
+.h2h-wrestler-names {
   display: flex;
   justify-content: space-between;
   margin-bottom: 1rem;
@@ -198,7 +198,7 @@
   margin-bottom: 1rem;
 }
 
-.h2h-record-player {
+.h2h-record-wrestler {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -302,7 +302,7 @@
   margin-bottom: 1.5rem;
 }
 
-.h2h-edge-player {
+.h2h-edge-wrestler {
   display: flex;
   flex-direction: column;
   align-items: center;

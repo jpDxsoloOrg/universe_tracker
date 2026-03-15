@@ -4,7 +4,7 @@ import { success, badRequest, notFound, serverError } from '../../lib/response';
 
 interface ContenderRanking {
   championshipId: string;
-  playerId: string;
+  wrestlerId: string;
   rank: number;
   rankingScore: number;
   winPercentage: number;
@@ -15,10 +15,9 @@ interface ContenderRanking {
   calculatedAt: string;
 }
 
-interface Player {
-  playerId: string;
+interface Wrestler {
+  wrestlerId: string;
   name: string;
-  currentWrestler: string;
   imageUrl?: string;
 }
 
@@ -58,36 +57,36 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const rankings = rankingsResult as unknown as ContenderRanking[];
 
     // ------------------------------------------------------------------
-    // 3. Collect all player IDs to fetch (contenders + current champion)
+    // 3. Collect all wrestler IDs to fetch (contenders + current champion)
     // ------------------------------------------------------------------
-    const playerIds = new Set<string>();
+    const wrestlerIds = new Set<string>();
     for (const ranking of rankings) {
-      playerIds.add(ranking.playerId);
+      wrestlerIds.add(ranking.wrestlerId);
     }
 
     const currentChampion = championship.currentChampion as string | string[] | undefined;
     if (currentChampion) {
       if (Array.isArray(currentChampion)) {
-        currentChampion.forEach((id) => playerIds.add(id));
+        currentChampion.forEach((id) => wrestlerIds.add(id));
       } else {
-        playerIds.add(currentChampion);
+        wrestlerIds.add(currentChampion);
       }
     }
 
     // ------------------------------------------------------------------
-    // 4. Fetch all required player records
+    // 4. Fetch all required wrestler records
     // ------------------------------------------------------------------
-    const playersMap = new Map<string, Player>();
+    const wrestlersMap = new Map<string, Wrestler>();
 
-    for (const playerId of playerIds) {
-      const playerResult = await dynamoDb.get({
-        TableName: TableNames.PLAYERS,
-        Key: { playerId },
+    for (const wrestlerId of wrestlerIds) {
+      const wrestlerResult = await dynamoDb.get({
+        TableName: TableNames.WRESTLERS,
+        Key: { wrestlerId },
       });
 
-      if (playerResult.Item) {
-        const player = playerResult.Item as unknown as Player;
-        playersMap.set(playerId, player);
+      if (wrestlerResult.Item) {
+        const wrestler = wrestlerResult.Item as unknown as Wrestler;
+        wrestlersMap.set(wrestlerId, wrestler);
       }
     }
 
@@ -98,22 +97,19 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     if (currentChampion) {
       const championId = Array.isArray(currentChampion) ? currentChampion[0] : currentChampion;
-      const championPlayer = playersMap.get(championId);
+      const championWrestler = wrestlersMap.get(championId);
 
-      if (championPlayer) {
+      if (championWrestler) {
         currentChampionData = {
-          playerId: championPlayer.playerId,
-          playerName: championPlayer.name,
-          wrestlerName: championPlayer.currentWrestler,
-          imageUrl: championPlayer.imageUrl || null,
+          wrestlerId: championWrestler.wrestlerId,
+          wrestlerName: championWrestler.name,
+          imageUrl: championWrestler.imageUrl || null,
         };
       }
     }
 
     // ------------------------------------------------------------------
     // 6. Build enriched contender list, excluding the current champion
-    //    (handles case where #1 contender became champion but rankings
-    //    haven't been recalculated yet)
     // ------------------------------------------------------------------
     const championIds = new Set<string>();
     if (currentChampion) {
@@ -125,11 +121,11 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     }
 
     const filteredRankings = rankings.filter(
-      (ranking) => !championIds.has(ranking.playerId),
+      (ranking) => !championIds.has(ranking.wrestlerId),
     );
 
     const contenders = filteredRankings.map((ranking, index) => {
-      const player = playersMap.get(ranking.playerId);
+      const wrestler = wrestlersMap.get(ranking.wrestlerId);
       const previousRank = ranking.previousRank ?? null;
       const isNew = previousRank === null || previousRank === undefined;
       const adjustedRank = index + 1; // Re-rank after filtering out champion
@@ -137,10 +133,9 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
       return {
         rank: adjustedRank,
-        playerId: ranking.playerId,
-        playerName: player?.name || 'Unknown',
-        wrestlerName: player?.currentWrestler || 'Unknown',
-        imageUrl: player?.imageUrl || null,
+        wrestlerId: ranking.wrestlerId,
+        wrestlerName: wrestler?.name || 'Unknown',
+        imageUrl: wrestler?.imageUrl || null,
         rankingScore: ranking.rankingScore,
         winPercentage: ranking.winPercentage,
         currentStreak: ranking.currentStreak,

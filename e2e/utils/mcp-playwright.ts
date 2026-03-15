@@ -99,7 +99,7 @@ export const mcpSelectors = {
   adminLogout: '.logout-btn',
 
   // Admin Tabs
-  tabPlayers: '.admin-tabs .tab:first-child',
+  tabWrestlers: '.admin-tabs .tab:first-child',
   tabDivisions: '.admin-tabs .tab:nth-child(2)',
   tabSchedule: '.admin-tabs .tab:nth-child(3)',
   tabResults: '.admin-tabs .tab:nth-child(4)',

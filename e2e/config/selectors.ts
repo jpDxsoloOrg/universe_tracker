@@ -29,7 +29,7 @@ export const selectors = {
     title: 'h2:has-text("Admin Panel")',
     logoutButton: 'button:has-text("Logout")',
     // Tab buttons by text
-    tabPlayers: 'button:has-text("Manage Players")',
+    tabPlayers: 'button:has-text("Manage Wrestlers")',
     tabDivisions: 'button:has-text("Divisions")',
     tabSchedule: 'button:has-text("Schedule Match")',
     tabResults: 'button:has-text("Record Results")',
@@ -40,14 +40,14 @@ export const selectors = {
     tabDangerZone: 'button:has-text("Danger Zone")',
   },
 
-  // Manage Players
+  // Manage Wrestlers
   players: {
-    heading: 'h2:has-text("Manage Players")',
-    addButton: 'button:has-text("Add New Player"), button:has-text("Add Player")',
-    nameInput: 'input:near(:text("Player Name")), input[placeholder*="name" i]',
+    heading: 'h2:has-text("Manage Wrestlers")',
+    addButton: 'button:has-text("Add New Wrestler"), button:has-text("Add Wrestler")',
+    nameInput: 'input:near(:text("Wrestler Name")), input[placeholder*="name" i]',
     wrestlerInput: 'input:near(:text("Wrestler")), input[placeholder*="wrestler" i]',
     divisionSelect: 'select:near(:text("Division"))',
-    submitButton: 'button:has-text("Add Player"), button:has-text("Save"), button:has-text("Create")',
+    submitButton: 'button:has-text("Add Wrestler"), button:has-text("Save"), button:has-text("Create")',
     cancelButton: 'button:has-text("Cancel")',
     playerCard: 'div:has(h4):has(button:has-text("Edit"))',
     editButton: 'button:has-text("Edit")',
@@ -153,7 +153,7 @@ export const selectors = {
     seasonSelect: 'select:near(:text("Season"))',
     divisionFilter: 'div:has(button:has-text("All"))',
     filterButton: 'button',
-    playerRow: 'table tbody tr',
+    wrestlerRow: 'table tbody tr',
   },
 
   // Public Pages - Championships

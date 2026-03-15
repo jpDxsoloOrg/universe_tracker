@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import type { ContenderWithPlayer } from '../../types/contender';
+import type { ContenderWithWrestler } from '../../types/contender';
 import {
   DEFAULT_WRESTLER_IMAGE,
   applyImageFallback,
@@ -8,7 +8,7 @@ import {
 import './ContenderCard.css';
 
 interface ContenderCardProps {
-  contender: ContenderWithPlayer;
+  contender: ContenderWithWrestler;
 }
 
 export default function ContenderCard({ contender }: ContenderCardProps) {
@@ -72,7 +72,7 @@ export default function ContenderCard({ contender }: ContenderCardProps) {
 
       <div className="contender-info">
         <h4 className="wrestler-name">{contender.wrestlerName}</h4>
-        <p className="player-name">{contender.playerName}</p>
+        <p className="wrestler-name">{contender.wrestlerName}</p>
         <div className="contender-stats">
           <div className="stat">
             <span className="stat-label">{t('contenders.score')}</span>

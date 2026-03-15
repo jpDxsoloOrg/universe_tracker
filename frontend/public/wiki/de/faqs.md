@@ -5,7 +5,7 @@ Häufige Fragen zur WWE-2K-Liga-Website.
 ## Tabelle und Ranglisten
 
 **Wie wird die Tabelle sortiert?**  
-Spieler werden zuerst nach Siegen, dann nach Siegquote, dann nach weniger Niederlagen sortiert. Unentschieden zählen für Ihre Bilanz, ändern aber nicht die Haupt-Kriterien.
+Wrestler werden zuerst nach Siegen, dann nach Siegquote, dann nach weniger Niederlagen sortiert. Unentschieden zählen für Ihre Bilanz, ändern aber nicht die Haupt-Kriterien.
 
 **Was ist der Unterschied zwischen Gesamt- und Saison-Tabelle?**  
 Die Gesamttabelle zeigt jedes jemals erfasste Match. Die Saison-Tabelle zeigt nur Matches der gewählten Saison. Nutzen Sie das Saison-Dropdown auf der Tabellen-Seite zum Wechseln.

@@ -75,7 +75,7 @@
   font-style: italic;
 }
 
-.no-players-message {
+.no-wrestlers-message {
   text-align: center;
   color: var(--color-text-secondary);
   padding: 2rem;
@@ -108,17 +108,17 @@
   font-size: 1.1rem;
 }
 
-.standings-table .player-name {
+.standings-table .wrestler-name {
   font-weight: bold;
   text-align: left;
 }
 
-.standings-table .player-name-link {
+.standings-table .wrestler-name-link {
   color: inherit;
   text-decoration: none;
 }
 
-.standings-table .player-name-link:hover {
+.standings-table .wrestler-name-link:hover {
   text-decoration: underline;
   color: var(--color-primary);
 }

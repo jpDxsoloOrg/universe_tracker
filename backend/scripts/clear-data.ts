@@ -20,7 +20,7 @@ const client = new DynamoDBClient({
 const docClient = DynamoDBDocumentClient.from(client);
 
 const TABLES = {
-  PLAYERS: `universe-tracker-api-players-${STAGE}`,
+  WRESTLERS: `universe-tracker-api-wrestlers-${STAGE}`,
   MATCHES: `universe-tracker-api-matches-${STAGE}`,
   CHAMPIONSHIPS: `universe-tracker-api-championships-${STAGE}`,
   CHAMPIONSHIP_HISTORY: `universe-tracker-api-championship-history-${STAGE}`,
@@ -58,7 +58,7 @@ async function clearAllData() {
   console.log('Starting to clear all data from local DynamoDB...\n');
 
   try {
-    await clearTable(TABLES.PLAYERS, ['playerId']);
+    await clearTable(TABLES.WRESTLERS, ['wrestlerId']);
     await clearTable(TABLES.MATCHES, ['matchId', 'date']);
     await clearTable(TABLES.CHAMPIONSHIPS, ['championshipId']);
     await clearTable(TABLES.CHAMPIONSHIP_HISTORY, ['championshipId', 'wonDate']);

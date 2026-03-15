@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 
 // --- Hoisted mocks ---
 const {
-  mockGetAllPlayers,
+  mockGetAllWrestlers,
   mockGetAllChampionships,
   mockGetAllTournaments,
   mockGetAllSeasons,
@@ -14,7 +14,7 @@ const {
   mockGetAllMatchTypes,
   mockScheduleMatch,
 } = vi.hoisted(() => ({
-  mockGetAllPlayers: vi.fn(),
+  mockGetAllWrestlers: vi.fn(),
   mockGetAllChampionships: vi.fn(),
   mockGetAllTournaments: vi.fn(),
   mockGetAllSeasons: vi.fn(),
@@ -26,7 +26,7 @@ const {
 
 vi.mock('../../../services/api', () => ({
   matchesApi: { schedule: mockScheduleMatch },
-  playersApi: { getAll: mockGetAllPlayers },
+  wrestlersApi: { getAll: mockGetAllWrestlers },
   championshipsApi: { getAll: mockGetAllChampionships },
   tournamentsApi: { getAll: mockGetAllTournaments },
   seasonsApi: { getAll: mockGetAllSeasons },
@@ -78,11 +78,11 @@ vi.mock('../SearchableSelect.css', () => ({}));
 import ScheduleMatch from '../ScheduleMatch';
 
 // --- Test data (use distinct wrestler names to avoid duplicate text issues) ---
-const mockPlayers = [
-  { playerId: 'p1', name: 'John Cena', currentWrestler: 'The Champ', wins: 10, losses: 2, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
-  { playerId: 'p2', name: 'Dwayne Johnson', currentWrestler: 'The Rock', wins: 8, losses: 3, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
-  { playerId: 'p3', name: 'Mark Calaway', currentWrestler: 'Undertaker', wins: 15, losses: 5, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
-  { playerId: 'p4', name: 'Paul Levesque', currentWrestler: 'Triple H', wins: 12, losses: 4, draws: 1, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+const mockWrestlers = [
+  { wrestlerId: 'p1', name: 'John Cena', wins: 10, losses: 2, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+  { wrestlerId: 'p2', name: 'Dwayne Johnson', wins: 8, losses: 3, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+  { wrestlerId: 'p3', name: 'Mark Calaway', wins: 15, losses: 5, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+  { wrestlerId: 'p4', name: 'Paul Levesque', wins: 12, losses: 4, draws: 1, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
 ];
 
 const mockChampionships = [
@@ -114,7 +114,7 @@ const mockMatchTypes = [
 ];
 
 function setupDefaultMocks() {
-  mockGetAllPlayers.mockResolvedValue(mockPlayers);
+  mockGetAllWrestlers.mockResolvedValue(mockWrestlers);
   mockGetAllChampionships.mockResolvedValue(mockChampionships);
   mockGetAllTournaments.mockResolvedValue(mockTournaments);
   mockGetAllSeasons.mockResolvedValue(mockSeasons);
@@ -137,7 +137,7 @@ describe('ScheduleMatch', () => {
   });
 
   it('shows loading state while data is being fetched', () => {
-    mockGetAllPlayers.mockReturnValue(new Promise(() => {}));
+    mockGetAllWrestlers.mockReturnValue(new Promise(() => {}));
     mockGetAllChampionships.mockReturnValue(new Promise(() => {}));
     mockGetAllTournaments.mockReturnValue(new Promise(() => {}));
     mockGetAllSeasons.mockReturnValue(new Promise(() => {}));
@@ -172,15 +172,11 @@ describe('ScheduleMatch', () => {
     expect(screen.getByText('Ladder Match')).toBeInTheDocument();
     expect(screen.getByText('Steel Cage')).toBeInTheDocument();
 
-    // Player cards are rendered in participants grid (use participant-name class)
-    expect(screen.getByText('John Cena')).toBeInTheDocument();
-    expect(screen.getByText('Dwayne Johnson')).toBeInTheDocument();
-    expect(screen.getByText('Mark Calaway')).toBeInTheDocument();
-    expect(screen.getByText('Paul Levesque')).toBeInTheDocument();
-
-    // Wrestler names are also shown
-    expect(screen.getByText('The Champ')).toBeInTheDocument();
-    expect(screen.getByText('The Rock')).toBeInTheDocument();
+    // Wrestler cards are rendered in participants grid (name appears in both participant-name and participant-wrestler divs)
+    expect(screen.getAllByText('John Cena').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Dwayne Johnson').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Mark Calaway').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Paul Levesque').length).toBeGreaterThanOrEqual(1);
 
     // Submit button
     expect(screen.getByRole('button', { name: 'Schedule Match' })).toBeInTheDocument();
@@ -190,7 +186,7 @@ describe('ScheduleMatch', () => {
     expect(seasonSelect).toHaveValue('s1');
   });
 
-  it('loads players, championships, tournaments, seasons, events, stipulations, and match types on mount', async () => {
+  it('loads wrestlers, championships, tournaments, seasons, events, stipulations, and match types on mount', async () => {
     setupDefaultMocks();
 
     renderScheduleMatch();
@@ -199,7 +195,7 @@ describe('ScheduleMatch', () => {
       expect(screen.getByRole('heading', { name: 'Schedule Match' })).toBeInTheDocument();
     });
 
-    expect(mockGetAllPlayers).toHaveBeenCalledTimes(1);
+    expect(mockGetAllWrestlers).toHaveBeenCalledTimes(1);
     expect(mockGetAllChampionships).toHaveBeenCalledTimes(1);
     expect(mockGetAllTournaments).toHaveBeenCalledTimes(1);
     expect(mockGetAllSeasons).toHaveBeenCalledTimes(1);
@@ -239,15 +235,15 @@ describe('ScheduleMatch', () => {
     renderScheduleMatch();
 
     await waitFor(() => {
-      expect(screen.getByText('John Cena')).toBeInTheDocument();
+      expect(screen.getAllByText('John Cena').length).toBeGreaterThanOrEqual(1);
     });
 
     // Select match format (no longer defaults to singles)
     await user.selectOptions(screen.getByLabelText('Match Format'), 'Singles');
 
-    // Click participant cards to select two players
-    await user.click(screen.getByText('John Cena').closest('.participant-card')!);
-    await user.click(screen.getByText('Dwayne Johnson').closest('.participant-card')!);
+    // Click participant cards to select two wrestlers
+    await user.click(screen.getAllByText('John Cena')[0].closest('.participant-card')!);
+    await user.click(screen.getAllByText('Dwayne Johnson')[0].closest('.participant-card')!);
 
     // Verify selected count
     expect(screen.getByText('Selected: 2')).toBeInTheDocument();
@@ -273,14 +269,14 @@ describe('ScheduleMatch', () => {
     renderScheduleMatch();
 
     await waitFor(() => {
-      expect(screen.getByText('John Cena')).toBeInTheDocument();
+      expect(screen.getAllByText('John Cena').length).toBeGreaterThanOrEqual(1);
     });
 
     // Select match format first (no longer defaults to singles)
     await user.selectOptions(screen.getByLabelText('Match Format'), 'Singles');
 
     // Select only one participant
-    await user.click(screen.getByText('John Cena').closest('.participant-card')!);
+    await user.click(screen.getAllByText('John Cena')[0].closest('.participant-card')!);
 
     // Submit
     await user.click(screen.getByRole('button', { name: 'Schedule Match' }));

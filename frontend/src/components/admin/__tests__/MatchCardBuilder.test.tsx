@@ -7,12 +7,12 @@ const {
   mockGetAllEvents,
   mockUpdateEvent,
   mockGetAllMatches,
-  mockGetAllPlayers,
+  mockGetAllWrestlers,
 } = vi.hoisted(() => ({
   mockGetAllEvents: vi.fn(),
   mockUpdateEvent: vi.fn(),
   mockGetAllMatches: vi.fn(),
-  mockGetAllPlayers: vi.fn(),
+  mockGetAllWrestlers: vi.fn(),
 }));
 
 vi.mock('../../../services/api', () => ({
@@ -23,8 +23,8 @@ vi.mock('../../../services/api', () => ({
   matchesApi: {
     getAll: mockGetAllMatches,
   },
-  playersApi: {
-    getAll: mockGetAllPlayers,
+  wrestlersApi: {
+    getAll: mockGetAllWrestlers,
   },
 }));
 
@@ -66,11 +66,11 @@ import MatchCardBuilder from '../MatchCardBuilder';
 
 // --- Test data ---
 const p = { wins: 0, losses: 0, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' };
-const mockPlayers = [
-  { playerId: 'p1', name: 'John Cena', currentWrestler: 'John Cena', ...p, wins: 10, losses: 2 },
-  { playerId: 'p2', name: 'The Rock', currentWrestler: 'The Rock', ...p, wins: 8, losses: 3 },
-  { playerId: 'p3', name: 'Undertaker', currentWrestler: 'The Deadman', ...p, wins: 15, losses: 5 },
-  { playerId: 'p4', name: 'Triple H', currentWrestler: 'The Game', ...p, wins: 12, losses: 4 },
+const mockWrestlers = [
+  { wrestlerId: 'p1', name: 'John Cena', ...p, wins: 10, losses: 2 },
+  { wrestlerId: 'p2', name: 'The Rock', ...p, wins: 8, losses: 3 },
+  { wrestlerId: 'p3', name: 'Undertaker', ...p, wins: 15, losses: 5 },
+  { wrestlerId: 'p4', name: 'Triple H', ...p, wins: 12, losses: 4 },
 ];
 
 const matchBase = { status: 'scheduled' as const, date: '2025-06-10', createdAt: '2024-01-01' };
@@ -109,7 +109,7 @@ const mockEventsData = [
 function setupDefaultMocks() {
   mockGetAllEvents.mockResolvedValue(mockEventsData);
   mockGetAllMatches.mockResolvedValue(mockScheduledMatches);
-  mockGetAllPlayers.mockResolvedValue(mockPlayers);
+  mockGetAllWrestlers.mockResolvedValue(mockWrestlers);
 }
 
 function renderMatchCardBuilder() {

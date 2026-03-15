@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { statisticsApi } from '../../services/api';
-import type { StatsPlayer } from '../../services/api';
+import type { StatsWrestler } from '../../services/api';
 import type { Achievement } from '../../types/statistics';
 import Skeleton from '../ui/Skeleton';
 import './Achievements.css';
@@ -11,23 +11,23 @@ type FilterType = 'all' | 'milestone' | 'record' | 'special';
 
 function Achievements() {
   const { t } = useTranslation();
-  const [players, setPlayers] = useState<StatsPlayer[]>([]);
-  const [selectedPlayerId, setSelectedPlayerId] = useState('');
+  const [wrestlers, setWrestlers] = useState<StatsWrestler[]>([]);
+  const [selectedWrestlerId, setSelectedWrestlerId] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
-  const [allAchievementDefs, setAllAchievementDefs] = useState<Omit<Achievement, 'playerId' | 'earnedAt'>[]>([]);
-  const [playerAchievements, setPlayerAchievements] = useState<Achievement[]>([]);
+  const [allAchievementDefs, setAllAchievementDefs] = useState<Omit<Achievement, 'wrestlerId' | 'earnedAt'>[]>([]);
+  const [wrestlerAchievements, setWrestlerAchievements] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Load player list and achievement definitions on mount
+  // Load wrestler list and achievement definitions on mount
   useEffect(() => {
     const abortController = new AbortController();
     const fetchInitial = async () => {
       try {
         const result = await statisticsApi.getAchievements(undefined, abortController.signal);
-        setPlayers(result.players);
+        setWrestlers(result.wrestlers);
         setAllAchievementDefs(result.allAchievements);
-        if (result.players.length > 0 && result.players[0]) {
-          setSelectedPlayerId(result.players[0].playerId);
+        if (result.wrestlers.length > 0 && result.wrestlers[0]) {
+          setSelectedWrestlerId(result.wrestlers[0].wrestlerId);
         }
       } catch (err: unknown) {
         if (err instanceof Error && err.name !== 'AbortError') {
@@ -41,27 +41,27 @@ function Achievements() {
     return () => abortController.abort();
   }, []);
 
-  // Load achievements for selected player
+  // Load achievements for selected wrestler
   useEffect(() => {
-    if (!selectedPlayerId) return;
+    if (!selectedWrestlerId) return;
     const abortController = new AbortController();
-    const fetchPlayerAchievements = async () => {
+    const fetchWrestlerAchievements = async () => {
       try {
-        const result = await statisticsApi.getAchievements(selectedPlayerId, abortController.signal);
-        setPlayerAchievements(result.achievements || []);
+        const result = await statisticsApi.getAchievements(selectedWrestlerId, abortController.signal);
+        setWrestlerAchievements(result.achievements || []);
       } catch (err: unknown) {
         if (err instanceof Error && err.name !== 'AbortError') {
-          console.error('Failed to load player achievements', err);
+          console.error('Failed to load wrestler achievements', err);
         }
       }
     };
-    fetchPlayerAchievements();
+    fetchWrestlerAchievements();
     return () => abortController.abort();
-  }, [selectedPlayerId]);
+  }, [selectedWrestlerId]);
 
   const earnedIds = useMemo(
-    () => new Set(playerAchievements.map((a) => a.achievementId)),
-    [playerAchievements]
+    () => new Set(wrestlerAchievements.map((a) => a.achievementId)),
+    [wrestlerAchievements]
   );
 
   const filteredAchievements = useMemo(() => {
@@ -77,7 +77,7 @@ function Achievements() {
     { key: 'special', label: t('statistics.achievements.filters.special') },
   ];
 
-  const player = players.find((p) => p.playerId === selectedPlayerId);
+  const wrestler = wrestlers.find((p) => p.wrestlerId === selectedWrestlerId);
 
   const earnedCount = filteredAchievements.filter((a) => earnedIds.has(a.achievementId)).length;
   const totalCount = filteredAchievements.length;
@@ -96,32 +96,32 @@ function Achievements() {
       <div className="ach-header">
         <h2>{t('statistics.achievements.title')}</h2>
         <div className="ach-nav-links">
-          <Link to="/stats">{t('statistics.nav.playerStats')}</Link>
+          <Link to="/stats">{t('statistics.nav.wrestlerStats')}</Link>
           <Link to="/stats/records">{t('statistics.nav.records')}</Link>
           <Link to="/stats/leaderboards">{t('statistics.nav.leaderboards')}</Link>
         </div>
       </div>
 
-      {/* Player Selector */}
-      <div className="ach-player-selector">
-        <label htmlFor="ach-player-select">{t('statistics.playerStats.selectPlayer')}</label>
+      {/* Wrestler Selector */}
+      <div className="ach-wrestler-selector">
+        <label htmlFor="ach-wrestler-select">{t('statistics.wrestlerStats.selectWrestler')}</label>
         <select
-          id="ach-player-select"
-          value={selectedPlayerId}
-          onChange={(e) => setSelectedPlayerId(e.target.value)}
+          id="ach-wrestler-select"
+          value={selectedWrestlerId}
+          onChange={(e) => setSelectedWrestlerId(e.target.value)}
         >
-          {players.map((p) => (
-            <option key={p.playerId} value={p.playerId}>
+          {wrestlers.map((p) => (
+            <option key={p.wrestlerId} value={p.wrestlerId}>
               {p.name} ({p.wrestlerName})
             </option>
           ))}
         </select>
       </div>
 
-      {/* Player Summary */}
+      {/* Wrestler Summary */}
       <div className="ach-summary">
         <span className="ach-summary-name">
-          {player?.name} ({player?.wrestlerName})
+          {wrestler?.name} ({wrestler?.wrestlerName})
         </span>
         <span className="ach-summary-count">
           {earnedCount}/{totalCount} {t('statistics.achievements.earned')}
@@ -152,7 +152,7 @@ function Achievements() {
         {filteredAchievements.map((achievement) => {
           const earned = earnedIds.has(achievement.achievementId);
           const earnedAch = earned
-            ? playerAchievements.find((a) => a.achievementId === achievement.achievementId)
+            ? wrestlerAchievements.find((a) => a.achievementId === achievement.achievementId)
             : null;
 
           return (

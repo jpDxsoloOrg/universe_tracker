@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { statisticsApi, playersApi } from '../../services/api';
+import { statisticsApi, wrestlersApi } from '../../services/api';
 import type { RatedMatchSummary } from '../../services/api';
-import type { Player } from '../../types';
+import type { Wrestler } from '../../types';
 import Skeleton from '../ui/Skeleton';
 import EmptyState from '../ui/EmptyState';
 import './BestMatches.css';
@@ -11,7 +11,7 @@ import './BestMatches.css';
 export default function BestMatches() {
   const { t } = useTranslation();
   const [matches, setMatches] = useState<RatedMatchSummary[]>([]);
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [wrestlers, setWrestlers] = useState<Wrestler[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,12 +20,12 @@ export default function BestMatches() {
     const load = async () => {
       try {
         setLoading(true);
-        const [ratingsRes, playersRes] = await Promise.all([
+        const [ratingsRes, wrestlersRes] = await Promise.all([
           statisticsApi.getMatchRatings(controller.signal),
-          playersApi.getAll(controller.signal),
+          wrestlersApi.getAll(controller.signal),
         ]);
         setMatches(ratingsRes.highestRatedMatches);
-        setPlayers(playersRes);
+        setWrestlers(wrestlersRes);
         setError(null);
       } catch (err) {
         if ((err as Error).name !== 'AbortError') {
@@ -39,9 +39,9 @@ export default function BestMatches() {
     return () => controller.abort();
   }, []);
 
-  const getPlayerName = (playerId: string): string => {
-    const p = players.find((x) => x.playerId === playerId);
-    return p ? p.currentWrestler : playerId;
+  const getWrestlerName = (wrestlerId: string): string => {
+    const p = wrestlers.find((x) => x.wrestlerId === wrestlerId);
+    return p ? p.name : wrestlerId;
   };
 
   if (loading) {
@@ -67,7 +67,7 @@ export default function BestMatches() {
       <div className="best-matches-header">
         <h2>{t('statistics.bestMatches.title')}</h2>
         <div className="best-matches-nav">
-          <Link to="/stats">{t('statistics.nav.playerStats')}</Link>
+          <Link to="/stats">{t('statistics.nav.wrestlerStats')}</Link>
           <Link to="/stats/head-to-head">{t('statistics.nav.headToHead')}</Link>
           <Link to="/stats/leaderboards">{t('statistics.nav.leaderboards')}</Link>
           <Link to="/stats/records">{t('statistics.nav.records')}</Link>
@@ -104,7 +104,7 @@ export default function BestMatches() {
                   {new Date(m.date).toLocaleDateString()}
                 </span>
                 <span className="best-match-participants">
-                  {m.participants.map((pid) => getPlayerName(pid)).join(' vs ')}
+                  {m.participants.map((pid) => getWrestlerName(pid)).join(' vs ')}
                 </span>
               </li>
             );

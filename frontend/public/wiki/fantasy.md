@@ -9,13 +9,13 @@ Compete in the fantasy league by picking wrestlers and earning points when they 
 1. When a show opens for picks, browse the available wrestlers and their costs
 2. Select wrestlers within your budget for each division
 3. Your picks earn points when they win matches — bigger matches earn more points
-4. Climb the leaderboard and compete for the top spot among all fantasy players
+4. Climb the leaderboard and compete for the top spot among all fantasy participants
 
 ## Fantasy Features
 
 | Feature | Description |
 |---------|-------------|
 | **Make Picks** | Choose wrestlers within your salary cap budget for each show |
-| **Leaderboard** | See where you rank against other fantasy players |
+| **Leaderboard** | See where you rank against other fantasy participants |
 | **Wrestler Costs** | View wrestler prices that change based on performance trends |
 | **Show Results** | Review your picks and see points earned after each show |

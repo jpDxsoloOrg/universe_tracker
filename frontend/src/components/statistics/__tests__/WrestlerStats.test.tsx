@@ -4,13 +4,13 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 
 // --- Hoisted mocks ---
-const { mockGetPlayerStats, mockGetAllSeasons } = vi.hoisted(() => ({
-  mockGetPlayerStats: vi.fn(),
+const { mockGetWrestlerStats, mockGetAllSeasons } = vi.hoisted(() => ({
+  mockGetWrestlerStats: vi.fn(),
   mockGetAllSeasons: vi.fn(),
 }));
 
 vi.mock('../../../services/api', () => ({
-  statisticsApi: { getPlayerStats: mockGetPlayerStats },
+  statisticsApi: { getWrestlerStats: mockGetWrestlerStats },
   seasonsApi: { getAll: mockGetAllSeasons },
 }));
 
@@ -18,14 +18,14 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const map: Record<string, string> = {
-        'statistics.playerStats.title': 'Player Stats',
-        'statistics.playerStats.selectPlayer': 'Select Player',
-        'statistics.playerStats.streaks': 'Streaks',
-        'statistics.playerStats.matchTypeBreakdown': 'Match Type Breakdown',
-        'statistics.playerStats.championshipHistory': 'Championship History',
-        'statistics.playerStats.recentAchievements': 'Recent Achievements',
-        'statistics.playerStats.viewAllAchievements': 'View All Achievements',
-        'statistics.playerStats.noData': 'No data available',
+        'statistics.wrestlerStats.title': 'Wrestler Stats',
+        'statistics.wrestlerStats.selectWrestler': 'Select Wrestler',
+        'statistics.wrestlerStats.streaks': 'Streaks',
+        'statistics.wrestlerStats.matchTypeBreakdown': 'Match Type Breakdown',
+        'statistics.wrestlerStats.championshipHistory': 'Championship History',
+        'statistics.wrestlerStats.recentAchievements': 'Recent Achievements',
+        'statistics.wrestlerStats.viewAllAchievements': 'View All Achievements',
+        'statistics.wrestlerStats.noData': 'No data available',
         'statistics.labels.wins': 'Wins',
         'statistics.labels.losses': 'Losses',
         'statistics.labels.draws': 'Draws',
@@ -66,18 +66,18 @@ vi.mock('react-router-dom', async () => {
   return { ...actual, useParams: () => ({}) };
 });
 
-vi.mock('../PlayerStats.css', () => ({}));
+vi.mock('../WrestlerStats.css', () => ({}));
 
-import PlayerStats from '../PlayerStats';
+import WrestlerStats from '../WrestlerStats';
 
 // --- Test data ---
-const mockPlayers = [
-  { playerId: 'p1', name: 'John Cena', wrestlerName: 'The Champ' },
-  { playerId: 'p2', name: 'The Rock', wrestlerName: 'The Great One' },
+const mockWrestlers = [
+  { wrestlerId: 'p1', name: 'John Cena', wrestlerName: 'The Champ' },
+  { wrestlerId: 'p2', name: 'The Rock', wrestlerName: 'The Great One' },
 ];
 
 const overallStat = {
-  playerId: 'p1',
+  wrestlerId: 'p1',
   statType: 'overall' as const,
   wins: 25,
   losses: 10,
@@ -118,7 +118,7 @@ const tagStat = {
 
 const mockChampionshipStats = [
   {
-    playerId: 'p1',
+    wrestlerId: 'p1',
     championshipId: 'c1',
     championshipName: 'World Heavyweight Championship',
     totalReigns: 3,
@@ -134,7 +134,7 @@ const mockChampionshipStats = [
 
 const mockAchievements = [
   {
-    playerId: 'p1',
+    wrestlerId: 'p1',
     achievementId: 'a1',
     achievementName: 'Grand Slam',
     achievementType: 'special' as const,
@@ -144,8 +144,8 @@ const mockAchievements = [
   },
 ];
 
-const fullPlayerStatsResponse = {
-  players: mockPlayers,
+const fullWrestlerStatsResponse = {
+  wrestlers: mockWrestlers,
   statistics: [overallStat, singlesStat, tagStat],
   championshipStats: mockChampionshipStats,
   achievements: mockAchievements,
@@ -154,27 +154,27 @@ const fullPlayerStatsResponse = {
 function renderComponent() {
   return render(
     <BrowserRouter>
-      <PlayerStats />
+      <WrestlerStats />
     </BrowserRouter>
   );
 }
 
-describe('PlayerStats', () => {
+describe('WrestlerStats', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetAllSeasons.mockResolvedValue([]);
   });
 
-  it('renders player selector and populates dropdown with players', async () => {
-    // First call returns player list, second returns full stats for first player
-    mockGetPlayerStats
-      .mockResolvedValueOnce({ players: mockPlayers })
-      .mockResolvedValueOnce(fullPlayerStatsResponse);
+  it('renders wrestler selector and populates dropdown with wrestlers', async () => {
+    // First call returns wrestler list, second returns full stats for first wrestler
+    mockGetWrestlerStats
+      .mockResolvedValueOnce({ wrestlers: mockWrestlers })
+      .mockResolvedValueOnce(fullWrestlerStatsResponse);
 
     renderComponent();
 
     await waitFor(() => {
-      expect(screen.getByText('Select Player')).toBeInTheDocument();
+      expect(screen.getByText('Select Wrestler')).toBeInTheDocument();
     });
 
     const select = screen.getByRole('combobox');
@@ -187,9 +187,9 @@ describe('PlayerStats', () => {
   });
 
   it('shows W-L-D record card, streaks, match type breakdown, championship history, and achievements', async () => {
-    mockGetPlayerStats
-      .mockResolvedValueOnce({ players: mockPlayers })
-      .mockResolvedValueOnce(fullPlayerStatsResponse);
+    mockGetWrestlerStats
+      .mockResolvedValueOnce({ wrestlers: mockWrestlers })
+      .mockResolvedValueOnce(fullWrestlerStatsResponse);
 
     renderComponent();
 
@@ -229,32 +229,32 @@ describe('PlayerStats', () => {
   });
 
   it('shows loading state initially', async () => {
-    mockGetPlayerStats.mockReturnValue(new Promise(() => {})); // never resolves
+    mockGetWrestlerStats.mockReturnValue(new Promise(() => {})); // never resolves
 
     renderComponent();
 
     expect(screen.getByRole('status', { name: 'Loading...' })).toBeInTheDocument();
   });
 
-  it('shows error message when player stats API fails', async () => {
-    // First call succeeds (loads players), second call fails (stats fetch)
-    mockGetPlayerStats
-      .mockResolvedValueOnce({ players: mockPlayers })
+  it('shows error message when wrestler stats API fails', async () => {
+    // First call succeeds (loads wrestlers), second call fails (stats fetch)
+    mockGetWrestlerStats
+      .mockResolvedValueOnce({ wrestlers: mockWrestlers })
       .mockRejectedValueOnce(new Error('Network error'));
 
     renderComponent();
 
     await waitFor(() => {
-      expect(screen.getByText('Failed to load player statistics')).toBeInTheDocument();
+      expect(screen.getByText('Failed to load wrestler statistics')).toBeInTheDocument();
     });
   });
 
-  it('changes player when a different one is selected from the dropdown', async () => {
+  it('changes wrestler when a different one is selected from the dropdown', async () => {
     const user = userEvent.setup();
 
-    mockGetPlayerStats
-      .mockResolvedValueOnce({ players: mockPlayers })
-      .mockResolvedValueOnce(fullPlayerStatsResponse);
+    mockGetWrestlerStats
+      .mockResolvedValueOnce({ wrestlers: mockWrestlers })
+      .mockResolvedValueOnce(fullWrestlerStatsResponse);
 
     renderComponent();
 
@@ -269,20 +269,20 @@ describe('PlayerStats', () => {
       expect(nameHeading).toHaveTextContent('John Cena (The Champ)');
     });
 
-    // Setup mock for the second player selection
-    mockGetPlayerStats.mockResolvedValueOnce({
-      ...fullPlayerStatsResponse,
+    // Setup mock for the second wrestler selection
+    mockGetWrestlerStats.mockResolvedValueOnce({
+      ...fullWrestlerStatsResponse,
       statistics: [
-        { ...overallStat, playerId: 'p2', wins: 30 },
-        { ...singlesStat, playerId: 'p2' },
+        { ...overallStat, wrestlerId: 'p2', wins: 30 },
+        { ...singlesStat, wrestlerId: 'p2' },
       ],
     });
 
     await user.selectOptions(screen.getByRole('combobox'), 'p2');
 
-    // The third call should be for player p2
+    // The third call should be for wrestler p2
     await waitFor(() => {
-      expect(mockGetPlayerStats).toHaveBeenCalledWith('p2', undefined, expect.any(AbortSignal));
+      expect(mockGetWrestlerStats).toHaveBeenCalledWith('p2', undefined, expect.any(AbortSignal));
     });
   });
 });

@@ -23,7 +23,7 @@ export default function TopBar() {
         'match-config': t('admin.panel.tabs.matchConfig'),
         seasons: t('admin.panel.tabs.seasons'),
         'season-awards': t('admin.panel.tabs.seasonAwards'),
-        players: t('admin.panel.tabs.managePlayers'),
+        wrestlers: t('admin.panel.tabs.manageWrestlers'),
         divisions: t('admin.panel.tabs.divisions'),
         championships: t('admin.panel.tabs.championships'),
         tournaments: t('admin.panel.tabs.tournaments'),
@@ -37,7 +37,7 @@ export default function TopBar() {
         results: t('admin.panel.groups.matchOps'),
         events: t('admin.panel.groups.matchOps'),
         'match-config': t('admin.panel.groups.matchOps'),
-        players: t('admin.panel.groups.leagueSetup'),
+        wrestlers: t('admin.panel.groups.leagueSetup'),
         divisions: t('admin.panel.groups.leagueSetup'),
         seasons: t('admin.panel.groups.leagueSetup'),
         'season-awards': t('admin.panel.groups.leagueSetup'),
@@ -72,7 +72,7 @@ export default function TopBar() {
     if (path.startsWith('/stats/')) {
       const segment = path.split('/')[2] ?? '';
       const statsMap: Record<string, string> = {
-        player: t('statistics.playerStats.title'),
+        wrestler: t('statistics.wrestlerStats.title'),
         'head-to-head': t('statistics.headToHead.title'),
         leaderboards: t('statistics.leaderboards.title'),
         records: t('statistics.recordBook.title'),
@@ -95,7 +95,7 @@ export default function TopBar() {
       '/events': t('nav.events'),
       '/matches': t('nav.matchSearch'),
       '/contenders': t('nav.contenders'),
-      '/stats': t('statistics.playerStats.title'),
+      '/stats': t('statistics.wrestlerStats.title'),
       '/guide': t('nav.help'),
     };
 

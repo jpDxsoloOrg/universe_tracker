@@ -163,40 +163,40 @@ describe('siteConfigApi', () => {
 // statisticsApi
 // ---------------------------------------------------------------------------
 describe('statisticsApi', () => {
-  it('getPlayerStats includes section=player-stats and optional playerId', async () => {
+  it('getWrestlerStats includes section=wrestler-stats and optional wrestlerId', async () => {
     (global.fetch as ReturnType<typeof vi.fn>)
-      .mockResolvedValueOnce(mockResponse({ players: [], statistics: [] }))
-      .mockResolvedValueOnce(mockResponse({ players: [], statistics: [] }));
+      .mockResolvedValueOnce(mockResponse({ wrestlers: [], statistics: [] }))
+      .mockResolvedValueOnce(mockResponse({ wrestlers: [], statistics: [] }));
 
-    // Without playerId
-    await statisticsApi.getPlayerStats();
+    // Without wrestlerId
+    await statisticsApi.getWrestlerStats();
     let url = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
-    expect(url).toContain('section=player-stats');
-    expect(url).not.toContain('playerId');
+    expect(url).toContain('section=wrestler-stats');
+    expect(url).not.toContain('wrestlerId');
 
-    // With playerId
-    await statisticsApi.getPlayerStats('p1');
+    // With wrestlerId
+    await statisticsApi.getWrestlerStats('p1');
     url = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[1][0] as string;
-    expect(url).toContain('section=player-stats');
-    expect(url).toContain('playerId=p1');
+    expect(url).toContain('section=wrestler-stats');
+    expect(url).toContain('wrestlerId=p1');
   });
 
-  it('getHeadToHead includes section=head-to-head with both player IDs', async () => {
+  it('getHeadToHead includes section=head-to-head with both wrestler IDs', async () => {
     (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockResponse({ players: [], headToHead: null, player1Stats: {}, player2Stats: {} }),
+      mockResponse({ wrestlers: [], headToHead: null, wrestler1Stats: {}, wrestler2Stats: {} }),
     );
 
     await statisticsApi.getHeadToHead('p1', 'p2');
 
     const url = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
     expect(url).toContain('section=head-to-head');
-    expect(url).toContain('player1Id=p1');
-    expect(url).toContain('player2Id=p2');
+    expect(url).toContain('wrestler1Id=p1');
+    expect(url).toContain('wrestler2Id=p2');
   });
 
   it('getLeaderboards includes section=leaderboards', async () => {
     (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockResponse({ players: [], leaderboards: {} }),
+      mockResponse({ wrestlers: [], leaderboards: {} }),
     );
 
     await statisticsApi.getLeaderboards();
@@ -216,19 +216,19 @@ describe('statisticsApi', () => {
     expect(url).toContain('section=records');
   });
 
-  it('getAchievements includes section=achievements and optional playerId', async () => {
+  it('getAchievements includes section=achievements and optional wrestlerId', async () => {
     (global.fetch as ReturnType<typeof vi.fn>)
-      .mockResolvedValueOnce(mockResponse({ players: [], allAchievements: [] }))
-      .mockResolvedValueOnce(mockResponse({ players: [], allAchievements: [], achievements: [] }));
+      .mockResolvedValueOnce(mockResponse({ wrestlers: [], allAchievements: [] }))
+      .mockResolvedValueOnce(mockResponse({ wrestlers: [], allAchievements: [], achievements: [] }));
 
     await statisticsApi.getAchievements();
     let url = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0][0] as string;
     expect(url).toContain('section=achievements');
-    expect(url).not.toContain('playerId');
+    expect(url).not.toContain('wrestlerId');
 
     await statisticsApi.getAchievements('p1');
     url = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[1][0] as string;
     expect(url).toContain('section=achievements');
-    expect(url).toContain('playerId=p1');
+    expect(url).toContain('wrestlerId=p1');
   });
 });

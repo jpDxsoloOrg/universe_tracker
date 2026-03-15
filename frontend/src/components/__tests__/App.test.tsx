@@ -32,7 +32,7 @@ vi.mock('../Championships', () => ({ default: () => <div data-testid="championsh
 vi.mock('../Tournaments', () => ({ default: () => <div data-testid="tournaments">Tournaments</div> }));
 vi.mock('../admin/AdminPanel', () => ({ default: () => <div data-testid="admin-panel">AdminPanel</div> }));
 vi.mock('../auth/Login', () => ({ default: () => <div data-testid="login">Login</div> }));
-vi.mock('../statistics/PlayerStats', () => ({ default: () => <div data-testid="player-stats">PlayerStats</div> }));
+vi.mock('../statistics/WrestlerStats', () => ({ default: () => <div data-testid="wrestler-stats">WrestlerStats</div> }));
 vi.mock('../statistics/HeadToHeadComparison', () => ({ default: () => <div>H2H</div> }));
 vi.mock('../statistics/Leaderboards', () => ({ default: () => <div>Leaderboards</div> }));
 vi.mock('../statistics/RecordBook', () => ({ default: () => <div>RecordBook</div> }));

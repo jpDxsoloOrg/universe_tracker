@@ -122,7 +122,7 @@ describe('requireRole', () => {
 
   it('returns 403 response when user lacks the required role', () => {
     const event = makeEvent({
-      username: 'player',
+      username: 'wrestler',
       email: 'p@b.com',
       principalId: 'sub-2',
       groups: '',

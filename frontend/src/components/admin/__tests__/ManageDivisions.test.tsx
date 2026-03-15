@@ -135,9 +135,9 @@ describe('ManageDivisions', () => {
     confirmSpy.mockRestore();
   });
 
-  it('shows error when delete fails (e.g., players assigned)', async () => {
+  it('shows error when delete fails (e.g., wrestlers assigned)', async () => {
     mockDivisionsApi.delete.mockRejectedValue(
-      new Error('Cannot delete division with assigned players')
+      new Error('Cannot delete division with assigned wrestlers')
     );
     const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
     const user = userEvent.setup();
@@ -149,7 +149,7 @@ describe('ManageDivisions', () => {
     await user.click(deleteButtons[0]);
 
     await waitFor(() => {
-      expect(screen.getByText('Cannot delete division with assigned players')).toBeInTheDocument();
+      expect(screen.getByText('Cannot delete division with assigned wrestlers')).toBeInTheDocument();
     });
     confirmSpy.mockRestore();
   });

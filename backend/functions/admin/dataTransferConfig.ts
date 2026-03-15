@@ -2,7 +2,7 @@ import { TableNames } from '../../lib/dynamodb';
 
 export type ExportDatasetKey =
   | 'divisions'
-  | 'players'
+  | 'wrestlers'
   | 'seasons'
   | 'seasonStandings'
   | 'championships'
@@ -28,9 +28,9 @@ export const EXPORT_SCHEMA_VERSION = 1;
 
 export const EXPORT_TABLES: readonly ExportTableConfig[] = [
   { key: 'divisions', tableName: TableNames.DIVISIONS, partitionKey: 'divisionId' },
-  { key: 'players', tableName: TableNames.PLAYERS, partitionKey: 'playerId' },
+  { key: 'wrestlers', tableName: TableNames.WRESTLERS, partitionKey: 'wrestlerId' },
   { key: 'seasons', tableName: TableNames.SEASONS, partitionKey: 'seasonId' },
-  { key: 'seasonStandings', tableName: TableNames.SEASON_STANDINGS, partitionKey: 'seasonId', sortKey: 'playerId' },
+  { key: 'seasonStandings', tableName: TableNames.SEASON_STANDINGS, partitionKey: 'seasonId', sortKey: 'wrestlerId' },
   { key: 'championships', tableName: TableNames.CHAMPIONSHIPS, partitionKey: 'championshipId' },
   {
     key: 'championshipHistory',
@@ -45,9 +45,9 @@ export const EXPORT_TABLES: readonly ExportTableConfig[] = [
     key: 'contenderRankings',
     tableName: TableNames.CONTENDER_RANKINGS,
     partitionKey: 'championshipId',
-    sortKey: 'playerId',
+    sortKey: 'wrestlerId',
   },
-  { key: 'rankingHistory', tableName: TableNames.RANKING_HISTORY, partitionKey: 'playerId', sortKey: 'weekKey' },
+  { key: 'rankingHistory', tableName: TableNames.RANKING_HISTORY, partitionKey: 'wrestlerId', sortKey: 'weekKey' },
   { key: 'siteConfig', tableName: TableNames.SITE_CONFIG, partitionKey: 'configKey' },
   { key: 'stipulations', tableName: TableNames.STIPULATIONS, partitionKey: 'stipulationId' },
   { key: 'matchTypes', tableName: TableNames.MATCH_TYPES, partitionKey: 'matchTypeId' },

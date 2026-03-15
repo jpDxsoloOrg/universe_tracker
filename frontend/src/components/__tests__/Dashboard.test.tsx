@@ -33,7 +33,7 @@ vi.mock('react-i18next', () => ({
         'dashboard.countdown.hours': 'h',
         'dashboard.countdown.minutes': 'm',
         'dashboard.vs': 'vs',
-        'standings.table.player': 'Player',
+        'standings.table.wrestler': 'Wrestler',
         'common.retry': 'Retry',
       };
       return map[key] ?? key;
@@ -51,7 +51,7 @@ const emptyDashboard = {
   recentResults: [],
   seasonInfo: null,
   quickStats: {
-    totalPlayers: 0,
+    totalWrestlers: 0,
     totalMatches: 0,
     activeChampionships: 0,
   },
@@ -90,7 +90,7 @@ describe('Dashboard', () => {
     const dataWithContent = {
       ...emptyDashboard,
       currentChampions: [
-        { championshipId: 'c1', championshipName: 'World', championName: 'Alice', playerId: 'p1' },
+        { championshipId: 'c1', championshipName: 'World', championName: 'Alice', wrestlerId: 'p1' },
       ],
       upcomingEvents: [
         { eventId: 'e1', name: 'WrestleMania', date: '2025-04-01', eventType: 'ppv' },
@@ -99,7 +99,7 @@ describe('Dashboard', () => {
         { matchId: 'm1', date: '2025-01-15', matchType: 'singles', winnerName: 'Alice', loserName: 'Bob' },
       ],
       seasonInfo: { seasonId: 's1', name: 'Season 1', status: 'active', matchesPlayed: 10 },
-      quickStats: { ...emptyDashboard.quickStats, totalPlayers: 5, totalMatches: 20, mostWinsPlayer: { name: 'Alice', wins: 8 } },
+      quickStats: { ...emptyDashboard.quickStats, totalWrestlers: 5, totalMatches: 20, mostWinsWrestler: { name: 'Alice', wins: 8 } },
     };
     mockGetDashboard.mockResolvedValue(dataWithContent);
 

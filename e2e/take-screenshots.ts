@@ -65,7 +65,7 @@ const ROUTE_GROUPS: Record<string, RouteEntry[]> = {
     { route: '/promos/new', name: 'promo-editor' },
   ],
   statistics: [
-    { route: '/stats', name: 'player-stats' },
+    { route: '/stats', name: 'wrestler-stats' },
     { route: '/stats/head-to-head', name: 'head-to-head' },
     { route: '/stats/leaderboards', name: 'leaderboards' },
     { route: '/stats/records', name: 'record-book' },

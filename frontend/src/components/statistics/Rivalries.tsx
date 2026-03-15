@@ -54,10 +54,10 @@ function Rivalries() {
   }, [selectedSeasonId]);
 
   function seriesRecordText(r: Rivalry): string {
-    const p1W = r.player1Wins;
-    const p2W = r.player2Wins;
-    const p1 = r.player1?.wrestlerName ?? r.player1Id;
-    const p2 = r.player2?.wrestlerName ?? r.player2Id;
+    const p1W = r.wrestler1Wins;
+    const p2W = r.wrestler2Wins;
+    const p1 = r.wrestler1?.wrestlerName ?? r.wrestler1Id;
+    const p2 = r.wrestler2?.wrestlerName ?? r.wrestler2Id;
     if (p1W > p2W) return t('rivalries.leads', { name: p1, wins: p1W, losses: p2W });
     if (p2W > p1W) return t('rivalries.leads', { name: p2, wins: p2W, losses: p1W });
     return t('rivalries.tied', { count: p1W });
@@ -95,7 +95,7 @@ function Rivalries() {
       <div className="rivalries-header">
         <h2>{t('rivalries.title')}</h2>
         <div className="rivalries-nav-links">
-          <Link to="/stats">{t('statistics.nav.playerStats')}</Link>
+          <Link to="/stats">{t('statistics.nav.wrestlerStats')}</Link>
           <Link to="/stats/head-to-head">{t('statistics.nav.headToHead')}</Link>
           <Link to="/stats/leaderboards">{t('statistics.nav.leaderboards')}</Link>
           <Link to="/stats/tale-of-tape">{t('statistics.nav.taleOfTape')}</Link>
@@ -118,26 +118,26 @@ function Rivalries() {
       ) : (
         <div className="rivalries-grid">
           {rivalries.map((r) => (
-            <div key={`${r.player1Id}-${r.player2Id}`} className="rivalry-card">
-              <div className="rivalry-card-players">
-                <div className="rivalry-player">
+            <div key={`${r.wrestler1Id}-${r.wrestler2Id}`} className="rivalry-card">
+              <div className="rivalry-card-wrestlers">
+                <div className="rivalry-wrestler">
                   <img
-                    src={resolveImageSrc(r.player1?.imageUrl, DEFAULT_WRESTLER_IMAGE)}
+                    src={resolveImageSrc(r.wrestler1?.imageUrl, DEFAULT_WRESTLER_IMAGE)}
                     onError={(event) => applyImageFallback(event, DEFAULT_WRESTLER_IMAGE)}
-                    alt={r.player1?.wrestlerName ?? r.player1Id}
-                    className="rivalry-player-img"
+                    alt={r.wrestler1?.wrestlerName ?? r.wrestler1Id}
+                    className="rivalry-wrestler-img"
                   />
-                  <span className="rivalry-player-name">{r.player1?.wrestlerName ?? r.player1Id}</span>
+                  <span className="rivalry-wrestler-name">{r.wrestler1?.wrestlerName ?? r.wrestler1Id}</span>
                 </div>
                 <span className="rivalry-vs">vs</span>
-                <div className="rivalry-player">
+                <div className="rivalry-wrestler">
                   <img
-                    src={resolveImageSrc(r.player2?.imageUrl, DEFAULT_WRESTLER_IMAGE)}
+                    src={resolveImageSrc(r.wrestler2?.imageUrl, DEFAULT_WRESTLER_IMAGE)}
                     onError={(event) => applyImageFallback(event, DEFAULT_WRESTLER_IMAGE)}
-                    alt={r.player2?.wrestlerName ?? r.player2Id}
-                    className="rivalry-player-img"
+                    alt={r.wrestler2?.wrestlerName ?? r.wrestler2Id}
+                    className="rivalry-wrestler-img"
                   />
-                  <span className="rivalry-player-name">{r.player2?.wrestlerName ?? r.player2Id}</span>
+                  <span className="rivalry-wrestler-name">{r.wrestler2?.wrestlerName ?? r.wrestler2Id}</span>
                 </div>
               </div>
               <p className="rivalry-series">{seriesRecordText(r)}</p>
@@ -149,7 +149,7 @@ function Rivalries() {
                 {intensityLabel(r.intensityBadge)}
               </span>
               <Link
-                to={`/stats/head-to-head?player1Id=${r.player1Id}&player2Id=${r.player2Id}`}
+                to={`/stats/head-to-head?wrestler1Id=${r.wrestler1Id}&wrestler2Id=${r.wrestler2Id}`}
                 className="rivalry-link"
               >
                 {t('rivalries.viewHeadToHead')}

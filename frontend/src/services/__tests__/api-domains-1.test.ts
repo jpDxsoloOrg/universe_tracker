@@ -1,6 +1,6 @@
 /**
  * Tests for domain API objects (Part 1):
- * playersApi, matchesApi, championshipsApi, tournamentsApi,
+ * wrestlersApi, matchesApi, championshipsApi, tournamentsApi,
  * standingsApi, seasonsApi, divisionsApi
  *
  * Each test verifies correct URL, HTTP method, request body,
@@ -8,7 +8,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
-  playersApi,
+  wrestlersApi,
   matchesApi,
   championshipsApi,
   tournamentsApi,
@@ -51,49 +51,49 @@ beforeEach(() => {
 });
 
 // ===========================================================================
-// playersApi
+// wrestlersApi
 // ===========================================================================
 
-describe('playersApi', () => {
-  it('getAll calls GET /players', async () => {
-    const players = [{ playerId: 'p1' }];
-    mockFetch(players);
+describe('wrestlersApi', () => {
+  it('getAll calls GET /wrestlers', async () => {
+    const wrestlers = [{ wrestlerId: 'p1' }];
+    mockFetch(wrestlers);
 
-    const result = await playersApi.getAll();
+    const result = await wrestlersApi.getAll();
 
-    expect(fetchCallUrl()).toBe(`${API_BASE}/players`);
+    expect(fetchCallUrl()).toBe(`${API_BASE}/wrestlers`);
     expect(fetchCallOptions().method).toBeUndefined(); // default GET
-    expect(result).toEqual(players);
+    expect(result).toEqual(wrestlers);
   });
 
-  it('create calls POST /players with body', async () => {
-    const newPlayer = { name: 'John Cena', currentWrestler: 'John Cena' };
-    mockFetch({ playerId: 'p-new', ...newPlayer });
+  it('create calls POST /wrestlers with body', async () => {
+    const newWrestler = { name: 'John Cena' };
+    mockFetch({ wrestlerId: 'p-new', ...newWrestler });
 
-    await playersApi.create(newPlayer as never);
+    await wrestlersApi.create(newWrestler as never);
 
-    expect(fetchCallUrl()).toBe(`${API_BASE}/players`);
+    expect(fetchCallUrl()).toBe(`${API_BASE}/wrestlers`);
     expect(fetchCallOptions().method).toBe('POST');
-    expect(fetchCallOptions().body).toBe(JSON.stringify(newPlayer));
+    expect(fetchCallOptions().body).toBe(JSON.stringify(newWrestler));
   });
 
-  it('update calls PUT /players/:id with body', async () => {
+  it('update calls PUT /wrestlers/:id with body', async () => {
     const updates = { name: 'Updated Name' };
-    mockFetch({ playerId: 'p1', ...updates });
+    mockFetch({ wrestlerId: 'p1', ...updates });
 
-    await playersApi.update('p1', updates);
+    await wrestlersApi.update('p1', updates);
 
-    expect(fetchCallUrl()).toBe(`${API_BASE}/players/p1`);
+    expect(fetchCallUrl()).toBe(`${API_BASE}/wrestlers/p1`);
     expect(fetchCallOptions().method).toBe('PUT');
     expect(fetchCallOptions().body).toBe(JSON.stringify(updates));
   });
 
-  it('delete calls DELETE /players/:id', async () => {
+  it('delete calls DELETE /wrestlers/:id', async () => {
     mockFetch(undefined, 204);
 
-    await playersApi.delete('p1');
+    await wrestlersApi.delete('p1');
 
-    expect(fetchCallUrl()).toBe(`${API_BASE}/players/p1`);
+    expect(fetchCallUrl()).toBe(`${API_BASE}/wrestlers/p1`);
     expect(fetchCallOptions().method).toBe('DELETE');
   });
 });

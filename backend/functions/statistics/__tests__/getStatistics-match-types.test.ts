@@ -17,7 +17,7 @@ vi.mock('../../../lib/dynamodb', () => ({
     queryAll: vi.fn(),
   },
   TableNames: {
-    PLAYERS: 'Players',
+    WRESTLERS: 'Wrestlers',
     MATCHES: 'Matches',
     MATCH_TYPES: 'MatchTypes',
     STIPULATIONS: 'Stipulations',
@@ -49,11 +49,10 @@ function makeEvent(overrides: Partial<APIGatewayProxyEvent> = {}): APIGatewayPro
   };
 }
 
-function makePlayer(playerId: string, name: string, currentWrestler: string) {
+function makeWrestler(wrestlerId: string, name: string) {
   return {
-    playerId,
+    wrestlerId,
     name,
-    currentWrestler,
     wins: 0,
     losses: 0,
     draws: 0,
@@ -82,10 +81,10 @@ describe('getStatistics - match-types section', () => {
   });
 
   it('returns all completed matches leaderboard when no filter is provided', async () => {
-    const players = [
-      makePlayer('p1', 'Alpha', 'A'),
-      makePlayer('p2', 'Beta', 'B'),
-      makePlayer('p3', 'Gamma', 'C'),
+    const wrestlers = [
+      makeWrestler('p1', 'Alpha'),
+      makeWrestler('p2', 'Beta'),
+      makeWrestler('p3', 'Gamma'),
     ];
 
     const matches = [
@@ -95,7 +94,7 @@ describe('getStatistics - match-types section', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce(players)
+      .mockResolvedValueOnce(wrestlers)
       .mockResolvedValueOnce(matches)
       .mockResolvedValueOnce([
         { matchTypeId: 'mt-single', name: 'Single' },
@@ -118,10 +117,10 @@ describe('getStatistics - match-types section', () => {
   });
 
   it('filters by matchTypeId using configured match type names', async () => {
-    const players = [
-      makePlayer('p1', 'Alpha', 'A'),
-      makePlayer('p2', 'Beta', 'B'),
-      makePlayer('p3', 'Gamma', 'C'),
+    const wrestlers = [
+      makeWrestler('p1', 'Alpha'),
+      makeWrestler('p2', 'Beta'),
+      makeWrestler('p3', 'Gamma'),
     ];
     const matches = [
       makeMatch({ participants: ['p1', 'p2'], winners: ['p1'], losers: ['p2'], matchFormat: 'Single' }),
@@ -131,7 +130,7 @@ describe('getStatistics - match-types section', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce(players)
+      .mockResolvedValueOnce(wrestlers)
       .mockResolvedValueOnce(matches)
       .mockResolvedValueOnce([
         { matchTypeId: 'mt-single', name: 'Single' },
@@ -147,15 +146,15 @@ describe('getStatistics - match-types section', () => {
     const body = JSON.parse(result!.body);
     expect(body.appliedFilters.matchTypeId).toBe('mt-tag');
     expect(body.appliedFilters.matchTypeName).toBe('Tag Team');
-    expect(body.leaderboard[0].playerName).toBe('Beta');
+    expect(body.leaderboard[0].wrestlerName).toBe('Beta');
     expect(body.leaderboard[0].wins).toBe(2);
     expect(body.leaderboard[0].matchesPlayed).toBe(2);
   });
 
   it('filters by stipulationId', async () => {
-    const players = [
-      makePlayer('p1', 'Alpha', 'A'),
-      makePlayer('p2', 'Beta', 'B'),
+    const wrestlers = [
+      makeWrestler('p1', 'Alpha'),
+      makeWrestler('p2', 'Beta'),
     ];
     const matches = [
       makeMatch({
@@ -175,7 +174,7 @@ describe('getStatistics - match-types section', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce(players)
+      .mockResolvedValueOnce(wrestlers)
       .mockResolvedValueOnce(matches)
       .mockResolvedValueOnce([{ matchTypeId: 'mt-single', name: 'Single' }])
       .mockResolvedValueOnce([

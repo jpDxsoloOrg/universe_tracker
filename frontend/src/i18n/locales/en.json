@@ -58,13 +58,13 @@
     "devLoginTitle": "Dev Login",
     "devLoginSubtitle": "Pick a role to sign in as (dev only)",
     "signInAsAdmin": "Sign in as Admin",
-    "loadingPlayers": "Loading players...",
-    "noPlayersFound": "No players found. Run seed data first."
+    "loadingWrestlers": "Loading wrestlers...",
+    "noWrestlersFound": "No wrestlers found. Run seed data first."
   },
   "emptyState": {
     "checkBackSoon": "Check back soon",
     "createFirstChampionship": "Create your first championship",
-    "createFirstPlayer": "Add your first player",
+    "createFirstWrestler": "Add your first wrestler",
     "createFirstTournament": "Create your first tournament",
     "createFirstDivision": "Create your first division",
     "goToAdmin": "Go to Admin"
@@ -183,7 +183,7 @@
       "adminMatchConfig": "Admin: Match Config",
       "adminSeasonAwards": "Admin: Season Awards",
       "adminDivisions": "Admin: Divisions",
-      "adminManagePlayers": "Admin: Manage Players",
+      "adminManageWrestlers": "Admin: Manage Wrestlers",
       "adminSeasons": "Admin: Seasons",
       "adminChampionships": "Admin: Championships",
       "adminEvents": "Admin: Events",
@@ -204,7 +204,7 @@
     "title": "League Standings",
     "pageTitle": "Standings",
     "loading": "Loading standings...",
-    "noPlayers": "No players have been added to the league yet.",
+    "noWrestlers": "No wrestlers have been added to the league yet.",
     "season": "Season",
     "allTime": "All-Time",
     "showingFor": "Showing standings for",
@@ -213,7 +213,7 @@
     "table": {
       "rank": "Rank",
       "image": "Image",
-      "player": "Player",
+      "wrestler": "Wrestler",
       "wrestler": "Wrestler",
       "division": "Division",
       "wins": "Wins",
@@ -287,7 +287,7 @@
     "title": "Match Search",
     "filtersLabel": "Match filters",
     "filters": {
-      "player": "Player",
+      "wrestler": "Wrestler",
       "matchType": "Match Type",
       "stipulation": "Stipulation",
       "status": "Status",
@@ -343,7 +343,7 @@
     "summaryGapValue": "{{count}} pts",
     "table": {
       "rank": "Rank",
-      "player": "Player",
+      "wrestler": "Wrestler",
       "w": "W",
       "l": "L",
       "d": "D",
@@ -354,7 +354,7 @@
     "panel": {
       "title": "Admin Panel",
       "tabs": {
-        "managePlayers": "Manage Players",
+        "manageWrestlers": "Manage Wrestlers",
         "divisions": "Divisions",
         "stipulations": "Stipulations",
         "matchConfig": "Match Config",
@@ -390,8 +390,8 @@
       "chooseSeason": "-- Select a season --",
       "createAward": "Create Award",
       "awardName": "Award Name",
-      "awardPlayer": "Player",
-      "choosePlayer": "-- Select a player --",
+      "awardWrestler": "Wrestler",
+      "chooseWrestler": "-- Select a wrestler --",
       "description": "Description",
       "value": "Value",
       "createSuccess": "Award created successfully!",
@@ -401,7 +401,7 @@
   },
   "statistics": {
     "nav": {
-      "playerStats": "Player Stats",
+      "wrestlerStats": "Wrestler Stats",
       "headToHead": "Head-to-Head",
       "leaderboards": "Leaderboards",
       "records": "Record Book",
@@ -445,10 +445,10 @@
       "intercontinental": "Intercontinental Championship",
       "tag": "Tag Team Championship"
     },
-    "playerStats": {
-      "title": "Player Statistics",
-      "selectPlayer": "Select Player",
-      "noData": "No statistics data available for this player.",
+    "wrestlerStats": {
+      "title": "Wrestler Statistics",
+      "selectWrestler": "Select Wrestler",
+      "noData": "No statistics data available for this wrestler.",
       "streaks": "Streaks & Records",
       "matchTypeBreakdown": "Match Type Breakdown",
       "winRateByMatchType": "Win Rate by Match Type",
@@ -459,15 +459,15 @@
     },
     "headToHead": {
       "title": "Head-to-Head Comparison",
-      "player1": "Player 1",
-      "player2": "Player 2",
-      "selectDifferent": "Please select two different players to compare.",
+      "wrestler1": "Wrestler 1",
+      "wrestler2": "Wrestler 2",
+      "selectDifferent": "Please select two different wrestlers to compare.",
       "statComparison": "Statistical Comparison",
       "headToHeadRecord": "Head-to-Head Record",
-      "noHistory": "No head-to-head history between these players.",
+      "noHistory": "No head-to-head history between these wrestlers.",
       "recentResults": "Recent Results",
-      "player1Win": "P1 Win",
-      "player2Win": "P2 Win",
+      "wrestler1Win": "W1 Win",
+      "wrestler2Win": "W2 Win",
       "statisticalEdge": "Statistical Edge",
       "advantages": "Advantages"
     },
@@ -497,7 +497,7 @@
       },
       "setOn": "Set on",
       "activeThreats": "Active Threats",
-      "activeThreatsDesc": "These records are currently being challenged. Keep an eye on these players!",
+      "activeThreatsDesc": "These records are currently being challenged. Keep an eye on these wrestlers!",
       "currentHolder": "Current Holder",
       "challenger": "Challenger"
     },
@@ -538,7 +538,7 @@
       "intense": "Intense 💥",
       "historic": "Historic 👑"
     },
-    "noRivalries": "No rivalries yet. Rivalries appear when two players have faced each other 3+ times.",
+    "noRivalries": "No rivalries yet. Rivalries appear when two wrestlers have faced each other 3+ times.",
     "viewHeadToHead": "View Head-to-Head"
   },
   "events": {
@@ -668,7 +668,7 @@
     "currentChampion": "Current Champion",
     "rankings": "Rankings",
     "noContenders": "No contenders ranked yet",
-    "noContendersHint": "Players need at least {{minMatches}} matches in the ranking period to qualify",
+    "noContendersHint": "Wrestlers need at least {{minMatches}} matches in the ranking period to qualify",
     "lastCalculated": "Last calculated",
     "rankingPeriod": "Ranking period",
     "days": "days",
@@ -686,7 +686,7 @@
     "rankingScore": "Ranking Score",
     "myStatus": {
       "title": "My Contender Status",
-      "subtitle": "Championship contender status for {{playerName}}",
+      "subtitle": "Championship contender status for {{wrestlerName}}",
       "progressToTop": "Progress to #1",
       "pathToTitle": "Path to Title",
       "matchesNeeded": "Matches Needed to Qualify",
@@ -707,7 +707,7 @@
       "includeDraws": "Include Draws in Rankings",
       "includeDrawsHint": "When enabled, draws will count partially toward ranking score",
       "divisionRestricted": "Division Restricted",
-      "divisionRestrictedHint": "When enabled, only players in the same division can contend",
+      "divisionRestrictedHint": "When enabled, only wrestlers in the same division can contend",
       "save": "Save Configuration",
       "recalculate": "Recalculate Rankings",
       "saveSuccess": "Configuration saved for {{championship}}",

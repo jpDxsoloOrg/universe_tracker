@@ -6,7 +6,7 @@ import { created, badRequest, notFound, serverError } from '../../lib/response';
 
 interface CreateAwardBody {
   name: string;
-  playerId: string;
+  wrestlerId: string;
   description?: string;
 }
 
@@ -23,8 +23,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     if (!body.name) {
       return badRequest('name is required');
     }
-    if (!body.playerId) {
-      return badRequest('playerId is required');
+    if (!body.wrestlerId) {
+      return badRequest('wrestlerId is required');
     }
 
     // Verify season exists
@@ -36,13 +36,13 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       return notFound('Season not found');
     }
 
-    // Verify player exists
-    const playerResult = await dynamoDb.get({
-      TableName: TableNames.PLAYERS,
-      Key: { playerId: body.playerId },
+    // Verify wrestler exists
+    const wrestlerResult = await dynamoDb.get({
+      TableName: TableNames.WRESTLERS,
+      Key: { wrestlerId: body.wrestlerId },
     });
-    if (!playerResult.Item) {
-      return notFound('Player not found');
+    if (!wrestlerResult.Item) {
+      return notFound('Wrestler not found');
     }
 
     const now = new Date().toISOString();
@@ -51,8 +51,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       seasonId,
       name: body.name,
       awardType: 'custom' as const,
-      playerId: body.playerId,
-      playerName: (playerResult.Item as { name: string }).name,
+      wrestlerId: body.wrestlerId,
+      wrestlerName: (wrestlerResult.Item as { name: string }).name,
       description: body.description || null,
       createdAt: now,
     };

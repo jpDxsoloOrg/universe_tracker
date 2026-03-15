@@ -1,14 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import { statisticsApi, seasonsApi } from '../services/api';
-import type { PlayerStatsResponse } from '../services/api';
+import type { WrestlerStatsResponse } from '../services/api';
 import type { Season } from '../types';
 
-interface UsePlayerStatsParams {
-  playerId?: string;
+interface UseWrestlerStatsParams {
+  wrestlerId?: string;
 }
 
-export function usePlayerStats({ playerId }: UsePlayerStatsParams) {
-  const [data, setData] = useState<PlayerStatsResponse | null>(null);
+export function useWrestlerStats({ wrestlerId }: UseWrestlerStatsParams) {
+  const [data, setData] = useState<WrestlerStatsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [seasons, setSeasons] = useState<Season[]>([]);
@@ -31,20 +31,20 @@ export function usePlayerStats({ playerId }: UsePlayerStatsParams) {
     return () => abortController.abort();
   }, []);
 
-  // Fetch player stats when playerId or selectedSeasonId changes
+  // Fetch wrestler stats when wrestlerId or selectedSeasonId changes
   useEffect(() => {
-    if (!playerId) return;
+    if (!wrestlerId) return;
     const abortController = new AbortController();
     const fetchStats = async () => {
       setLoading(true);
       setError(null);
       try {
         const seasonId = selectedSeasonId || undefined;
-        const result = await statisticsApi.getPlayerStats(playerId, seasonId, abortController.signal);
+        const result = await statisticsApi.getWrestlerStats(wrestlerId, seasonId, abortController.signal);
         setData(result);
       } catch (err: unknown) {
         if (err instanceof Error && err.name !== 'AbortError') {
-          setError('Failed to load player statistics');
+          setError('Failed to load wrestler statistics');
         }
       } finally {
         setLoading(false);
@@ -52,7 +52,7 @@ export function usePlayerStats({ playerId }: UsePlayerStatsParams) {
     };
     fetchStats();
     return () => abortController.abort();
-  }, [playerId, selectedSeasonId]);
+  }, [wrestlerId, selectedSeasonId]);
 
   const overallStats = useMemo(
     () => data?.statistics?.find((s) => s.statType === 'overall'),

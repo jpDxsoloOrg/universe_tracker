@@ -80,8 +80,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       }
     };
 
-    // Delete all players
-    await clearTable('players', TableNames.PLAYERS, 'playerId');
+    // Delete all wrestlers
+    await clearTable('wrestlers', TableNames.WRESTLERS, 'wrestlerId');
 
     // Delete all matches
     await clearTable('matches', TableNames.MATCHES, 'matchId', 'date');
@@ -99,7 +99,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     await clearTable('seasons', TableNames.SEASONS, 'seasonId');
 
     // Delete all season standings
-    await clearTable('seasonStandings', TableNames.SEASON_STANDINGS, 'seasonId', 'playerId');
+    await clearTable('seasonStandings', TableNames.SEASON_STANDINGS, 'seasonId', 'wrestlerId');
 
     // Delete all divisions
     await clearTable('divisions', TableNames.DIVISIONS, 'divisionId');
@@ -108,10 +108,10 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     await clearTable('events', TableNames.EVENTS, 'eventId');
 
     // Delete all contender rankings
-    await clearTable('contenderRankings', TableNames.CONTENDER_RANKINGS, 'championshipId', 'playerId');
+    await clearTable('contenderRankings', TableNames.CONTENDER_RANKINGS, 'championshipId', 'wrestlerId');
 
     // Delete all ranking history
-    await clearTable('rankingHistory', TableNames.RANKING_HISTORY, 'playerId', 'weekKey');
+    await clearTable('rankingHistory', TableNames.RANKING_HISTORY, 'wrestlerId', 'weekKey');
 
     const response: Record<string, unknown> = {
       message: totalErrors > 0

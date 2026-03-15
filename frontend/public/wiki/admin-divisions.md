@@ -1,6 +1,6 @@
 # Managing Divisions
 
-The **Divisions** page lets you group players by weight class, card position, or role—for example Heavyweight, Cruiserweight, Main Event, or Jobbers. Divisions are not show brands; they define who can contend for which championships when division restrictions are enabled.
+The **Divisions** page lets you group wrestlers by weight class, card position, or role—for example Heavyweight, Cruiserweight, Main Event, or Jobbers. Divisions are not show brands; they define who can contend for which championships when division restrictions are enabled.
 
 ## Creating a Division
 
@@ -23,11 +23,11 @@ The **Divisions** page lets you group players by weight class, card position, or
 2. Click the **Delete** button on the division card
 3. Confirm the action in the dialog
 
-**Note:** You cannot delete a division that has players assigned to it. Reassign or remove players from the division first.
+**Note:** You cannot delete a division that has wrestlers assigned to it. Reassign or remove wrestlers from the division first.
 
-## Assigning Players to Divisions
+## Assigning Wrestlers to Divisions
 
-1. Navigate to **Manage Players**
-2. When editing a player, use the **Division** dropdown
+1. Navigate to **Manage Wrestlers**
+2. When editing a wrestler, use the **Division** dropdown
 3. Select the appropriate division or "No Division"
-4. Save the player to apply the assignment
+4. Save the wrestler to apply the assignment

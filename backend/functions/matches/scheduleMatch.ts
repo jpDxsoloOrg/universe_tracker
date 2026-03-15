@@ -52,19 +52,19 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     }
 
     // Validate all participants exist
-    const playerValidationPromises = body.participants.map(async (playerId) => {
-      const player = await dynamoDb.get({
-        TableName: TableNames.PLAYERS,
-        Key: { playerId },
+    const wrestlerValidationPromises = body.participants.map(async (wrestlerId) => {
+      const wrestler = await dynamoDb.get({
+        TableName: TableNames.WRESTLERS,
+        Key: { wrestlerId },
       });
-      return { playerId, exists: !!player.Item, player: player.Item };
+      return { wrestlerId, exists: !!wrestler.Item, wrestler: wrestler.Item };
     });
 
-    const playerResults = await Promise.all(playerValidationPromises);
-    const missingPlayers = playerResults.filter((p) => !p.exists).map((p) => p.playerId);
+    const wrestlerResults = await Promise.all(wrestlerValidationPromises);
+    const missingWrestlers = wrestlerResults.filter((w) => !w.exists).map((w) => w.wrestlerId);
 
-    if (missingPlayers.length > 0) {
-      return notFound(`Players not found: ${missingPlayers.join(', ')}`);
+    if (missingWrestlers.length > 0) {
+      return notFound(`Wrestlers not found: ${missingWrestlers.join(', ')}`);
     }
 
     // Validate championship exists if provided
@@ -81,14 +81,14 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       // Enforce division restriction: all participants must belong to the championship's division
       const champDivisionId = championship.Item.divisionId as string | undefined;
       if (champDivisionId) {
-        const wrongDivision = playerResults.filter((p) => {
-          const playerDivision = (p.player as Record<string, unknown>)?.divisionId as string | undefined;
-          return playerDivision !== champDivisionId;
+        const wrongDivision = wrestlerResults.filter((w) => {
+          const wrestlerDivision = (w.wrestler as Record<string, unknown>)?.divisionId as string | undefined;
+          return wrestlerDivision !== champDivisionId;
         });
 
         if (wrongDivision.length > 0) {
           return badRequest(
-            `Championship is locked to a division. The following participants are not in the correct division: ${wrongDivision.map((p) => p.playerId).join(', ')}`,
+            `Championship is locked to a division. The following participants are not in the correct division: ${wrongDivision.map((w) => w.wrestlerId).join(', ')}`,
           );
         }
       }

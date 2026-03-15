@@ -7,7 +7,7 @@ Die Seite **Benutzerverwaltung** ermöglicht die Verwaltung von Benutzerkonten u
 | Rolle | Beschreibung |
 |--------|---------------|
 | **Admin** | Vollzugriff auf alle Verwaltungsfunktionen, inkl. Gefahrenzone, öffentliche Seiten und geschützte Funktionen |
-| **Moderator** | Zugriff auf alle Verwaltungsfunktionen außer der Gefahrenzone (kein Beispieldaten erzeugen oder Alle Daten löschen). Kann Spieler, Matches, Meisterschaften, Herausforderungen, Promos und andere alltägliche Admin-Aufgaben verwalten. Kann nur von einem Super-Admin zugewiesen werden. |
+| **Moderator** | Zugriff auf alle Verwaltungsfunktionen außer der Gefahrenzone (kein Beispieldaten erzeugen oder Alle Daten löschen). Kann Wrestler, Matches, Meisterschaften, Herausforderungen, Promos und andere alltägliche Admin-Aufgaben verwalten. Kann nur von einem Super-Admin zugewiesen werden. |
 | **Wrestler** | Zugriff auf die persönliche Profilseite mit Statistiken, Herausforderer-Status, Herausforderungen und Promos |
 | **Fantasy** | Zugriff auf die Fantasy-Liga: Tipps abgeben, Ranglisten ansehen, Wrestler-Kosten verfolgen |
 

@@ -19,7 +19,7 @@ vi.mock('../../../lib/dynamodb', () => ({
     queryAll: vi.fn(),
   },
   TableNames: {
-    PLAYERS: 'Players',
+    WRESTLERS: 'Wrestlers',
     MATCHES: 'Matches',
     CHAMPIONSHIPS: 'Championships',
     CHAMPIONSHIP_HISTORY: 'ChampionshipHistory',
@@ -53,11 +53,10 @@ function makeEvent(overrides: Partial<APIGatewayProxyEvent> = {}): APIGatewayPro
   };
 }
 
-function makePlayer(id: string, name: string, wrestler: string) {
+function makeWrestler(id: string, name: string) {
   return {
-    playerId: id,
+    wrestlerId: id,
     name,
-    currentWrestler: wrestler,
     wins: 0,
     losses: 0,
     draws: 0,
@@ -80,8 +79,8 @@ function makeMatch(overrides: Record<string, unknown> = {}) {
   };
 }
 
-const player1 = makePlayer('p1', 'Player One', 'Wrestler A');
-const player2 = makePlayer('p2', 'Player Two', 'Wrestler B');
+const wrestler1 = makeWrestler('p1', 'Wrestler One');
+const wrestler2 = makeWrestler('p2', 'Wrestler Two');
 
 // ─── Tests ───────────────────────────────────────────────────────────
 
@@ -92,7 +91,7 @@ describe('getStatistics - match-types section', () => {
 
   it('returns a leaderboard for all completed matches when no filters', async () => {
     mockScanAll.mockImplementation(({ TableName }: { TableName: string }) => {
-      if (TableName === 'Players') return Promise.resolve([player1, player2]);
+      if (TableName === 'Wrestlers') return Promise.resolve([wrestler1, wrestler2]);
       if (TableName === 'Matches') {
         return Promise.resolve([
           makeMatch({ matchFormat: 'Singles', winners: ['p1'], losers: ['p2'] }),
@@ -113,19 +112,19 @@ describe('getStatistics - match-types section', () => {
     expect(Array.isArray(body.leaderboard)).toBe(true);
     expect(body.leaderboard.length).toBe(2);
 
-    // Both players have matches, sorted by winPercentage desc then wins desc
+    // Both wrestlers have matches, sorted by winPercentage desc then wins desc
     // p1: 2W 1L = 66.7%, p2: 1W 2L = 33.3%
-    expect(body.leaderboard[0].playerId).toBe('p1');
+    expect(body.leaderboard[0].wrestlerId).toBe('p1');
     expect(body.leaderboard[0].wins).toBe(2);
     expect(body.leaderboard[0].losses).toBe(1);
     expect(body.leaderboard[0].rank).toBe(1);
-    expect(body.leaderboard[1].playerId).toBe('p2');
+    expect(body.leaderboard[1].wrestlerId).toBe('p2');
     expect(body.leaderboard[1].rank).toBe(2);
   });
 
-  it('only includes players with matches', async () => {
+  it('only includes wrestlers with matches', async () => {
     mockScanAll.mockImplementation(({ TableName }: { TableName: string }) => {
-      if (TableName === 'Players') return Promise.resolve([player1, player2]);
+      if (TableName === 'Wrestlers') return Promise.resolve([wrestler1, wrestler2]);
       if (TableName === 'Matches') {
         return Promise.resolve([
           makeMatch({ matchFormat: 'Singles', winners: ['p1'], losers: ['p2'], participants: ['p1', 'p2'] }),
@@ -144,7 +143,7 @@ describe('getStatistics - match-types section', () => {
 
   it('filters by seasonId when provided', async () => {
     mockScanAll.mockImplementation(({ TableName }: { TableName: string }) => {
-      if (TableName === 'Players') return Promise.resolve([player1, player2]);
+      if (TableName === 'Wrestlers') return Promise.resolve([wrestler1, wrestler2]);
       if (TableName === 'Matches') {
         return Promise.resolve([
           makeMatch({ matchFormat: 'Singles', seasonId: 's1', winners: ['p1'], losers: ['p2'] }),
@@ -161,7 +160,7 @@ describe('getStatistics - match-types section', () => {
 
     const body = JSON.parse(result!.body);
     // Only s1 match: p1 wins
-    expect(body.leaderboard[0].playerId).toBe('p1');
+    expect(body.leaderboard[0].wrestlerId).toBe('p1');
     expect(body.leaderboard[0].wins).toBe(1);
     expect(body.leaderboard[0].losses).toBe(0);
   });

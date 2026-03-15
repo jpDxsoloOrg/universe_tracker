@@ -24,7 +24,7 @@ const client = new DynamoDBClient(
 const docClient = DynamoDBDocumentClient.from(client);
 
 const TABLES = {
-  PLAYERS: `universe-tracker-api-players-${STAGE}`,
+  WRESTLERS: `universe-tracker-api-wrestlers-${STAGE}`,
   MATCHES: `universe-tracker-api-matches-${STAGE}`,
   CHAMPIONSHIPS: `universe-tracker-api-championships-${STAGE}`,
   CHAMPIONSHIP_HISTORY: `universe-tracker-api-championship-history-${STAGE}`,
@@ -38,7 +38,7 @@ const TABLES = {
   SITE_CONFIG: `universe-tracker-api-site-config-${STAGE}`,
 };
 
-const wrestlers = [
+const wrestlerNames = [
   'Stone Cold Steve Austin',
   'The Rock',
   'The Undertaker',
@@ -51,21 +51,6 @@ const wrestlers = [
   'CM Punk',
   'Roman Reigns',
   'Seth Rollins',
-];
-
-const playerNames = [
-  'John Stone',
-  'Mike Rock',
-  'Jake Undertaker',
-  'Chris Helmsley',
-  'Alex Michaels',
-  'Sam Hart',
-  'Dave Cena',
-  'Randy Legend',
-  'Adam Copeland',
-  'Phil Brooks',
-  'Joe Anoa\'i',
-  'Colby Lopez',
 ];
 
 const stipulations = ['Standard', 'No DQ', 'Steel Cage', 'Ladder Match', 'Hell in a Cell', 'Tables Match'];
@@ -136,12 +121,11 @@ async function seedData() {
     console.log(`  ✓ Division: ${division.name}`);
   }
 
-  // ── Players ────────────────────────────────────────────────
-  console.log('\nCreating players...');
-  const players = playerNames.map((name, index) => ({
-    playerId: uuidv4(),
+  // ── Wrestlers ─────────────────────────────────────────────
+  console.log('\nCreating wrestlers...');
+  const seedWrestlers = wrestlerNames.map((name, index) => ({
+    wrestlerId: uuidv4(),
     name,
-    currentWrestler: wrestlers[index],
     wins: Math.floor(Math.random() * 15) + 3,
     losses: Math.floor(Math.random() * 12) + 2,
     draws: Math.floor(Math.random() * 3),
@@ -150,9 +134,9 @@ async function seedData() {
     updatedAt: now,
   }));
 
-  for (const player of players) {
-    await putItem(TABLES.PLAYERS, player);
-    console.log(`  ✓ Player: ${player.name} (${player.currentWrestler}) [${divisions.find(d => d.divisionId === player.divisionId)!.name}]`);
+  for (const wrestler of seedWrestlers) {
+    await putItem(TABLES.WRESTLERS, wrestler);
+    console.log(`  ✓ Wrestler: ${wrestler.name} [${divisions.find(d => d.divisionId === wrestler.divisionId)!.name}]`);
   }
 
   // ── Seasons ────────────────────────────────────────────────
@@ -171,17 +155,17 @@ async function seedData() {
 
   // ── Season Standings ───────────────────────────────────────
   console.log('\nCreating season standings...');
-  for (const player of players) {
+  for (const wrestler of seedWrestlers) {
     const standing = {
       seasonId: season.seasonId,
-      playerId: player.playerId,
+      wrestlerId: wrestler.wrestlerId,
       wins: Math.floor(Math.random() * 8) + 1,
       losses: Math.floor(Math.random() * 6) + 1,
       draws: Math.floor(Math.random() * 2),
       updatedAt: now,
     };
     await putItem(TABLES.SEASON_STANDINGS, standing);
-    console.log(`  ✓ Standing: ${player.name} (${standing.wins}W-${standing.losses}L-${standing.draws}D)`);
+    console.log(`  ✓ Standing: ${wrestler.name} (${standing.wins}W-${standing.losses}L-${standing.draws}D)`);
   }
 
   // ── Championships ──────────────────────────────────────────
@@ -191,7 +175,7 @@ async function seedData() {
       championshipId: uuidv4(),
       name: 'World Heavyweight Championship',
       type: 'singles',
-      currentChampion: players[0].playerId,
+      currentChampion: seedWrestlers[0].wrestlerId,
       divisionId: divisions[0].divisionId,
       isActive: true,
       createdAt: now,
@@ -202,7 +186,7 @@ async function seedData() {
       championshipId: uuidv4(),
       name: 'Intercontinental Championship',
       type: 'singles',
-      currentChampion: players[1].playerId,
+      currentChampion: seedWrestlers[1].wrestlerId,
       isActive: true,
       createdAt: now,
       updatedAt: now,
@@ -212,7 +196,7 @@ async function seedData() {
       championshipId: uuidv4(),
       name: 'Tag Team Championship',
       type: 'tag',
-      currentChampion: [players[2].playerId, players[3].playerId],
+      currentChampion: [seedWrestlers[2].wrestlerId, seedWrestlers[3].wrestlerId],
       isActive: true,
       createdAt: now,
       updatedAt: now,
@@ -222,7 +206,7 @@ async function seedData() {
       championshipId: uuidv4(),
       name: 'United States Championship',
       type: 'singles',
-      currentChampion: players[4].playerId,
+      currentChampion: seedWrestlers[4].wrestlerId,
       divisionId: divisions[1].divisionId,
       isActive: true,
       createdAt: now,
@@ -260,10 +244,10 @@ async function seedData() {
     const ago = Math.floor(Math.random() * 25) + 5;
     const matchDate = daysAgo(ago);
 
-    const p1 = players[Math.floor(Math.random() * players.length)];
-    let p2 = players[Math.floor(Math.random() * players.length)];
-    while (p2.playerId === p1.playerId) {
-      p2 = players[Math.floor(Math.random() * players.length)];
+    const p1 = seedWrestlers[Math.floor(Math.random() * seedWrestlers.length)];
+    let p2 = seedWrestlers[Math.floor(Math.random() * seedWrestlers.length)];
+    while (p2.wrestlerId === p1.wrestlerId) {
+      p2 = seedWrestlers[Math.floor(Math.random() * seedWrestlers.length)];
     }
 
     const winner = Math.random() > 0.5 ? p1 : p2;
@@ -274,9 +258,9 @@ async function seedData() {
       date: matchDate.toISOString(),
       matchType: 'singles',
       stipulation: stipulations[Math.floor(Math.random() * stipulations.length)],
-      participants: [p1.playerId, p2.playerId],
-      winners: [winner.playerId],
-      losers: [loser.playerId],
+      participants: [p1.wrestlerId, p2.wrestlerId],
+      winners: [winner.wrestlerId],
+      losers: [loser.wrestlerId],
       isChampionship: false,
       seasonId: season.seasonId,
       status: 'completed',
@@ -290,10 +274,10 @@ async function seedData() {
     const ahead = Math.floor(Math.random() * 14) + 1;
     const matchDate = daysFromNow(ahead);
 
-    const p1 = players[Math.floor(Math.random() * players.length)];
-    let p2 = players[Math.floor(Math.random() * players.length)];
-    while (p2.playerId === p1.playerId) {
-      p2 = players[Math.floor(Math.random() * players.length)];
+    const p1 = seedWrestlers[Math.floor(Math.random() * seedWrestlers.length)];
+    let p2 = seedWrestlers[Math.floor(Math.random() * seedWrestlers.length)];
+    while (p2.wrestlerId === p1.wrestlerId) {
+      p2 = seedWrestlers[Math.floor(Math.random() * seedWrestlers.length)];
     }
 
     const match: Record<string, unknown> = {
@@ -301,7 +285,7 @@ async function seedData() {
       date: matchDate.toISOString(),
       matchType: i % 2 === 0 ? 'singles' : 'tag',
       stipulation: stipulations[Math.floor(Math.random() * stipulations.length)],
-      participants: [p1.playerId, p2.playerId],
+      participants: [p1.wrestlerId, p2.wrestlerId],
       isChampionship: i === 0,
       seasonId: season.seasonId,
       status: 'scheduled',
@@ -329,21 +313,21 @@ async function seedData() {
       name: 'King of the Ring 2024',
       type: 'single-elimination',
       status: 'in-progress',
-      participants: [players[0].playerId, players[1].playerId, players[2].playerId, players[3].playerId],
+      participants: [seedWrestlers[0].wrestlerId, seedWrestlers[1].wrestlerId, seedWrestlers[2].wrestlerId, seedWrestlers[3].wrestlerId],
       brackets: {
         rounds: [
           {
             roundNumber: 1,
             matches: [
               {
-                participant1: players[0].playerId,
-                participant2: players[1].playerId,
-                winner: players[0].playerId,
+                participant1: seedWrestlers[0].wrestlerId,
+                participant2: seedWrestlers[1].wrestlerId,
+                winner: seedWrestlers[0].wrestlerId,
               },
               {
-                participant1: players[2].playerId,
-                participant2: players[3].playerId,
-                winner: players[2].playerId,
+                participant1: seedWrestlers[2].wrestlerId,
+                participant2: seedWrestlers[3].wrestlerId,
+                winner: seedWrestlers[2].wrestlerId,
               },
             ],
           },
@@ -351,8 +335,8 @@ async function seedData() {
             roundNumber: 2,
             matches: [
               {
-                participant1: players[0].playerId,
-                participant2: players[2].playerId,
+                participant1: seedWrestlers[0].wrestlerId,
+                participant2: seedWrestlers[2].wrestlerId,
               },
             ],
           },
@@ -366,12 +350,12 @@ async function seedData() {
       name: 'G1 Climax 2024',
       type: 'round-robin',
       status: 'in-progress',
-      participants: [players[4].playerId, players[5].playerId, players[6].playerId, players[7].playerId],
+      participants: [seedWrestlers[4].wrestlerId, seedWrestlers[5].wrestlerId, seedWrestlers[6].wrestlerId, seedWrestlers[7].wrestlerId],
       standings: {
-        [players[4].playerId]: { wins: 2, losses: 1, draws: 0, points: 4 },
-        [players[5].playerId]: { wins: 2, losses: 1, draws: 0, points: 4 },
-        [players[6].playerId]: { wins: 1, losses: 2, draws: 0, points: 2 },
-        [players[7].playerId]: { wins: 1, losses: 2, draws: 0, points: 2 },
+        [seedWrestlers[4].wrestlerId]: { wins: 2, losses: 1, draws: 0, points: 4 },
+        [seedWrestlers[5].wrestlerId]: { wins: 2, losses: 1, draws: 0, points: 4 },
+        [seedWrestlers[6].wrestlerId]: { wins: 1, losses: 2, draws: 0, points: 2 },
+        [seedWrestlers[7].wrestlerId]: { wins: 1, losses: 2, draws: 0, points: 2 },
       },
       createdAt: now,
       version: 1,
@@ -469,17 +453,17 @@ async function seedData() {
   // ── Contender Rankings ─────────────────────────────────────
   console.log('\nCreating contender rankings...');
   // Rankings for the World Heavyweight Championship (singles, division-locked to Raw)
-  const rawPlayers = players.filter(p => p.divisionId === divisions[0].divisionId);
+  const rawWrestlers = seedWrestlers.filter(w => w.divisionId === divisions[0].divisionId);
   const whcChampionId = championships[0].currentChampion as string;
-  const whcContenders = rawPlayers
-    .filter(p => p.playerId !== whcChampionId)
+  const whcContenders = rawWrestlers
+    .filter(p => p.wrestlerId !== whcChampionId)
     .slice(0, 3);
 
   for (let i = 0; i < whcContenders.length; i++) {
     const contender = whcContenders[i];
     const ranking: Record<string, unknown> = {
       championshipId: championships[0].championshipId,
-      playerId: contender.playerId,
+      wrestlerId: contender.wrestlerId,
       rank: i + 1,
       rankingScore: 80 - i * 15,
       winPercentage: 0.6 - i * 0.1,
@@ -502,15 +486,15 @@ async function seedData() {
 
   // Rankings for the Intercontinental Championship (open, no division lock)
   const icChampionId = championships[1].currentChampion as string;
-  const icContenders = players
-    .filter(p => p.playerId !== icChampionId)
+  const icContenders = seedWrestlers
+    .filter(p => p.wrestlerId !== icChampionId)
     .slice(0, 5);
 
   for (let i = 0; i < icContenders.length; i++) {
     const contender = icContenders[i];
     const ranking: Record<string, unknown> = {
       championshipId: championships[1].championshipId,
-      playerId: contender.playerId,
+      wrestlerId: contender.wrestlerId,
       rank: i + 1,
       rankingScore: 90 - i * 12,
       winPercentage: 0.7 - i * 0.08,
@@ -540,7 +524,7 @@ async function seedData() {
       const contender = icContenders[i];
       const weekKey = getISOWeekKey(championships[1].championshipId, weekDate);
       const entry = {
-        playerId: contender.playerId,
+        wrestlerId: contender.wrestlerId,
         weekKey,
         championshipId: championships[1].championshipId,
         rank: i + 1 + (weekOffset === 2 ? 1 : 0), // slightly different older ranks
@@ -571,9 +555,9 @@ async function seedData() {
   console.log('\n✅ Seed data created successfully!');
   console.log('\nSummary:');
   console.log(`  - ${divisions.length} divisions`);
-  console.log(`  - ${players.length} players`);
+  console.log(`  - ${seedWrestlers.length} wrestlers`);
   console.log(`  - 1 season`);
-  console.log(`  - ${players.length} season standings`);
+  console.log(`  - ${seedWrestlers.length} season standings`);
   console.log(`  - ${championships.length} championships`);
   console.log(`  - ${championships.length} championship history entries`);
   console.log(`  - ${matches.length} matches (${completedMatches.length} completed, ${scheduledMatches.length} scheduled)`);

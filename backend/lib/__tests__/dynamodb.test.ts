@@ -36,7 +36,7 @@ describe('dynamoDb wrapper', () => {
       mockSend.mockResolvedValue({ Item: { id: '1', name: 'Test' } });
 
       const result = await dynamoDb.get({
-        TableName: 'Players',
+        TableName: 'Wrestlers',
         Key: { id: '1' },
       });
 
@@ -48,7 +48,7 @@ describe('dynamoDb wrapper', () => {
       mockSend.mockResolvedValue({});
 
       const result = await dynamoDb.get({
-        TableName: 'Players',
+        TableName: 'Wrestlers',
         Key: { id: 'missing' },
       });
 
@@ -63,14 +63,14 @@ describe('dynamoDb wrapper', () => {
       mockSend.mockResolvedValue({});
 
       await dynamoDb.put({
-        TableName: 'Players',
-        Item: { id: '1', name: 'New Player' },
+        TableName: 'Wrestlers',
+        Item: { id: '1', name: 'New Wrestler' },
       });
 
       expect(mockSend).toHaveBeenCalledOnce();
       const cmd = mockSend.mock.calls[0][0];
-      expect(cmd.input.TableName).toBe('Players');
-      expect(cmd.input.Item).toEqual({ id: '1', name: 'New Player' });
+      expect(cmd.input.TableName).toBe('Wrestlers');
+      expect(cmd.input.Item).toEqual({ id: '1', name: 'New Wrestler' });
     });
   });
 
@@ -81,7 +81,7 @@ describe('dynamoDb wrapper', () => {
       mockSend.mockResolvedValue({ Attributes: { id: '1', name: 'Updated' } });
 
       const result = await dynamoDb.update({
-        TableName: 'Players',
+        TableName: 'Wrestlers',
         Key: { id: '1' },
         UpdateExpression: 'SET #name = :name',
         ExpressionAttributeNames: { '#name': 'name' },
@@ -99,7 +99,7 @@ describe('dynamoDb wrapper', () => {
       mockSend.mockResolvedValue({});
 
       await dynamoDb.delete({
-        TableName: 'Players',
+        TableName: 'Wrestlers',
         Key: { id: '1' },
       });
 
@@ -115,7 +115,7 @@ describe('dynamoDb wrapper', () => {
     it('sends ScanCommand and returns Items', async () => {
       mockSend.mockResolvedValue({ Items: [{ id: '1' }, { id: '2' }] });
 
-      const result = await dynamoDb.scan({ TableName: 'Players' });
+      const result = await dynamoDb.scan({ TableName: 'Wrestlers' });
 
       expect(result.Items).toHaveLength(2);
     });
@@ -123,7 +123,7 @@ describe('dynamoDb wrapper', () => {
     it('returns empty Items array when table is empty', async () => {
       mockSend.mockResolvedValue({ Items: [] });
 
-      const result = await dynamoDb.scan({ TableName: 'Players' });
+      const result = await dynamoDb.scan({ TableName: 'Wrestlers' });
 
       expect(result.Items).toEqual([]);
     });
@@ -136,7 +136,7 @@ describe('dynamoDb wrapper', () => {
       mockSend.mockResolvedValue({ Items: [{ id: '1' }], Count: 1 });
 
       const result = await dynamoDb.query({
-        TableName: 'Players',
+        TableName: 'Wrestlers',
         KeyConditionExpression: 'id = :id',
         ExpressionAttributeValues: { ':id': '1' },
       });
@@ -149,7 +149,7 @@ describe('dynamoDb wrapper', () => {
       mockSend.mockResolvedValue({ Items: [], Count: 0 });
 
       const result = await dynamoDb.query({
-        TableName: 'Players',
+        TableName: 'Wrestlers',
         KeyConditionExpression: 'id = :id',
         ExpressionAttributeValues: { ':id': 'none' },
       });
@@ -166,7 +166,7 @@ describe('dynamoDb wrapper', () => {
 
       await dynamoDb.transactWrite({
         TransactItems: [
-          { Put: { TableName: 'Players', Item: { id: '1' } } },
+          { Put: { TableName: 'Wrestlers', Item: { id: '1' } } },
         ],
       });
 
@@ -181,7 +181,7 @@ describe('dynamoDb wrapper', () => {
       await expect(
         dynamoDb.transactWrite({
           TransactItems: [
-            { Put: { TableName: 'Players', Item: { id: '1' } } },
+            { Put: { TableName: 'Wrestlers', Item: { id: '1' } } },
           ],
         }),
       ).rejects.toThrow('Transaction cancelled');
@@ -197,7 +197,7 @@ describe('dynamoDb wrapper', () => {
         LastEvaluatedKey: undefined,
       });
 
-      const items = await dynamoDb.scanAll({ TableName: 'Players' });
+      const items = await dynamoDb.scanAll({ TableName: 'Wrestlers' });
 
       expect(items).toEqual([{ id: '1' }, { id: '2' }]);
       expect(mockSend).toHaveBeenCalledOnce();
@@ -218,7 +218,7 @@ describe('dynamoDb wrapper', () => {
           LastEvaluatedKey: undefined,
         });
 
-      const items = await dynamoDb.scanAll({ TableName: 'Players' });
+      const items = await dynamoDb.scanAll({ TableName: 'Wrestlers' });
 
       expect(items).toEqual([{ id: '1' }, { id: '2' }, { id: '3' }]);
       expect(mockSend).toHaveBeenCalledTimes(3);
@@ -227,7 +227,7 @@ describe('dynamoDb wrapper', () => {
     it('returns empty array when table is empty', async () => {
       mockSend.mockResolvedValue({ Items: undefined, LastEvaluatedKey: undefined });
 
-      const items = await dynamoDb.scanAll({ TableName: 'Players' });
+      const items = await dynamoDb.scanAll({ TableName: 'Wrestlers' });
 
       expect(items).toEqual([]);
     });
@@ -243,7 +243,7 @@ describe('dynamoDb wrapper', () => {
       });
 
       const items = await dynamoDb.queryAll({
-        TableName: 'Players',
+        TableName: 'Wrestlers',
         KeyConditionExpression: 'pk = :pk',
         ExpressionAttributeValues: { ':pk': 'A' },
       });
@@ -263,7 +263,7 @@ describe('dynamoDb wrapper', () => {
         });
 
       const items = await dynamoDb.queryAll({
-        TableName: 'Players',
+        TableName: 'Wrestlers',
         KeyConditionExpression: 'pk = :pk',
         ExpressionAttributeValues: { ':pk': 'A' },
       });

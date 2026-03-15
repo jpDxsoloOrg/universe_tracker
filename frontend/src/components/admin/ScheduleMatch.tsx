@@ -1,8 +1,8 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { matchesApi, playersApi, championshipsApi, tournamentsApi, seasonsApi, eventsApi, stipulationsApi, matchTypesApi } from '../../services/api';
-import type { Player, Championship, Tournament, Season, Stipulation, MatchType } from '../../types';
+import { matchesApi, wrestlersApi, championshipsApi, tournamentsApi, seasonsApi, eventsApi, stipulationsApi, matchTypesApi } from '../../services/api';
+import type { Wrestler, Championship, Tournament, Season, Stipulation, MatchType } from '../../types';
 import type { LeagueEvent, MatchDesignation } from '../../types/event';
 import SearchableSelect from './SearchableSelect';
 import Skeleton from '../ui/Skeleton';
@@ -11,7 +11,7 @@ import './ScheduleMatch.css';
 export default function ScheduleMatch() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [wrestlers, setWrestlers] = useState<Wrestler[]>([]);
   const [championships, setChampionships] = useState<Championship[]>([]);
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [seasons, setSeasons] = useState<Season[]>([]);
@@ -23,7 +23,7 @@ export default function ScheduleMatch() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Tag team state: array of teams, each team is an array of player IDs
+  // Tag team state: array of teams, each team is an array of wrestler IDs
   const [teams, setTeams] = useState<string[][]>([[], []]);
 
   const [formData, setFormData] = useState({
@@ -46,8 +46,8 @@ export default function ScheduleMatch() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [playersData, championshipsData, tournamentsData, seasonsData, eventsData, stipulationsData, matchTypesData] = await Promise.all([
-        playersApi.getAll(),
+      const [wrestlersData, championshipsData, tournamentsData, seasonsData, eventsData, stipulationsData, matchTypesData] = await Promise.all([
+        wrestlersApi.getAll(),
         championshipsApi.getAll(),
         tournamentsApi.getAll(),
         seasonsApi.getAll(),
@@ -55,7 +55,7 @@ export default function ScheduleMatch() {
         stipulationsApi.getAll(),
         matchTypesApi.getAll(),
       ]);
-      setPlayers(playersData);
+      setWrestlers(wrestlersData);
       setChampionships(championshipsData);
       setTournaments(tournamentsData.filter(t => t.status !== 'completed'));
       setSeasons(seasonsData);
@@ -177,34 +177,34 @@ export default function ScheduleMatch() {
     setTeams([[], []]);
   };
 
-  const handleParticipantToggle = (playerId: string) => {
+  const handleParticipantToggle = (wrestlerId: string) => {
     setFormData(prev => ({
       ...prev,
-      participants: prev.participants.includes(playerId)
-        ? prev.participants.filter(id => id !== playerId)
-        : [...prev.participants, playerId],
+      participants: prev.participants.includes(wrestlerId)
+        ? prev.participants.filter(id => id !== wrestlerId)
+        : [...prev.participants, wrestlerId],
     }));
   };
 
   // Tag team helper functions
-  const handleTeamMemberToggle = (teamIndex: number, playerId: string) => {
+  const handleTeamMemberToggle = (teamIndex: number, wrestlerId: string) => {
     setTeams(prev => {
       const newTeams = [...prev];
       const currentTeam = newTeams[teamIndex];
       const team = currentTeam ? [...currentTeam] : [];
 
-      if (team.includes(playerId)) {
+      if (team.includes(wrestlerId)) {
         // Remove from this team
-        newTeams[teamIndex] = team.filter(id => id !== playerId);
+        newTeams[teamIndex] = team.filter(id => id !== wrestlerId);
       } else {
         // Remove from other teams first
         newTeams.forEach((t, i) => {
           if (i !== teamIndex && t) {
-            newTeams[i] = t.filter(id => id !== playerId);
+            newTeams[i] = t.filter(id => id !== wrestlerId);
           }
         });
         // Add to this team
-        newTeams[teamIndex] = [...team, playerId];
+        newTeams[teamIndex] = [...team, wrestlerId];
       }
 
       return newTeams;
@@ -220,13 +220,13 @@ export default function ScheduleMatch() {
     setTeams(prev => prev.filter((_, i) => i !== teamIndex));
   };
 
-  const getPlayerTeamIndex = (playerId: string): number => {
-    return teams.findIndex(team => team.includes(playerId));
+  const getWrestlerTeamIndex = (wrestlerId: string): number => {
+    return teams.findIndex(team => team.includes(wrestlerId));
   };
 
-  const getPlayerName = (playerId: string): string => {
-    const player = players.find(p => p.playerId === playerId);
-    return player ? player.name : t('common.unknown');
+  const getWrestlerName = (wrestlerId: string): string => {
+    const wrestler = wrestlers.find(p => p.wrestlerId === wrestlerId);
+    return wrestler ? wrestler.name : t('common.unknown');
   };
 
   const handleMatchFormatChange = (newFormat: string) => {
@@ -415,13 +415,13 @@ export default function ScheduleMatch() {
                   </div>
                   <div className="team-members">
                     {team.length > 0 ? (
-                      team.map(playerId => (
-                        <span key={playerId} className="team-member-tag">
-                          {getPlayerName(playerId)}
+                      team.map(wrestlerId => (
+                        <span key={wrestlerId} className="team-member-tag">
+                          {getWrestlerName(wrestlerId)}
                           <button
                             type="button"
                             className="remove-member-btn"
-                            onClick={() => handleTeamMemberToggle(teamIndex, playerId)}
+                            onClick={() => handleTeamMemberToggle(teamIndex, wrestlerId)}
                           >
                             ×
                           </button>
@@ -431,21 +431,21 @@ export default function ScheduleMatch() {
                       <span className="no-members">{t('scheduleMatch.tagTeam.noMembers')}</span>
                     )}
                   </div>
-                  <div className="team-players-grid">
-                    {players.filter(p => !team.includes(p.playerId)).map(player => {
-                      const playerTeamIndex = getPlayerTeamIndex(player.playerId);
-                      const isInOtherTeam = playerTeamIndex !== -1 && playerTeamIndex !== teamIndex;
+                  <div className="team-wrestlers-grid">
+                    {wrestlers.filter(p => !team.includes(p.wrestlerId)).map(wrestler => {
+                      const wrestlerTeamIndex = getWrestlerTeamIndex(wrestler.wrestlerId);
+                      const isInOtherTeam = wrestlerTeamIndex !== -1 && wrestlerTeamIndex !== teamIndex;
                       return (
                         <div
-                          key={player.playerId}
+                          key={wrestler.wrestlerId}
                           className={`participant-card ${isInOtherTeam ? 'in-other-team' : ''}`}
-                          onClick={() => !isInOtherTeam && handleTeamMemberToggle(teamIndex, player.playerId)}
+                          onClick={() => !isInOtherTeam && handleTeamMemberToggle(teamIndex, wrestler.wrestlerId)}
                         >
-                          <div className="participant-name">{player.name}</div>
-                          <div className="participant-wrestler">{player.currentWrestler}</div>
+                          <div className="participant-name">{wrestler.name}</div>
+                          <div className="participant-wrestler">{wrestler.name}</div>
                           {isInOtherTeam && (
                             <div className="other-team-label">
-                              {t('scheduleMatch.tagTeam.team')} {playerTeamIndex + 1}
+                              {t('scheduleMatch.tagTeam.team')} {wrestlerTeamIndex + 1}
                             </div>
                           )}
                         </div>
@@ -471,14 +471,14 @@ export default function ScheduleMatch() {
           <div className="form-group">
             <label>{t('scheduleMatch.participants')} ({formData.matchFormat.toLowerCase() === 'singles' ? '2' : '2+'})</label>
             <div className="participants-grid">
-              {players.map(player => (
+              {wrestlers.map(wrestler => (
                 <div
-                  key={player.playerId}
-                  className={`participant-card ${formData.participants.includes(player.playerId) ? 'selected' : ''}`}
-                  onClick={() => handleParticipantToggle(player.playerId)}
+                  key={wrestler.wrestlerId}
+                  className={`participant-card ${formData.participants.includes(wrestler.wrestlerId) ? 'selected' : ''}`}
+                  onClick={() => handleParticipantToggle(wrestler.wrestlerId)}
                 >
-                  <div className="participant-name">{player.name}</div>
-                  <div className="participant-wrestler">{player.currentWrestler}</div>
+                  <div className="participant-name">{wrestler.name}</div>
+                  <div className="participant-wrestler">{wrestler.name}</div>
                 </div>
               ))}
             </div>

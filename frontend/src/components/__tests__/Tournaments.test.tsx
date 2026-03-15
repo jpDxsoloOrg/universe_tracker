@@ -3,17 +3,17 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 
 // --- Hoisted mocks ---
-const { mockGetAllTournaments, mockGetAllPlayers } = vi.hoisted(() => ({
+const { mockGetAllTournaments, mockGetAllWrestlers } = vi.hoisted(() => ({
   mockGetAllTournaments: vi.fn(),
-  mockGetAllPlayers: vi.fn(),
+  mockGetAllWrestlers: vi.fn(),
 }));
 
 vi.mock('../../services/api', () => ({
   tournamentsApi: {
     getAll: mockGetAllTournaments,
   },
-  playersApi: {
-    getAll: mockGetAllPlayers,
+  wrestlersApi: {
+    getAll: mockGetAllWrestlers,
   },
 }));
 
@@ -42,7 +42,7 @@ vi.mock('react-i18next', () => ({
         'tournaments.summaryGap': 'Gap',
         'tournaments.summaryGapValue': '{{count}} pts',
         'tournaments.table.rank': 'Rank',
-        'tournaments.table.player': 'Player',
+        'tournaments.table.wrestler': 'Wrestler',
         'tournaments.table.w': 'W',
         'tournaments.table.l': 'L',
         'tournaments.table.d': 'D',
@@ -64,11 +64,11 @@ vi.mock('../Tournaments.css', () => ({}));
 import Tournaments from '../Tournaments';
 
 // --- Test data ---
-const mockPlayers = [
-  { playerId: 'p1', name: 'John Cena', currentWrestler: 'John Cena', wins: 10, losses: 2, draws: 1, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
-  { playerId: 'p2', name: 'The Rock', currentWrestler: 'The Rock', wins: 8, losses: 3, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
-  { playerId: 'p3', name: 'Undertaker', currentWrestler: 'Undertaker', wins: 15, losses: 5, draws: 2, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
-  { playerId: 'p4', name: 'Triple H', currentWrestler: 'Triple H', wins: 12, losses: 4, draws: 1, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+const mockWrestlers = [
+  { wrestlerId: 'p1', name: 'John Cena', wins: 10, losses: 2, draws: 1, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+  { wrestlerId: 'p2', name: 'The Rock', wins: 8, losses: 3, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+  { wrestlerId: 'p3', name: 'Undertaker', wins: 15, losses: 5, draws: 2, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+  { wrestlerId: 'p4', name: 'Triple H', wins: 12, losses: 4, draws: 1, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
 ];
 
 const singleEliminationTournament = {
@@ -140,7 +140,7 @@ describe('Tournaments', () => {
       roundRobinTournament,
       completedTournament,
     ]);
-    mockGetAllPlayers.mockResolvedValue(mockPlayers);
+    mockGetAllWrestlers.mockResolvedValue(mockWrestlers);
 
     renderTournaments();
 
@@ -164,7 +164,7 @@ describe('Tournaments', () => {
 
   it('shows bracket view for single-elimination tournament in detail modal', async () => {
     mockGetAllTournaments.mockResolvedValue([singleEliminationTournament]);
-    mockGetAllPlayers.mockResolvedValue(mockPlayers);
+    mockGetAllWrestlers.mockResolvedValue(mockWrestlers);
 
     renderTournaments();
 
@@ -194,7 +194,7 @@ describe('Tournaments', () => {
 
   it('shows standings table for round-robin tournament in detail modal', async () => {
     mockGetAllTournaments.mockResolvedValue([roundRobinTournament]);
-    mockGetAllPlayers.mockResolvedValue(mockPlayers);
+    mockGetAllWrestlers.mockResolvedValue(mockWrestlers);
 
     renderTournaments();
 
@@ -211,10 +211,10 @@ describe('Tournaments', () => {
 
     // Table headers
     expect(screen.getByText('Rank')).toBeInTheDocument();
-    expect(screen.getByText('Player')).toBeInTheDocument();
+    expect(screen.getByText('Wrestler')).toBeInTheDocument();
     expect(screen.getByText('Pts')).toBeInTheDocument();
 
-    // Player names in standings (sorted by points: p1=4, p2=2, p3=0)
+    // Wrestler names in standings (sorted by points: p1=4, p2=2, p3=0)
     const rows = screen.getAllByRole('row');
     // Header row + 3 data rows
     expect(rows).toHaveLength(4);
@@ -228,7 +228,7 @@ describe('Tournaments', () => {
 
   it('handles empty state when no tournaments exist', async () => {
     mockGetAllTournaments.mockResolvedValue([]);
-    mockGetAllPlayers.mockResolvedValue(mockPlayers);
+    mockGetAllWrestlers.mockResolvedValue(mockWrestlers);
 
     renderTournaments();
 

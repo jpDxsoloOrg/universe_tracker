@@ -10,7 +10,7 @@ provider:
   environment:
     SERVICE_NAME: ${self:service}
     STAGE: ${self:provider.stage}
-    PLAYERS_TABLE: ${self:service}-players-${self:provider.stage}
+    WRESTLERS_TABLE: ${self:service}-wrestlers-${self:provider.stage}
     MATCHES_TABLE: ${self:service}-matches-${self:provider.stage}
     CHAMPIONSHIPS_TABLE: ${self:service}-championships-${self:provider.stage}
     CHAMPIONSHIP_HISTORY_TABLE: ${self:service}-championship-history-${self:provider.stage}
@@ -43,8 +43,8 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
           Resource:
-            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PLAYERS_TABLE}
-            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PLAYERS_TABLE}/index/*
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.WRESTLERS_TABLE}
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.WRESTLERS_TABLE}/index/*
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.MATCHES_TABLE}
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.MATCHES_TABLE}/index/*
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.CHAMPIONSHIPS_TABLE}
@@ -177,31 +177,31 @@ functions:
           cors: *corsConfig
           authorizer: adminAuthorizer
 
-  # Players (Phase 2 consolidated: getPlayers, createPlayer, updatePlayer, deletePlayer)
-  players:
-    handler: functions/players/handler.handler
+  # Wrestlers (Phase 2 consolidated: getWrestlers, createWrestler, updateWrestler, deleteWrestler)
+  wrestlers:
+    handler: functions/wrestlers/handler.handler
     events:
       - http:
-          path: players
+          path: wrestlers
           method: get
           cors: *corsConfig
       - http:
-          path: players
+          path: wrestlers
           method: post
           cors: *corsConfig
           authorizer: adminAuthorizer
       - http:
-          path: players/{playerId}
+          path: wrestlers/{wrestlerId}
           method: put
           cors: *corsConfig
           authorizer: adminAuthorizer
       - http:
-          path: players/{playerId}
+          path: wrestlers/{wrestlerId}
           method: delete
           cors: *corsConfig
           authorizer: adminAuthorizer
       - http:
-          path: players/{playerId}/statistics
+          path: wrestlers/{wrestlerId}/statistics
           method: get
           cors: *corsConfig
 
@@ -554,26 +554,17 @@ resources:
         RestApiId:
           Ref: ApiGatewayRestApi
 
-    PlayersTable:
+    WrestlersTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:provider.environment.PLAYERS_TABLE}
+        TableName: ${self:provider.environment.WRESTLERS_TABLE}
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
-          - AttributeName: playerId
-            AttributeType: S
-          - AttributeName: userId
+          - AttributeName: wrestlerId
             AttributeType: S
         KeySchema:
-          - AttributeName: playerId
+          - AttributeName: wrestlerId
             KeyType: HASH
-        GlobalSecondaryIndexes:
-          - IndexName: UserIdIndex
-            KeySchema:
-              - AttributeName: userId
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
 
     MatchesTable:
       Type: AWS::DynamoDB::Table
@@ -662,17 +653,17 @@ resources:
         AttributeDefinitions:
           - AttributeName: seasonId
             AttributeType: S
-          - AttributeName: playerId
+          - AttributeName: wrestlerId
             AttributeType: S
         KeySchema:
           - AttributeName: seasonId
             KeyType: HASH
-          - AttributeName: playerId
+          - AttributeName: wrestlerId
             KeyType: RANGE
         GlobalSecondaryIndexes:
-          - IndexName: PlayerIndex
+          - IndexName: WrestlerIndex
             KeySchema:
-              - AttributeName: playerId
+              - AttributeName: wrestlerId
                 KeyType: HASH
               - AttributeName: seasonId
                 KeyType: RANGE
@@ -744,14 +735,14 @@ resources:
         AttributeDefinitions:
           - AttributeName: championshipId
             AttributeType: S
-          - AttributeName: playerId
+          - AttributeName: wrestlerId
             AttributeType: S
           - AttributeName: rank
             AttributeType: N
         KeySchema:
           - AttributeName: championshipId
             KeyType: HASH
-          - AttributeName: playerId
+          - AttributeName: wrestlerId
             KeyType: RANGE
         GlobalSecondaryIndexes:
           - IndexName: RankIndex
@@ -769,14 +760,14 @@ resources:
         TableName: ${self:provider.environment.RANKING_HISTORY_TABLE}
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
-          - AttributeName: playerId
+          - AttributeName: wrestlerId
             AttributeType: S
           - AttributeName: weekKey
             AttributeType: S
           - AttributeName: championshipId
             AttributeType: S
         KeySchema:
-          - AttributeName: playerId
+          - AttributeName: wrestlerId
             KeyType: HASH
           - AttributeName: weekKey
             KeyType: RANGE

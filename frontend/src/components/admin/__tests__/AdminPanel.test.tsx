@@ -23,7 +23,7 @@ vi.mock('react-router-dom', async () => {
 });
 
 // Mock all child admin components to isolate AdminPanel logic
-vi.mock('../ManagePlayers', () => ({ default: () => <div data-testid="manage-players">ManagePlayers</div> }));
+vi.mock('../ManageWrestlers', () => ({ default: () => <div data-testid="manage-wrestlers">ManageWrestlers</div> }));
 vi.mock('../ManageDivisions', () => ({ default: () => <div data-testid="manage-divisions">ManageDivisions</div> }));
 vi.mock('../ScheduleMatch', () => ({ default: () => <div data-testid="schedule-match">ScheduleMatch</div> }));
 vi.mock('../RecordResult', () => ({ default: () => <div data-testid="record-result">RecordResult</div> }));
@@ -70,10 +70,10 @@ describe('AdminPanel', () => {
 
     renderAdminPanel('/admin/divisions');
     expect(screen.getByTestId('manage-divisions')).toBeInTheDocument();
-    expect(screen.queryByTestId('manage-players')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('manage-wrestlers')).not.toBeInTheDocument();
   });
 
-  it('defaults to players tab when no tab parameter', () => {
+  it('defaults to wrestlers tab when no tab parameter', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       isAdminOrModerator: true,
@@ -81,7 +81,7 @@ describe('AdminPanel', () => {
     });
 
     renderAdminPanel('/admin');
-    expect(screen.getByTestId('manage-players')).toBeInTheDocument();
+    expect(screen.getByTestId('manage-wrestlers')).toBeInTheDocument();
   });
 
   it('redirects to login when not authenticated', () => {
@@ -91,7 +91,7 @@ describe('AdminPanel', () => {
       isSuperAdmin: false,
     });
 
-    renderAdminPanel('/admin/players');
+    renderAdminPanel('/admin/wrestlers');
     expect(screen.getByTestId('navigate')).toHaveAttribute('data-to', '/login');
   });
 
@@ -102,7 +102,7 @@ describe('AdminPanel', () => {
       isSuperAdmin: false,
     });
 
-    renderAdminPanel('/admin/players');
+    renderAdminPanel('/admin/wrestlers');
     expect(screen.getByText('Admin Access Required')).toBeInTheDocument();
     expect(screen.getByText('You need admin privileges to access this panel.')).toBeInTheDocument();
   });

@@ -79,7 +79,7 @@ export default function SeasonAwardsPage() {
       <div className="season-awards-page">
         <EmptyState
           title={t('seasonAwards.title')}
-          description={t('standings.noPlayers')}
+          description={t('standings.noWrestlers')}
         />
       </div>
     );

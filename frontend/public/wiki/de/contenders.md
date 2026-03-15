@@ -12,5 +12,5 @@ Die Ranglisten werden automatisch aus der letzten Kampfleistung berechnet. Jede 
 |-------------|--------------|
 | **Rang** | Die Herausforderer-Position (#1 ist als Nächstes für einen Titelkampf dran) |
 | **Punktzahl** | Eine berechnete Ranglistenpunktzahl aus letzten Siegen und Leistung |
-| **Sieg %** | Die Siegquote des Spielers im Ranglistenzeitraum |
+| **Sieg %** | Die Siegquote des Wrestlers im Ranglistenzeitraum |
 | **Serie** | Aktuelle Sieges- oder Niederlagenserie |

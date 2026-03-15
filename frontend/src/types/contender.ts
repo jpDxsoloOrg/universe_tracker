@@ -1,6 +1,6 @@
 export interface ContenderRanking {
   championshipId: string;
-  playerId: string;
+  wrestlerId: string;
   rank: number;
   rankingScore: number;
   winPercentage: number;
@@ -17,7 +17,7 @@ export interface ContenderRanking {
 }
 
 export interface RankingMovement {
-  playerId: string;
+  wrestlerId: string;
   currentRank: number;
   previousRank?: number;
   movement: number;
@@ -34,8 +34,7 @@ export interface ContenderConfig {
 }
 
 // Display types for UI
-export interface ContenderWithPlayer extends ContenderRanking {
-  playerName: string;
+export interface ContenderWithWrestler extends ContenderRanking {
   wrestlerName: string;
   imageUrl?: string;
   movement: number;
@@ -47,19 +46,18 @@ export interface ChampionshipContenders {
   championshipName: string;
   divisionId?: string | null;
   currentChampion: {
-    playerId: string;
-    playerName: string;
+    wrestlerId: string;
     wrestlerName: string;
     imageUrl?: string;
   };
-  contenders: ContenderWithPlayer[];
+  contenders: ContenderWithWrestler[];
   calculatedAt: string;
   config?: ContenderConfig;
 }
 
-export interface PlayerContenderStatus {
-  playerId: string;
-  playerName: string;
+export interface WrestlerContenderStatus {
+  wrestlerId: string;
+  wrestlerName: string;
   championships: Array<{
     championshipId: string;
     championshipName: string;

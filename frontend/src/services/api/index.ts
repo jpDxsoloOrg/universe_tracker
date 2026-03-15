@@ -2,7 +2,7 @@
 export { API_BASE_URL, getAuthToken, fetchWithAuth } from './apiClient';
 
 // API modules
-export { playersApi } from './players.api';
+export { wrestlersApi } from './wrestlers.api';
 export { matchesApi } from './matches.api';
 export { championshipsApi } from './championships.api';
 export { tournamentsApi } from './tournaments.api';
@@ -26,8 +26,8 @@ export { seasonAwardsApi } from './seasonAwards.api';
 // Type/interface re-exports
 export type { SiteFeatures } from './siteConfig.api';
 export type {
-  StatsPlayer,
-  PlayerStatsResponse,
+  StatsWrestler,
+  WrestlerStatsResponse,
   HeadToHeadResponse,
   LeaderboardsResponse,
   RecordsResponse,
@@ -36,7 +36,7 @@ export type {
   MatchRatingsResponse,
   MatchTypeStatsEntry,
   MatchTypeLeaderboardsResponse,
-  PlayerMatchStatsByType,
-  PlayerMatchStatsResponse,
+  WrestlerMatchStatsByType,
+  WrestlerMatchStatsResponse,
 } from './statistics.api';
 export type { SeasonAwardsResponse } from './seasonAwards.api';

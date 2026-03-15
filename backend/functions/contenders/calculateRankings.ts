@@ -14,7 +14,7 @@ interface Championship {
 
 interface ExistingRanking {
   championshipId: string;
-  playerId: string;
+  wrestlerId: string;
   rank: number;
   peakRank?: number;
 }
@@ -92,7 +92,7 @@ async function calculateAllRankings(requestedChampionshipId?: string): Promise<R
     const existingMap = new Map<string, ExistingRanking>();
     for (const item of existingItems) {
       const existing = item as unknown as ExistingRanking;
-      existingMap.set(existing.playerId, existing);
+      existingMap.set(existing.wrestlerId, existing);
     }
 
     // 2b. Delete all existing rankings for this championship
@@ -101,7 +101,7 @@ async function calculateAllRankings(requestedChampionshipId?: string): Promise<R
         TableName: TableNames.CONTENDER_RANKINGS,
         Key: {
           championshipId: item.championshipId as string,
-          playerId: item.playerId as string,
+          wrestlerId: item.wrestlerId as string,
         },
       });
     }
@@ -119,7 +119,7 @@ async function calculateAllRankings(requestedChampionshipId?: string): Promise<R
 
     // 2d. Write new rankings to CONTENDER_RANKINGS
     for (const ranking of rankings) {
-      const oldData = existingMap.get(ranking.playerId);
+      const oldData = existingMap.get(ranking.wrestlerId);
       const previousRank = oldData ? oldData.rank : undefined;
       const oldPeakRank = oldData?.peakRank ?? Infinity;
       const peakRank = Math.min(oldPeakRank, ranking.rank);
@@ -132,7 +132,7 @@ async function calculateAllRankings(requestedChampionshipId?: string): Promise<R
         TableName: TableNames.CONTENDER_RANKINGS,
         Item: {
           championshipId,
-          playerId: ranking.playerId,
+          wrestlerId: ranking.wrestlerId,
           rank: ranking.rank,
           rankingScore: ranking.rankingScore,
           winPercentage: ranking.winPercentage,
@@ -154,14 +154,14 @@ async function calculateAllRankings(requestedChampionshipId?: string): Promise<R
     const weekKey = buildWeekKey(championshipId);
 
     for (const ranking of rankings) {
-      const oldData = existingMap.get(ranking.playerId);
+      const oldData = existingMap.get(ranking.wrestlerId);
       const previousRank = oldData ? oldData.rank : undefined;
       const movement = previousRank !== undefined ? previousRank - ranking.rank : 0;
 
       await dynamoDb.put({
         TableName: TableNames.RANKING_HISTORY,
         Item: {
-          playerId: ranking.playerId,
+          wrestlerId: ranking.wrestlerId,
           weekKey,
           championshipId,
           rank: ranking.rank,

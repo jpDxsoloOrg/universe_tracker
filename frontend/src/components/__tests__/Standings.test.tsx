@@ -27,7 +27,7 @@ vi.mock('react-i18next', () => ({
         'standings.title': 'Standings',
         'standings.pageTitle': 'Standings',
         'standings.loading': 'Loading standings...',
-        'standings.noPlayers': 'No players found.',
+        'standings.noWrestlers': 'No wrestlers found.',
         'standings.season': 'Season',
         'standings.allTime': 'All Time',
         'standings.showingFor': 'Showing for',
@@ -35,7 +35,7 @@ vi.mock('react-i18next', () => ({
         'standings.noDivision': 'No Division',
         'standings.table.rank': 'Rank',
         'standings.table.image': 'Image',
-        'standings.table.player': 'Player',
+        'standings.table.wrestler': 'Wrestler',
         'standings.table.wrestler': 'Wrestler',
         'standings.table.division': 'Division',
         'standings.table.wins': 'W',
@@ -59,7 +59,7 @@ vi.mock('react-i18next', () => ({
 }));
 
 vi.mock('../Standings.css', () => ({}));
-vi.mock('../PlayerHoverCard.css', () => ({}));
+vi.mock('../WrestlerHoverCard.css', () => ({}));
 
 import Standings from '../Standings';
 
@@ -72,11 +72,10 @@ function renderStandings() {
 }
 
 // --- Test data ---
-const mockPlayers = [
+const mockWrestlers = [
   {
-    playerId: 'p1',
+    wrestlerId: 'p1',
     name: 'John Cena',
-    currentWrestler: 'The Champ',
     wins: 25,
     losses: 10,
     draws: 3,
@@ -85,9 +84,8 @@ const mockPlayers = [
     updatedAt: '2024-06-01',
   },
   {
-    playerId: 'p2',
+    wrestlerId: 'p2',
     name: 'The Rock',
-    currentWrestler: 'The Great One',
     wins: 20,
     losses: 12,
     draws: 1,
@@ -96,9 +94,8 @@ const mockPlayers = [
     updatedAt: '2024-06-01',
   },
   {
-    playerId: 'p3',
+    wrestlerId: 'p3',
     name: 'Undertaker',
-    currentWrestler: 'The Deadman',
     wins: 18,
     losses: 5,
     draws: 0,
@@ -136,9 +133,9 @@ describe('Standings', () => {
     vi.clearAllMocks();
   });
 
-  it('renders standings table with W-L-D, win percentage, and player info', async () => {
+  it('renders standings table with W-L-D, win percentage, and wrestler info', async () => {
     mockGetStandings.mockResolvedValue({
-      players: mockPlayers,
+      wrestlers: mockWrestlers,
       sortedByWins: true,
     });
     mockGetAllSeasons.mockResolvedValue(mockSeasons);
@@ -152,18 +149,15 @@ describe('Standings', () => {
 
     // Table headers
     expect(screen.getByText('Rank')).toBeInTheDocument();
-    expect(screen.getByText('Player')).toBeInTheDocument();
     expect(screen.getByText('Wrestler')).toBeInTheDocument();
     expect(screen.getByText('W')).toBeInTheDocument();
     expect(screen.getByText('L')).toBeInTheDocument();
     expect(screen.getByText('D')).toBeInTheDocument();
     expect(screen.getByText('Win %')).toBeInTheDocument();
 
-    // Player data
+    // Wrestler data
     expect(screen.getByText('John Cena')).toBeInTheDocument();
-    expect(screen.getByText('The Champ')).toBeInTheDocument();
     expect(screen.getByText('The Rock')).toBeInTheDocument();
-    expect(screen.getByText('The Great One')).toBeInTheDocument();
 
     // Win percentages
     // 25/(25+10+3) = 65.8%
@@ -184,9 +178,9 @@ describe('Standings', () => {
     expect(screen.getByText('Streak')).toBeInTheDocument();
   });
 
-  it('renders player names as links to stats page', async () => {
+  it('renders wrestler names as links to stats page', async () => {
     mockGetStandings.mockResolvedValue({
-      players: mockPlayers,
+      wrestlers: mockWrestlers,
       sortedByWins: true,
     });
     mockGetAllSeasons.mockResolvedValue(mockSeasons);
@@ -199,19 +193,19 @@ describe('Standings', () => {
     });
 
     const link = screen.getByRole('link', { name: 'John Cena' });
-    expect(link).toHaveAttribute('href', '/stats/player/p1');
+    expect(link).toHaveAttribute('href', '/stats/wrestler/p1');
   });
 
   it('renders form dots and streak badge when data present', async () => {
-    const playersWithForm = [
+    const wrestlersWithForm = [
       {
-        ...mockPlayers[0],
+        ...mockWrestlers[0],
         recentForm: ['W', 'W', 'L', 'W', 'W'] as const,
         currentStreak: { type: 'W' as const, count: 5 },
       },
     ];
     mockGetStandings.mockResolvedValue({
-      players: playersWithForm,
+      wrestlers: wrestlersWithForm,
       sortedByWins: true,
     });
     mockGetAllSeasons.mockResolvedValue([]);
@@ -230,7 +224,7 @@ describe('Standings', () => {
 
   it('renders dash when no recentForm', async () => {
     mockGetStandings.mockResolvedValue({
-      players: mockPlayers,
+      wrestlers: mockWrestlers,
       sortedByWins: true,
     });
     mockGetAllSeasons.mockResolvedValue([]);
@@ -249,7 +243,7 @@ describe('Standings', () => {
 
   it('filters standings by season when season selector is changed', async () => {
     mockGetStandings.mockResolvedValue({
-      players: mockPlayers,
+      wrestlers: mockWrestlers,
       sortedByWins: true,
     });
     mockGetAllSeasons.mockResolvedValue(mockSeasons);
@@ -276,7 +270,7 @@ describe('Standings', () => {
 
     // Switch to Season 2
     mockGetStandings.mockResolvedValue({
-      players: [mockPlayers[0]],
+      wrestlers: [mockWrestlers[0]],
       seasonId: 's2',
       sortedByWins: true,
     });
@@ -294,9 +288,9 @@ describe('Standings', () => {
     });
   });
 
-  it('shows empty state when no players exist', async () => {
+  it('shows empty state when no wrestlers exist', async () => {
     mockGetStandings.mockResolvedValue({
-      players: [],
+      wrestlers: [],
       sortedByWins: true,
     });
     mockGetAllSeasons.mockResolvedValue([]);
@@ -305,7 +299,7 @@ describe('Standings', () => {
     renderStandings();
 
     await waitFor(() => {
-      expect(screen.getByText('No players found.')).toBeInTheDocument();
+      expect(screen.getByText('No wrestlers found.')).toBeInTheDocument();
     });
   });
 
@@ -327,7 +321,7 @@ describe('Standings', () => {
 
     // Click retry triggers re-fetch
     mockGetStandings.mockResolvedValue({
-      players: mockPlayers,
+      wrestlers: mockWrestlers,
       sortedByWins: true,
     });
 

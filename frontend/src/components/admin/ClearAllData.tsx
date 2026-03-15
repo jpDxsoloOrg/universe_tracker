@@ -3,7 +3,7 @@ import { adminApi } from '../../services/api';
 import './ClearAllData.css';
 
 const SEED_MODULES: { id: string; label: string }[] = [
-  { id: 'core', label: 'Core (Divisions, Players, Seasons)' },
+  { id: 'core', label: 'Core (Divisions, Wrestlers, Seasons)' },
   { id: 'championships', label: 'Championships' },
   { id: 'matches', label: 'Matches' },
   { id: 'standings', label: 'Standings' },
@@ -39,7 +39,7 @@ export default function ClearAllData() {
       return;
     }
 
-    if (!confirm('FINAL WARNING: This will permanently delete ALL data including players, matches, championships, tournaments, seasons, divisions, and all standings. This action CANNOT be undone. Are you absolutely sure?')) {
+    if (!confirm('FINAL WARNING: This will permanently delete ALL data including wrestlers, matches, championships, tournaments, seasons, divisions, and all standings. This action CANNOT be undone. Are you absolutely sure?')) {
       return;
     }
 
@@ -62,7 +62,7 @@ export default function ClearAllData() {
   };
 
   const handleSeedData = async () => {
-    if (!confirm('This will generate sample data including players, divisions, seasons, championships, matches, and tournaments. Any existing data will remain. Continue?')) {
+    if (!confirm('This will generate sample data including wrestlers, divisions, seasons, championships, matches, and tournaments. Any existing data will remain. Continue?')) {
       return;
     }
 
@@ -133,9 +133,9 @@ export default function ClearAllData() {
         <div className="seed-details">
           <h4>What gets created (full seed):</h4>
           <ul>
-            <li><strong>12 Players</strong> - With random win/loss records and wrestler assignments</li>
+            <li><strong>12 Wrestlers</strong> - With random win/loss records and wrestler assignments</li>
             <li><strong>3 Divisions</strong> - e.g., Heavyweight, Cruiserweight, Mid-Card</li>
-            <li><strong>1 Active Season</strong> - With standings for all players</li>
+            <li><strong>1 Active Season</strong> - With standings for all wrestlers</li>
             <li><strong>4 Championships</strong> - World, Intercontinental, Tag Team, and US titles</li>
             <li><strong>12 Matches</strong> - Mix of completed and scheduled matches</li>
             <li><strong>2 Tournaments</strong> - Single elimination and round robin</li>
@@ -157,7 +157,7 @@ export default function ClearAllData() {
           This action will permanently delete <strong>ALL</strong> data from the system:
         </p>
         <ul>
-          <li>All players (wrestlers) and their records</li>
+          <li>All wrestlers (wrestlers) and their records</li>
           <li>All matches and results</li>
           <li>All championships and their history</li>
           <li>All tournaments</li>
@@ -179,7 +179,7 @@ export default function ClearAllData() {
               <ul>
                 {resultType === 'deleted' ? (
                   <>
-                    <li>Players: {resultCounts['players'] ?? 0}</li>
+                    <li>Wrestlers: {resultCounts['wrestlers'] ?? 0}</li>
                     <li>Matches: {resultCounts['matches'] ?? 0}</li>
                     <li>Championships: {resultCounts['championships'] ?? 0}</li>
                     <li>Championship History: {resultCounts['championshipHistory'] ?? 0}</li>
@@ -191,7 +191,7 @@ export default function ClearAllData() {
                 ) : (
                   <>
                     <li>Divisions: {resultCounts['divisions'] ?? 0}</li>
-                    <li>Players: {resultCounts['players'] ?? 0}</li>
+                    <li>Wrestlers: {resultCounts['wrestlers'] ?? 0}</li>
                     <li>Seasons: {resultCounts['seasons'] ?? 0}</li>
                     <li>Season Standings: {resultCounts['seasonStandings'] ?? 0}</li>
                     <li>Championships: {resultCounts['championships'] ?? 0}</li>

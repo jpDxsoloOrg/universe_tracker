@@ -10,7 +10,7 @@ const FEATURE_LABELS: Record<keyof SiteFeatures, { name: string; description: st
   },
   statistics: {
     name: 'Statistics',
-    description: 'Player stats, head-to-head, leaderboards, records, and achievements',
+    description: 'Wrestler stats, head-to-head, leaderboards, records, and achievements',
   },
 };
 

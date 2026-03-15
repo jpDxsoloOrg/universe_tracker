@@ -64,7 +64,7 @@ describe('ClearAllData', () => {
     mockAdminApi.clearAll.mockResolvedValue({
       message: 'All data cleared',
       deletedCounts: {
-        players: 12,
+        wrestlers: 12,
         matches: 8,
         championships: 4,
         championshipHistory: 6,
@@ -91,7 +91,7 @@ describe('ClearAllData', () => {
     expect(screen.getByText('All data has been cleared successfully!')).toBeInTheDocument();
     // Deleted counts displayed
     expect(screen.getByText('Deleted Items:')).toBeInTheDocument();
-    expect(screen.getByText(/Players: 12/)).toBeInTheDocument();
+    expect(screen.getByText(/Wrestlers: 12/)).toBeInTheDocument();
     expect(screen.getByText(/Matches: 8/)).toBeInTheDocument();
     expect(screen.getByText(/Championships: 4/)).toBeInTheDocument();
 
@@ -129,7 +129,7 @@ describe('ClearAllData', () => {
       message: 'Sample data generated',
       createdCounts: {
         divisions: 3,
-        players: 12,
+        wrestlers: 12,
         seasons: 1,
         seasonStandings: 12,
         championships: 4,
@@ -147,14 +147,14 @@ describe('ClearAllData', () => {
 
     expect(screen.getByText('Sample data has been generated successfully!')).toBeInTheDocument();
     expect(screen.getByText('Created Items:')).toBeInTheDocument();
-    expect(screen.getByText(/Players: 12/)).toBeInTheDocument();
+    expect(screen.getByText(/Wrestlers: 12/)).toBeInTheDocument();
   });
 
   it('calls seedData with no args when no modules selected (full seed)', async () => {
     const user = userEvent.setup();
     mockAdminApi.seedData.mockResolvedValue({
       message: 'Sample data generated',
-      createdCounts: { divisions: 3, players: 12 },
+      createdCounts: { divisions: 3, wrestlers: 12 },
     });
 
     render(<ClearAllData />);
@@ -171,11 +171,11 @@ describe('ClearAllData', () => {
     const user = userEvent.setup();
     mockAdminApi.seedData.mockResolvedValue({
       message: 'Sample data generated',
-      createdCounts: { divisions: 3, players: 12 },
+      createdCounts: { divisions: 3, wrestlers: 12 },
     });
 
     render(<ClearAllData />);
-    const coreCheckbox = screen.getByRole('checkbox', { name: /Core \(Divisions, Players, Seasons\)/ });
+    const coreCheckbox = screen.getByRole('checkbox', { name: /Core \(Divisions, Wrestlers, Seasons\)/ });
     await user.click(coreCheckbox);
     const championshipsCheckbox = screen.getByRole('checkbox', { name: /^Championships$/ });
     await user.click(championshipsCheckbox);

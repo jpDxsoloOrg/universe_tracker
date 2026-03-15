@@ -1,33 +1,33 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { usePlayerStats } from '../../hooks/usePlayerStats';
+import { useWrestlerStats } from '../../hooks/useWrestlerStats';
 import Skeleton from '../ui/Skeleton';
 import EmptyState from '../ui/EmptyState';
-import PlayerStatsContent from './PlayerStatsContent';
+import WrestlerStatsContent from './WrestlerStatsContent';
 import SeasonSelector from './SeasonSelector';
-import './PlayerStats.css';
+import './WrestlerStats.css';
 
-interface EmbeddedPlayerStatsProps {
-  playerId: string;
+interface EmbeddedWrestlerStatsProps {
+  wrestlerId: string;
 }
 
-function EmbeddedPlayerStats({ playerId }: EmbeddedPlayerStatsProps) {
+function EmbeddedWrestlerStats({ wrestlerId }: EmbeddedWrestlerStatsProps) {
   const { t } = useTranslation();
 
   const {
     data, loading, error, seasons, selectedSeasonId, setSelectedSeasonId,
     overallStats, matchTypeStats, championshipStats, achievements,
-  } = usePlayerStats({ playerId });
+  } = useWrestlerStats({ wrestlerId });
 
-  const player = useMemo(
-    () => data?.players?.find((p) => p.playerId === playerId),
-    [data, playerId]
+  const wrestler = useMemo(
+    () => data?.wrestlers?.find((p) => p.wrestlerId === wrestlerId),
+    [data, wrestlerId]
   );
 
   if (loading && !overallStats) {
     return (
-      <div className="player-stats">
+      <div className="wrestler-stats">
         <Skeleton variant="block" count={3} />
       </div>
     );
@@ -35,25 +35,25 @@ function EmbeddedPlayerStats({ playerId }: EmbeddedPlayerStatsProps) {
 
   if (error) {
     return (
-      <div className="player-stats">
+      <div className="wrestler-stats">
         <p>{error}</p>
       </div>
     );
   }
 
-  if (!player || !overallStats) {
+  if (!wrestler || !overallStats) {
     return (
-      <div className="player-stats">
+      <div className="wrestler-stats">
         <EmptyState
-          title={t('statistics.playerStats.title')}
-          description={t('statistics.playerStats.noData')}
+          title={t('statistics.wrestlerStats.title')}
+          description={t('statistics.wrestlerStats.noData')}
         />
       </div>
     );
   }
 
   return (
-    <div className="player-stats">
+    <div className="wrestler-stats">
       <div className="ps-nav-links">
         <Link to="/stats/head-to-head">{t('statistics.nav.headToHead')}</Link>
         <Link to="/stats/leaderboards">{t('statistics.nav.leaderboards')}</Link>
@@ -72,8 +72,8 @@ function EmbeddedPlayerStats({ playerId }: EmbeddedPlayerStatsProps) {
         compact
       />
 
-      <PlayerStatsContent
-        player={player}
+      <WrestlerStatsContent
+        wrestler={wrestler}
         overallStats={overallStats}
         matchTypeStats={matchTypeStats}
         championshipStats={championshipStats}
@@ -83,4 +83,4 @@ function EmbeddedPlayerStats({ playerId }: EmbeddedPlayerStatsProps) {
   );
 }
 
-export default EmbeddedPlayerStats;
+export default EmbeddedWrestlerStats;

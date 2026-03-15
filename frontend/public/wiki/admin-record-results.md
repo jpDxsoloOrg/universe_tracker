@@ -15,7 +15,7 @@ The **Record Results** page allows you to enter match outcomes.
 
 ## What Happens When You Record a Result
 
-- Player win/loss/draw records are automatically updated (both all-time and season)
+- Wrestler win/loss/draw records are automatically updated (both all-time and season)
 - League standings are recalculated
 - If it's a championship match, the title changes hands to the winner
 - If it's a tournament match, brackets/standings are updated

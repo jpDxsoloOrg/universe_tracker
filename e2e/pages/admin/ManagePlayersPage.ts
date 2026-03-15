@@ -3,13 +3,13 @@ import { BasePage } from '../BasePage';
 import { selectors } from '../../config/selectors';
 import { AdminPanelPage } from './AdminPanelPage';
 
-export interface PlayerData {
+export interface WrestlerData {
   name: string;
   wrestler: string;
   divisionId?: string;
 }
 
-export class ManagePlayersPage extends BasePage {
+export class ManageWrestlersPage extends BasePage {
   private adminPanel: AdminPanelPage;
 
   constructor(page: Page) {
@@ -22,13 +22,13 @@ export class ManagePlayersPage extends BasePage {
     await this.page.waitForSelector(selectors.players.heading, { timeout: 10000 }).catch(() => {});
   }
 
-  async clickAddPlayer(): Promise<void> {
+  async clickAddWrestler(): Promise<void> {
     await this.page.locator(selectors.players.addButton).click();
     await this.page.waitForTimeout(500);
   }
 
-  async createPlayer(data: PlayerData): Promise<void> {
-    await this.clickAddPlayer();
+  async createWrestler(data: WrestlerData): Promise<void> {
+    await this.clickAddWrestler();
 
     const nameInputs = this.page.locator('input[type="text"]');
     await nameInputs.first().fill(data.name);
@@ -50,16 +50,16 @@ export class ManagePlayersPage extends BasePage {
     await this.page.waitForTimeout(1000);
   }
 
-  async playerExists(playerName: string): Promise<boolean> {
+  async wrestlerExists(wrestlerName: string): Promise<boolean> {
     await this.waitForNetworkIdle();
     await this.page.waitForTimeout(500);
     const pageContent = await this.page.content();
-    return pageContent.includes(playerName);
+    return pageContent.includes(wrestlerName);
   }
 
-  async deletePlayer(playerName: string): Promise<void> {
-    // Players are in a table - find the row with the player name, then find delete button in that row
-    const deleteButton = this.page.locator(`//td[text()="${playerName}"]/ancestor::tr//button[contains(text(),"Delete")]`).first();
+  async deleteWrestler(wrestlerName: string): Promise<void> {
+    // Wrestlers are in a table - find the row with the wrestler name, then find delete button in that row
+    const deleteButton = this.page.locator(`//td[text()="${wrestlerName}"]/ancestor::tr//button[contains(text(),"Delete")]`).first();
 
     if (await deleteButton.isVisible({ timeout: 5000 }).catch(() => false)) {
       // Set up dialog handler before clicking
@@ -73,8 +73,8 @@ export class ManagePlayersPage extends BasePage {
     }
   }
 
-  async editPlayer(playerName: string, newData: Partial<PlayerData>): Promise<void> {
-    const card = this.page.locator(`div:has(h4:text-is("${playerName}"))`).first();
+  async editWrestler(wrestlerName: string, newData: Partial<WrestlerData>): Promise<void> {
+    const card = this.page.locator(`div:has(h4:text-is("${wrestlerName}"))`).first();
 
     if (await card.isVisible({ timeout: 5000 }).catch(() => false)) {
       await card.locator('button:has-text("Edit")').click();
@@ -96,9 +96,9 @@ export class ManagePlayersPage extends BasePage {
     }
   }
 
-  async getPlayerCount(): Promise<number> {
+  async getWrestlerCount(): Promise<number> {
     await this.waitForNetworkIdle();
-    const heading = await this.page.locator('h3:has-text("All Players")').textContent().catch(() => '(0)');
+    const heading = await this.page.locator('h3:has-text("All Wrestlers")').textContent().catch(() => '(0)');
     const match = heading?.match(/\((\d+)\)/);
     return match ? parseInt(match[1]) : 0;
   }

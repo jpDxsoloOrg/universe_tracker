@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../pages/LoginPage';
-import { ManagePlayersPage } from '../../pages/admin/ManagePlayersPage';
+import { ManageWrestlersPage } from '../../pages/admin/ManagePlayersPage';
 import { ManageChampionshipsPage } from '../../pages/admin/ManageChampionshipsPage';
 import { ManageDivisionsPage } from '../../pages/admin/ManageDivisionsPage';
 import { ManageSeasonsPage } from '../../pages/admin/ManageSeasonsPage';
@@ -9,8 +9,8 @@ import { adminCredentials } from '../../config/credentials';
 test.describe('Full Workflow Integration', () => {
   const timestamp = Date.now();
   const testData = {
-    player1: `E2E Player 1 ${timestamp}`,
-    player2: `E2E Player 2 ${timestamp}`,
+    wrestler1: `E2E Wrestler 1 ${timestamp}`,
+    wrestler2: `E2E Wrestler 2 ${timestamp}`,
     championship: `E2E Championship ${timestamp}`,
     division: `E2E Division ${timestamp}`,
     season: `E2E Season ${timestamp}`,
@@ -18,7 +18,7 @@ test.describe('Full Workflow Integration', () => {
 
   test('complete league management workflow', async ({ page }) => {
     const loginPage = new LoginPage(page);
-    const playersPage = new ManagePlayersPage(page);
+    const wrestlersPage = new ManageWrestlersPage(page);
     const championshipsPage = new ManageChampionshipsPage(page);
     const divisionsPage = new ManageDivisionsPage(page);
     const seasonsPage = new ManageSeasonsPage(page);
@@ -40,20 +40,20 @@ test.describe('Full Workflow Integration', () => {
     expect(await divisionsPage.divisionExists(testData.division)).toBe(true);
     console.log('Division created');
 
-    // Step 3: Create Players
-    console.log('Step 3: Creating players...');
-    await playersPage.selectTab();
-    await playersPage.createPlayer({
-      name: testData.player1,
+    // Step 3: Create Wrestlers
+    console.log('Step 3: Creating wrestlers...');
+    await wrestlersPage.selectTab();
+    await wrestlersPage.createWrestler({
+      name: testData.wrestler1,
       wrestler: 'Stone Cold Steve Austin',
     });
-    await playersPage.createPlayer({
-      name: testData.player2,
+    await wrestlersPage.createWrestler({
+      name: testData.wrestler2,
       wrestler: 'The Rock',
     });
-    expect(await playersPage.playerExists(testData.player1)).toBe(true);
-    expect(await playersPage.playerExists(testData.player2)).toBe(true);
-    console.log('Players created');
+    expect(await wrestlersPage.wrestlerExists(testData.wrestler1)).toBe(true);
+    expect(await wrestlersPage.wrestlerExists(testData.wrestler2)).toBe(true);
+    console.log('Wrestlers created');
 
     // Step 4: Create Championship
     console.log('Step 4: Creating championship...');
@@ -88,11 +88,11 @@ test.describe('Full Workflow Integration', () => {
     await championshipsPage.deleteChampionship(testData.championship);
     console.log('Championship deleted');
 
-    // Delete players
-    await playersPage.selectTab();
-    await playersPage.deletePlayer(testData.player1);
-    await playersPage.deletePlayer(testData.player2);
-    console.log('Players deleted');
+    // Delete wrestlers
+    await wrestlersPage.selectTab();
+    await wrestlersPage.deleteWrestler(testData.wrestler1);
+    await wrestlersPage.deleteWrestler(testData.wrestler2);
+    console.log('Wrestlers deleted');
 
     // Delete division
     await divisionsPage.selectTab();

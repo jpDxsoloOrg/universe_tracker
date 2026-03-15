@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 
-import ManagePlayers from './ManagePlayers';
+import ManageWrestlers from './ManageWrestlers';
 import ManageDivisions from './ManageDivisions';
 import ManageMatchConfig from './ManageMatchConfig';
 import ScheduleMatch from './ScheduleMatch';
@@ -20,16 +20,16 @@ import './AdminPanel.css';
 import ManageSeasonAwards from './ManageSeasonAwards';
 import AdminContenderConfig from './AdminContenderConfig';
 
-type AdminTab = 'players' | 'divisions' | 'match-config' | 'schedule' | 'results' | 'championships' | 'tournaments' | 'seasons' | 'season-awards' | 'events' | 'contender-config' | 'danger' | 'features';
+type AdminTab = 'wrestlers' | 'divisions' | 'match-config' | 'schedule' | 'results' | 'championships' | 'tournaments' | 'seasons' | 'season-awards' | 'events' | 'contender-config' | 'danger' | 'features';
 
-const VALID_TABS: AdminTab[] = ['players', 'divisions', 'match-config', 'schedule', 'results', 'championships', 'tournaments', 'seasons', 'season-awards', 'events', 'contender-config', 'danger', 'features'];
+const VALID_TABS: AdminTab[] = ['wrestlers', 'divisions', 'match-config', 'schedule', 'results', 'championships', 'tournaments', 'seasons', 'season-awards', 'events', 'contender-config', 'danger', 'features'];
 
 
 export default function AdminPanel() {
   const { tab } = useParams<{ tab: string }>();
   const { isAuthenticated, isAdminOrModerator, isSuperAdmin } = useAuth();
 
-  const activeTab: AdminTab = (tab && VALID_TABS.includes(tab as AdminTab)) ? tab as AdminTab : 'players';
+  const activeTab: AdminTab = (tab && VALID_TABS.includes(tab as AdminTab)) ? tab as AdminTab : 'wrestlers';
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -60,7 +60,7 @@ export default function AdminPanel() {
 
   const tabContent: Record<AdminTab, JSX.Element> = {
     features: <ManageFeatures />,
-    players: <ManagePlayers />,
+    wrestlers: <ManageWrestlers />,
     divisions: <ManageDivisions />,
     'match-config': <ManageMatchConfig />,
     schedule: <ScheduleMatch />,

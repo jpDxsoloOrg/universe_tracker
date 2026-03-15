@@ -2,34 +2,34 @@ import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { statisticsApi } from '../../services/api';
-import type { StatsPlayer } from '../../services/api';
-import { usePlayerStats } from '../../hooks/usePlayerStats';
+import type { StatsWrestler } from '../../services/api';
+import { useWrestlerStats } from '../../hooks/useWrestlerStats';
 import Skeleton from '../ui/Skeleton';
 import EmptyState from '../ui/EmptyState';
-import PlayerStatsContent from './PlayerStatsContent';
+import WrestlerStatsContent from './WrestlerStatsContent';
 import SeasonSelector from './SeasonSelector';
-import './PlayerStats.css';
+import './WrestlerStats.css';
 
-function PlayerStats() {
+function WrestlerStats() {
   const { t } = useTranslation();
-  const { playerId: routePlayerId } = useParams<{ playerId: string }>();
-  const [selectedPlayerId, setSelectedPlayerId] = useState(routePlayerId || '');
-  const [players, setPlayers] = useState<StatsPlayer[]>([]);
+  const { wrestlerId: routeWrestlerId } = useParams<{ wrestlerId: string }>();
+  const [selectedWrestlerId, setSelectedWrestlerId] = useState(routeWrestlerId || '');
+  const [wrestlers, setWrestlers] = useState<StatsWrestler[]>([]);
 
   const {
     loading, error, seasons, selectedSeasonId, setSelectedSeasonId,
     overallStats, matchTypeStats, championshipStats, achievements,
-  } = usePlayerStats({ playerId: selectedPlayerId });
+  } = useWrestlerStats({ wrestlerId: selectedWrestlerId });
 
-  // Load player list on mount (unique to full page)
+  // Load wrestler list on mount (unique to full page)
   useEffect(() => {
     const abortController = new AbortController();
-    const fetchPlayers = async () => {
+    const fetchWrestlers = async () => {
       try {
-        const result = await statisticsApi.getPlayerStats(undefined, undefined, abortController.signal);
-        setPlayers(result.players);
-        if (!selectedPlayerId && result.players.length > 0 && result.players[0]) {
-          setSelectedPlayerId(result.players[0].playerId);
+        const result = await statisticsApi.getWrestlerStats(undefined, undefined, abortController.signal);
+        setWrestlers(result.wrestlers);
+        if (!selectedWrestlerId && result.wrestlers.length > 0 && result.wrestlers[0]) {
+          setSelectedWrestlerId(result.wrestlers[0].wrestlerId);
         }
       } catch (err: unknown) {
         if (err instanceof Error && err.name !== 'AbortError') {
@@ -37,19 +37,19 @@ function PlayerStats() {
         }
       }
     };
-    fetchPlayers();
+    fetchWrestlers();
     return () => abortController.abort();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const player = useMemo(
-    () => players.find((p) => p.playerId === selectedPlayerId),
-    [players, selectedPlayerId]
+  const wrestler = useMemo(
+    () => wrestlers.find((p) => p.wrestlerId === selectedWrestlerId),
+    [wrestlers, selectedWrestlerId]
   );
 
   if (loading && !overallStats) {
     return (
-      <div className="player-stats">
-        <h2>{t('statistics.playerStats.title')}</h2>
+      <div className="wrestler-stats">
+        <h2>{t('statistics.wrestlerStats.title')}</h2>
         <Skeleton variant="block" count={3} />
       </div>
     );
@@ -57,28 +57,28 @@ function PlayerStats() {
 
   if (error) {
     return (
-      <div className="player-stats">
-        <h2>{t('statistics.playerStats.title')}</h2>
+      <div className="wrestler-stats">
+        <h2>{t('statistics.wrestlerStats.title')}</h2>
         <p>{error}</p>
       </div>
     );
   }
 
-  if (!player || !overallStats) {
+  if (!wrestler || !overallStats) {
     return (
-      <div className="player-stats">
+      <div className="wrestler-stats">
         <EmptyState
-          title={t('statistics.playerStats.title')}
-          description={t('statistics.playerStats.noData')}
+          title={t('statistics.wrestlerStats.title')}
+          description={t('statistics.wrestlerStats.noData')}
         />
       </div>
     );
   }
 
   return (
-    <div className="player-stats">
+    <div className="wrestler-stats">
       <div className="ps-header">
-        <h2>{t('statistics.playerStats.title')}</h2>
+        <h2>{t('statistics.wrestlerStats.title')}</h2>
         <div className="ps-nav-links">
           <Link to="/stats/head-to-head">{t('statistics.nav.headToHead')}</Link>
           <Link to="/stats/leaderboards">{t('statistics.nav.leaderboards')}</Link>
@@ -92,15 +92,15 @@ function PlayerStats() {
       </div>
 
       <div className="ps-controls">
-        <div className="ps-player-selector">
-          <label htmlFor="player-select">{t('statistics.playerStats.selectPlayer')}</label>
+        <div className="ps-wrestler-selector">
+          <label htmlFor="wrestler-select">{t('statistics.wrestlerStats.selectWrestler')}</label>
           <select
-            id="player-select"
-            value={selectedPlayerId}
-            onChange={(e) => setSelectedPlayerId(e.target.value)}
+            id="wrestler-select"
+            value={selectedWrestlerId}
+            onChange={(e) => setSelectedWrestlerId(e.target.value)}
           >
-            {players.map((p) => (
-              <option key={p.playerId} value={p.playerId}>
+            {wrestlers.map((p) => (
+              <option key={p.wrestlerId} value={p.wrestlerId}>
                 {p.name} ({p.wrestlerName})
               </option>
             ))}
@@ -113,8 +113,8 @@ function PlayerStats() {
         />
       </div>
 
-      <PlayerStatsContent
-        player={player}
+      <WrestlerStatsContent
+        wrestler={wrestler}
         overallStats={overallStats}
         matchTypeStats={matchTypeStats}
         championshipStats={championshipStats}
@@ -124,4 +124,4 @@ function PlayerStats() {
   );
 }
 
-export default PlayerStats;
+export default WrestlerStats;

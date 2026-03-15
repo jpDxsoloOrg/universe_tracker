@@ -7,8 +7,8 @@
 - [Schnellstart](admin-quickstart) — Liga von Grund auf einrichten
 - [Match-Konfiguration](admin-match-config) — Match-Typen und Stipulations für die Planung verwalten
 - [Benutzerverwaltung](admin-user-management) — Rollen und Zuweisung von Wrestler, Fantasy, Admin, Moderator
-- [Divisionen](admin-divisions) — Divisionen anlegen und verwalten, Spieler zuweisen
-- [Spieler verwalten](admin-manage-players) — Wrestler, Bilder, Divisionen bearbeiten; Spieler löschen
+- [Divisionen](admin-divisions) — Divisionen anlegen und verwalten, Wrestler zuweisen
+- [Wrestler verwalten](admin-manage-players) — Wrestler, Bilder, Divisionen bearbeiten; Wrestler löschen
 - [Saisons](admin-seasons) — Saisons anlegen, beenden und löschen; Saison-Tabellen
 - [Saison-Auszeichnungen](admin-season-awards) — Auto-Awards prüfen und eigene Awards vergeben
 

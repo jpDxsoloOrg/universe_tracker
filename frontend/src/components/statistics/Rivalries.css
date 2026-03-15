@@ -52,7 +52,7 @@
   background: var(--card-bg, #fff);
 }
 
-.rivalry-card-players {
+.rivalry-card-wrestlers {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -60,26 +60,26 @@
   margin-bottom: 0.75rem;
 }
 
-.rivalry-player {
+.rivalry-wrestler {
   display: flex;
   flex-direction: column;
   align-items: center;
   min-width: 0;
 }
 
-.rivalry-player-img,
-.rivalry-player-placeholder {
+.rivalry-wrestler-img,
+.rivalry-wrestler-placeholder {
   width: 48px;
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
 }
 
-.rivalry-player-placeholder {
+.rivalry-wrestler-placeholder {
   background: var(--bg-muted, #eee);
 }
 
-.rivalry-player-name {
+.rivalry-wrestler-name {
   font-size: 0.875rem;
   font-weight: 600;
   margin-top: 0.25rem;

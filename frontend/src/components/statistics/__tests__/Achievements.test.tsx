@@ -25,8 +25,8 @@ vi.mock('react-i18next', () => ({
         'statistics.achievements.filters.milestones': 'Milestones',
         'statistics.achievements.filters.records': 'Records',
         'statistics.achievements.filters.special': 'Special',
-        'statistics.playerStats.selectPlayer': 'Select Player',
-        'statistics.nav.playerStats': 'Player Stats',
+        'statistics.wrestlerStats.selectWrestler': 'Select Wrestler',
+        'statistics.nav.wrestlerStats': 'Wrestler Stats',
         'statistics.nav.records': 'Records',
         'statistics.nav.leaderboards': 'Leaderboards',
         'common.loading': 'Loading...',
@@ -41,9 +41,9 @@ vi.mock('../Achievements.css', () => ({}));
 import Achievements from '../Achievements';
 
 // --- Test data ---
-const mockPlayers = [
-  { playerId: 'p1', name: 'John Cena', wrestlerName: 'The Champ' },
-  { playerId: 'p2', name: 'The Rock', wrestlerName: 'The Great One' },
+const mockWrestlers = [
+  { wrestlerId: 'p1', name: 'John Cena', wrestlerName: 'The Champ' },
+  { wrestlerId: 'p2', name: 'The Rock', wrestlerName: 'The Great One' },
 ];
 
 const allAchievementDefs = [
@@ -70,10 +70,10 @@ const allAchievementDefs = [
   },
 ];
 
-const playerAchievements = [
+const wrestlerAchievements = [
   {
     ...allAchievementDefs[0],
-    playerId: 'p1',
+    wrestlerId: 'p1',
     earnedAt: '2024-03-15',
   },
 ];
@@ -92,21 +92,21 @@ describe('Achievements', () => {
   });
 
   it('renders achievement badges with earned/locked status and progress bar', async () => {
-    // First call: load initial data (no playerId)
+    // First call: load initial data (no wrestlerId)
     mockGetAchievements.mockResolvedValueOnce({
-      players: mockPlayers,
+      wrestlers: mockWrestlers,
       allAchievements: allAchievementDefs,
     });
-    // Second call: load player achievements (with playerId)
+    // Second call: load wrestler achievements (with wrestlerId)
     mockGetAchievements.mockResolvedValueOnce({
-      players: mockPlayers,
+      wrestlers: mockWrestlers,
       allAchievements: allAchievementDefs,
-      achievements: playerAchievements,
+      achievements: wrestlerAchievements,
     });
 
     renderComponent();
 
-    // Wait for player achievements to load (second API call)
+    // Wait for wrestler achievements to load (second API call)
     await waitFor(() => {
       expect(document.querySelector('.ach-earned-date')).toBeTruthy();
     });
@@ -132,13 +132,13 @@ describe('Achievements', () => {
     const user = userEvent.setup();
 
     mockGetAchievements.mockResolvedValueOnce({
-      players: mockPlayers,
+      wrestlers: mockWrestlers,
       allAchievements: allAchievementDefs,
     });
     mockGetAchievements.mockResolvedValueOnce({
-      players: mockPlayers,
+      wrestlers: mockWrestlers,
       allAchievements: allAchievementDefs,
-      achievements: playerAchievements,
+      achievements: wrestlerAchievements,
     });
 
     renderComponent();

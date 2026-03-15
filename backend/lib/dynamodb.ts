@@ -116,7 +116,7 @@ export const dynamoDb = {
 };
 
 export const TableNames = {
-  PLAYERS: process.env.PLAYERS_TABLE!,
+  WRESTLERS: process.env.WRESTLERS_TABLE!,
   MATCHES: process.env.MATCHES_TABLE!,
   CHAMPIONSHIPS: process.env.CHAMPIONSHIPS_TABLE!,
   CHAMPIONSHIP_HISTORY: process.env.CHAMPIONSHIP_HISTORY_TABLE!,

@@ -6,15 +6,14 @@ Die Tabellen-Seite ist die Startseite und zeigt die aktuelle Liga-Rangliste.
 
 | Spalte | Beschreibung |
 |--------|--------------|
-| **Rang** | Position des Spielers basierend auf der Siegquote |
-| **Spieler** | Der Name des Spielers |
-| **Wrestler** | Der WWE-Wrestler, den sie bzw. er aktuell spielt |
-| **Division** | Die Marke/Division, der der Spieler zugeordnet ist |
+| **Rang** | Position des Wrestlers basierend auf der Siegquote |
+| **Wrestler** | Der Name des Wrestlers |
+| **Division** | Die Marke/Division, der der Wrestler zugeordnet ist |
 | **S / N / U** | Gesamtanzahl Siege, Niederlagen und Unentschieden |
 | **Sieg %** | Siegquote, berechnet aus der Bilanz |
 
 ## Wie die Rangliste funktioniert
 
-Spieler werden nach ihrer Siegquote sortiert. Spieler mit mehr Siegen und weniger Niederlagen stehen weiter oben. Sie können nach Division filtern oder Gesamt- bzw. Saison-Bilanzen anzeigen.
+Wrestler werden nach ihrer Siegquote sortiert. Wrestler mit mehr Siegen und weniger Niederlagen stehen weiter oben. Sie können nach Division filtern oder Gesamt- bzw. Saison-Bilanzen anzeigen.
 
 **Formel:** Sieg % = Siege ÷ (Siege + Niederlagen + Unentschieden) × 100

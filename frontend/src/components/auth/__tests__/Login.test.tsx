@@ -26,8 +26,8 @@ vi.mock('react-i18next', () => ({
         'auth.devLoginTitle': 'Dev Login',
         'auth.devLoginSubtitle': 'Pick a role to sign in as (dev only)',
         'auth.signInAsAdmin': 'Sign in as Admin',
-        'auth.loadingPlayers': 'Loading players...',
-        'auth.noPlayersFound': 'No players found. Run seed data first.',
+        'auth.loadingWrestlers': 'Loading wrestlers...',
+        'auth.noWrestlersFound': 'No wrestlers found. Run seed data first.',
       };
       return map[key] ?? key;
     },

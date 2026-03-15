@@ -1,15 +1,15 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { matchesApi, playersApi, seasonsApi, championshipsApi, stipulationsApi, matchTypesApi } from '../services/api';
+import { matchesApi, wrestlersApi, seasonsApi, championshipsApi, stipulationsApi, matchTypesApi } from '../services/api';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
-import type { Match, MatchFilters, Player, Season, Championship, Stipulation, MatchType } from '../types';
+import type { Match, MatchFilters, Wrestler, Season, Championship, Stipulation, MatchType } from '../types';
 import Skeleton from './ui/Skeleton';
 import EmptyState from './ui/EmptyState';
 import './MatchSearch.css';
 
 const FILTER_KEYS: (keyof MatchFilters)[] = [
-  'status', 'playerId', 'matchType', 'stipulationId', 'championshipId', 'seasonId', 'dateFrom', 'dateTo',
+  'status', 'wrestlerId', 'matchType', 'stipulationId', 'championshipId', 'seasonId', 'dateFrom', 'dateTo',
 ];
 
 function filtersFromParams(params: URLSearchParams): MatchFilters {
@@ -41,7 +41,7 @@ export default function MatchSearch() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [matches, setMatches] = useState<Match[]>([]);
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [wrestlers, setWrestlers] = useState<Wrestler[]>([]);
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [championships, setChampionships] = useState<Championship[]>([]);
   const [stipulations, setStipulations] = useState<Stipulation[]>([]);
@@ -70,15 +70,15 @@ export default function MatchSearch() {
     const controller = new AbortController();
     const load = async () => {
       try {
-        const [playersData, seasonsData, championshipsData, stipulationsData, matchTypesData] = await Promise.all([
-          playersApi.getAll(controller.signal),
+        const [wrestlersData, seasonsData, championshipsData, stipulationsData, matchTypesData] = await Promise.all([
+          wrestlersApi.getAll(controller.signal),
           seasonsApi.getAll(controller.signal),
           championshipsApi.getAll(controller.signal),
           stipulationsApi.getAll(controller.signal),
           matchTypesApi.getAll(controller.signal),
         ]);
         if (!controller.signal.aborted) {
-          setPlayers(playersData);
+          setWrestlers(wrestlersData);
           setSeasons(seasonsData);
           setChampionships(championshipsData);
           setStipulations(stipulationsData);
@@ -122,11 +122,11 @@ export default function MatchSearch() {
     return () => controller.abort();
   }, [filters]);
 
-  const playerMap = useMemo(() => {
-    const map = new Map<string, Player>();
-    for (const p of players) map.set(p.playerId, p);
+  const wrestlerMap = useMemo(() => {
+    const map = new Map<string, Wrestler>();
+    for (const p of wrestlers) map.set(p.wrestlerId, p);
     return map;
-  }, [players]);
+  }, [wrestlers]);
 
   const championshipMap = useMemo(() => {
     const map = new Map<string, Championship>();
@@ -146,7 +146,7 @@ export default function MatchSearch() {
     return map;
   }, [seasons]);
 
-  const getPlayerName = useCallback((id: string) => playerMap.get(id)?.name ?? id, [playerMap]);
+  const getWrestlerName = useCallback((id: string) => wrestlerMap.get(id)?.name ?? id, [wrestlerMap]);
 
   return (
     <div className="match-search-container">
@@ -164,17 +164,17 @@ export default function MatchSearch() {
       {/* Filter Panel */}
       <div className="match-search-filters" role="search" aria-label={t('matchSearch.filtersLabel')}>
         <div className="filter-row">
-          {/* Player */}
+          {/* Wrestler */}
           <div className="filter-field">
-            <label htmlFor="filter-player">{t('matchSearch.filters.player')}</label>
+            <label htmlFor="filter-wrestler">{t('matchSearch.filters.wrestler')}</label>
             <select
-              id="filter-player"
-              value={filters.playerId ?? ''}
-              onChange={(e) => updateFilter('playerId', e.target.value)}
+              id="filter-wrestler"
+              value={filters.wrestlerId ?? ''}
+              onChange={(e) => updateFilter('wrestlerId', e.target.value)}
             >
               <option value="">{t('common.all')}</option>
-              {players.map((p) => (
-                <option key={p.playerId} value={p.playerId}>{p.name}</option>
+              {wrestlers.map((p) => (
+                <option key={p.wrestlerId} value={p.wrestlerId}>{p.name}</option>
               ))}
             </select>
           </div>
@@ -333,7 +333,7 @@ export default function MatchSearch() {
                         match.winners?.includes(pid) ? 'match-winner' :
                         match.losers?.includes(pid) ? 'match-loser' : ''
                       }>
-                        {getPlayerName(pid)}
+                        {getWrestlerName(pid)}
                       </span>
                     </span>
                   ))}

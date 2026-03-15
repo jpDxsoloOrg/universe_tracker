@@ -252,8 +252,7 @@ interface MatchEntryProps {
       stipulationId?: string;
       stipulationName?: string;
       participants: {
-        playerId: string;
-        playerName: string;
+        wrestlerId: string;
         wrestlerName: string;
       }[];
       winners?: string[];
@@ -317,15 +316,15 @@ function MatchEntry({ match, isCompleted, t }: MatchEntryProps) {
 
       <div className="match-participants">
         {matchData.participants.map((p) => {
-          const isWinner = isCompleted && matchData.winners?.includes(p.playerId);
-          const isLoser = isCompleted && matchData.losers?.includes(p.playerId);
+          const isWinner = isCompleted && matchData.winners?.includes(p.wrestlerId);
+          const isLoser = isCompleted && matchData.losers?.includes(p.wrestlerId);
           return (
             <span
-              key={p.playerId}
+              key={p.wrestlerId}
               className={`participant ${isWinner ? 'winner' : ''} ${isLoser ? 'loser' : ''}`}
             >
               {p.wrestlerName}
-              <span className="participant-player">({p.playerName})</span>
+              <span className="participant-wrestler">({p.wrestlerName})</span>
               {isWinner && <span className="winner-indicator"> {t('events.detail.winner')}</span>}
             </span>
           );

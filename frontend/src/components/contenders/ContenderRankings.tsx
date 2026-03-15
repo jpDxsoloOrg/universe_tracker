@@ -215,8 +215,8 @@ export default function ContenderRankings() {
                   <h4 className="champion-wrestler-name">
                     {contenderData.currentChampion.wrestlerName}
                   </h4>
-                  <p className="champion-player-name">
-                    {contenderData.currentChampion.playerName}
+                  <p className="champion-wrestler-name">
+                    {contenderData.currentChampion.wrestlerName}
                   </p>
                 </div>
               </div>
@@ -236,7 +236,7 @@ export default function ContenderRankings() {
                 </div>
               ) : (
                 contenderData.contenders.map((contender) => (
-                  <ContenderCard key={contender.playerId} contender={contender} />
+                  <ContenderCard key={contender.wrestlerId} contender={contender} />
                 ))
               )}
             </div>

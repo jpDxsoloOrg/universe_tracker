@@ -12,7 +12,7 @@ export const seasonAwardsApi = {
     return fetchWithAuth(`${API_BASE_URL}/seasons/${seasonId}/awards`, {}, signal);
   },
 
-  create: async (seasonId: string, award: { name: string; playerId: string; description?: string }): Promise<SeasonAward> => {
+  create: async (seasonId: string, award: { name: string; wrestlerId: string; description?: string }): Promise<SeasonAward> => {
     return fetchWithAuth(`${API_BASE_URL}/seasons/${seasonId}/awards`, {
       method: 'POST',
       body: JSON.stringify(award),

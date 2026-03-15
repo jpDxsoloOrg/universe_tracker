@@ -11,7 +11,7 @@ interface AuthState {
 interface AuthContextType extends AuthState {
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-  devSignIn?: (player: { playerId: string; name: string }, roles?: UserRole[]) => void;
+  devSignIn?: (wrestler: { wrestlerId: string; name: string }, roles?: UserRole[]) => void;
   isAdminOrModerator: boolean;
   isSuperAdmin: boolean;
   isModerator: boolean;
@@ -35,21 +35,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const init = async () => {
       // Dev mode: restore dev session from sessionStorage
       if (import.meta.env.DEV) {
-        const devPlayer = sessionStorage.getItem('devPlayer');
-        if (devPlayer) {
+        const devWrestler = sessionStorage.getItem('devWrestler');
+        if (devWrestler) {
           try {
-            const player = JSON.parse(devPlayer);
+            const wrestler = JSON.parse(devWrestler);
             if (!mounted) return;
-            const groups = (player.groups as UserRole[]) || ['Admin'];
+            const groups = (wrestler.groups as UserRole[]) || ['Admin'];
             setState({
               isAuthenticated: true,
               isLoading: false,
               groups,
-              email: `${(player.name as string).toLowerCase().replace(/\s/g, '.')}@dev.local`,
+              email: `${(wrestler.name as string).toLowerCase().replace(/\s/g, '.')}@dev.local`,
             });
             return;
           } catch {
-            sessionStorage.removeItem('devPlayer');
+            sessionStorage.removeItem('devWrestler');
           }
         }
       }
@@ -110,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const handleSignOut = useCallback(async () => {
     await cognitoAuth.signOut();
-    sessionStorage.removeItem('devPlayer');
+    sessionStorage.removeItem('devWrestler');
     setState({
       isAuthenticated: false,
       isLoading: false,
@@ -125,17 +125,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return state.groups.includes(role);
   }, [state.groups]);
 
-  // Dev-only: sign in as a player without Cognito
-  const devSignIn = useCallback((player: { playerId: string; name: string }, roles?: UserRole[]) => {
+  // Dev-only: sign in as a wrestler without Cognito
+  const devSignIn = useCallback((wrestler: { wrestlerId: string; name: string }, roles?: UserRole[]) => {
     const groups = roles || ['Admin'];
-    sessionStorage.setItem('accessToken', `dev-${player.playerId}`);
+    sessionStorage.setItem('accessToken', `dev-${wrestler.wrestlerId}`);
     sessionStorage.setItem('userGroups', JSON.stringify(groups));
-    sessionStorage.setItem('devPlayer', JSON.stringify({ ...player, groups }));
+    sessionStorage.setItem('devWrestler', JSON.stringify({ ...wrestler, groups }));
     setState({
       isAuthenticated: true,
       isLoading: false,
       groups,
-      email: `${player.name.toLowerCase().replace(/\s/g, '.')}@dev.local`,
+      email: `${wrestler.name.toLowerCase().replace(/\s/g, '.')}@dev.local`,
     });
   }, []);
 

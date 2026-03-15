@@ -2,7 +2,7 @@
 
 *Diese Funktion ist für Wrestler. Sie kann von Ihrer Liga ein- oder ausgeschaltet werden.*
 
-Als Wrestler können Sie Herausforderungen aussprechen, annehmen, ablehnen oder kontern, um Matches mit anderen Spielern zu vereinbaren.
+Als Wrestler können Sie Herausforderungen aussprechen, annehmen, ablehnen oder kontern, um Matches mit anderen Wrestlern zu vereinbaren.
 
 ## Herausforderungs-Board
 

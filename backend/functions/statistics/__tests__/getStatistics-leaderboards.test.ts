@@ -19,7 +19,7 @@ vi.mock('../../../lib/dynamodb', () => ({
     queryAll: vi.fn(),
   },
   TableNames: {
-    PLAYERS: 'Players',
+    WRESTLERS: 'Wrestlers',
     MATCHES: 'Matches',
     CHAMPIONSHIPS: 'Championships',
     CHAMPIONSHIP_HISTORY: 'ChampionshipHistory',
@@ -51,11 +51,10 @@ function makeEvent(overrides: Partial<APIGatewayProxyEvent> = {}): APIGatewayPro
   };
 }
 
-function makePlayer(id: string, name: string, wrestler: string) {
+function makeWrestler(id: string, name: string) {
   return {
-    playerId: id,
+    wrestlerId: id,
     name,
-    currentWrestler: wrestler,
     wins: 0,
     losses: 0,
     draws: 0,
@@ -78,16 +77,16 @@ function makeMatch(overrides: Record<string, unknown> = {}) {
   };
 }
 
-const player1 = makePlayer('p1', 'Alpha', 'Wrestler A');
-const player2 = makePlayer('p2', 'Beta', 'Wrestler B');
-const player3 = makePlayer('p3', 'Gamma', 'Wrestler C');
+const wrestler1 = makeWrestler('p1', 'Alpha');
+const wrestler2 = makeWrestler('p2', 'Beta');
+const wrestler3 = makeWrestler('p3', 'Gamma');
 
 // ─── Leaderboards Section ────────────────────────────────────────────
 
 describe('getStatistics - leaderboards', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('ranks players by most wins correctly', async () => {
+  it('ranks wrestlers by most wins correctly', async () => {
     // p1: 3 wins, p2: 1 win, p3: 0 wins
     const matches = [
       makeMatch({ matchId: 'm1', participants: ['p1', 'p2'], winners: ['p1'], losers: ['p2'] }),
@@ -97,7 +96,7 @@ describe('getStatistics - leaderboards', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2, player3])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2, wrestler3])  // WRESTLERS
       .mockResolvedValueOnce(matches)                       // MATCHES
       .mockResolvedValueOnce([]);                           // CHAMPIONSHIP_HISTORY
 
@@ -111,17 +110,17 @@ describe('getStatistics - leaderboards', () => {
     const body = JSON.parse(result!.body);
     const mostWins = body.leaderboards.mostWins;
 
-    expect(mostWins[0].playerName).toBe('Alpha');
+    expect(mostWins[0].wrestlerName).toBe('Alpha');
     expect(mostWins[0].value).toBe(3);
     expect(mostWins[0].rank).toBe(1);
-    expect(mostWins[1].playerName).toBe('Beta');
+    expect(mostWins[1].wrestlerName).toBe('Beta');
     expect(mostWins[1].value).toBe(1);
     expect(mostWins[1].rank).toBe(2);
     expect(mostWins[2].value).toBe(0);
     expect(mostWins[2].rank).toBe(3);
   });
 
-  it('ranks best win percentage filtering out players with zero matches', async () => {
+  it('ranks best win percentage filtering out wrestlers with zero matches', async () => {
     // p1: 2 wins / 3 matches = 66.7%, p2: 1 win / 1 match = 100%, p3: 0 matches
     const matches = [
       makeMatch({ matchId: 'm1', participants: ['p1', 'p2'], winners: ['p1'], losers: ['p2'] }),
@@ -130,7 +129,7 @@ describe('getStatistics - leaderboards', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2, player3])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2, wrestler3])  // WRESTLERS
       .mockResolvedValueOnce(matches)                       // MATCHES
       .mockResolvedValueOnce([]);                           // CHAMPIONSHIP_HISTORY
 
@@ -150,9 +149,9 @@ describe('getStatistics - leaderboards', () => {
     // p3 participates in m2 (loss) = 0W 1L = 0%
     // p1: 2W 1L = 66.7%
     // Sorted: p1 (66.7%), p2 (50%), p3 (0%)
-    expect(bestWinPct[0].playerName).toBe('Alpha');
+    expect(bestWinPct[0].wrestlerName).toBe('Alpha');
     expect(bestWinPct[0].value).toBe(66.7);
-    expect(bestWinPct[1].playerName).toBe('Beta');
+    expect(bestWinPct[1].wrestlerName).toBe('Beta');
     expect(bestWinPct[1].value).toBe(50);
   });
 
@@ -166,7 +165,7 @@ describe('getStatistics - leaderboards', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2, player3])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2, wrestler3])  // WRESTLERS
       .mockResolvedValueOnce(matches)                       // MATCHES
       .mockResolvedValueOnce([]);                           // CHAMPIONSHIP_HISTORY
 
@@ -180,7 +179,7 @@ describe('getStatistics - leaderboards', () => {
     const body = JSON.parse(result!.body);
     const longestStreak = body.leaderboards.longestStreak;
 
-    expect(longestStreak[0].playerName).toBe('Alpha');
+    expect(longestStreak[0].wrestlerName).toBe('Alpha');
     expect(longestStreak[0].value).toBe(3);
     expect(longestStreak[0].rank).toBe(1);
   });
@@ -194,7 +193,7 @@ describe('getStatistics - leaderboards', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2, player3])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2, wrestler3])  // WRESTLERS
       .mockResolvedValueOnce(matches)                       // MATCHES
       .mockResolvedValueOnce([]);                           // CHAMPIONSHIP_HISTORY
 
@@ -208,9 +207,9 @@ describe('getStatistics - leaderboards', () => {
     const body = JSON.parse(result!.body);
     const mostChamps = body.leaderboards.mostChampionships;
 
-    expect(mostChamps[0].playerName).toBe('Alpha');
+    expect(mostChamps[0].wrestlerName).toBe('Alpha');
     expect(mostChamps[0].value).toBe(2);
-    expect(mostChamps[1].playerName).toBe('Beta');
+    expect(mostChamps[1].wrestlerName).toBe('Beta');
     expect(mostChamps[1].value).toBe(1);
   });
 
@@ -222,7 +221,7 @@ describe('getStatistics - leaderboards', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2, player3])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2, wrestler3])  // WRESTLERS
       .mockResolvedValueOnce([])                            // MATCHES
       .mockResolvedValueOnce(champHistory);                 // CHAMPIONSHIP_HISTORY
 
@@ -236,12 +235,12 @@ describe('getStatistics - leaderboards', () => {
     const body = JSON.parse(result!.body);
     const longestReign = body.leaderboards.longestReign;
 
-    expect(longestReign[0].playerName).toBe('Alpha');
+    expect(longestReign[0].wrestlerName).toBe('Alpha');
     expect(longestReign[0].value).toBe(152);
     expect(longestReign[0].rank).toBe(1);
-    expect(longestReign[1].playerName).toBe('Gamma');
+    expect(longestReign[1].wrestlerName).toBe('Gamma');
     expect(longestReign[1].value).toBe(31);
-    expect(longestReign[2].playerName).toBe('Beta');
+    expect(longestReign[2].wrestlerName).toBe('Beta');
     expect(longestReign[2].value).toBe(30);
   });
 });
@@ -273,7 +272,7 @@ describe('getStatistics - records', () => {
     }
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2, player3])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2, wrestler3])  // WRESTLERS
       .mockResolvedValueOnce(matches)                       // MATCHES
       .mockResolvedValueOnce([]);                           // CHAMPIONSHIP_HISTORY
 
@@ -322,7 +321,7 @@ describe('getStatistics - records', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2, player3])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2, wrestler3])  // WRESTLERS
       .mockResolvedValueOnce(matches)                       // MATCHES
       .mockResolvedValueOnce(champHistory);                 // CHAMPIONSHIP_HISTORY
 
@@ -366,7 +365,7 @@ describe('getStatistics - records', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2, player3])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2, wrestler3])  // WRESTLERS
       .mockResolvedValueOnce(matches)                       // MATCHES
       .mockResolvedValueOnce([]);                           // CHAMPIONSHIP_HISTORY
 
@@ -413,7 +412,7 @@ describe('getStatistics - records', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2, player3])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2, wrestler3])  // WRESTLERS
       .mockResolvedValueOnce(matches)                       // MATCHES
       .mockResolvedValueOnce([]);                           // CHAMPIONSHIP_HISTORY
 
@@ -446,7 +445,7 @@ describe('getStatistics - records', () => {
     expect(cageRecord.holderName).toBe('N/A');
     expect(cageRecord.value).toBe('0%');
 
-    // mostLadderWins returns first player with 0 wins (all tied at 0)
+    // mostLadderWins returns first wrestler with 0 wins (all tied at 0)
     const ladderRecord = matchTypeRecords.find((r: any) => r.recordName === 'Most Ladder Match Wins');
     expect(ladderRecord.value).toBe(0);
   });
@@ -466,7 +465,7 @@ describe('getStatistics - records', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2, player3])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2, wrestler3])  // WRESTLERS
       .mockResolvedValueOnce(matches)                       // MATCHES
       .mockResolvedValueOnce([]);                           // CHAMPIONSHIP_HISTORY
 

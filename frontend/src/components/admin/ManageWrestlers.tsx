@@ -1,6 +1,6 @@
 import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { playersApi, imagesApi, divisionsApi } from '../../services/api';
+import { wrestlersApi, imagesApi, divisionsApi } from '../../services/api';
 import { sanitizeName } from '../../utils/sanitize';
 import { logger } from '../../utils/logger';
 import { FILE_UPLOAD_LIMITS, VALIDATION } from '../../constants';
@@ -9,16 +9,16 @@ import {
   applyImageFallback,
   resolveImageSrc,
 } from '../../constants/imageFallbacks';
-import type { Player, Division } from '../../types';
-import './ManagePlayers.css';
+import type { Wrestler, Division } from '../../types';
+import './ManageWrestlers.css';
 
-export default function ManagePlayers() {
-  const [players, setPlayers] = useState<Player[]>([]);
+export default function ManageWrestlers() {
+  const [wrestlers, setWrestlers] = useState<Wrestler[]>([]);
   const [divisions, setDivisions] = useState<Division[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
+  const [editingWrestler, setEditingWrestler] = useState<Wrestler | null>(null);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -27,7 +27,6 @@ export default function ManagePlayers() {
   // Form state
   const [formData, setFormData] = useState({
     name: '',
-    currentWrestler: '',
     imageUrl: '',
     divisionId: '',
   });
@@ -43,11 +42,11 @@ export default function ManagePlayers() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [playersData, divisionsData] = await Promise.all([
-        playersApi.getAll(),
+      const [wrestlersData, divisionsData] = await Promise.all([
+        wrestlersApi.getAll(),
         divisionsApi.getAll(),
       ]);
-      setPlayers(playersData);
+      setWrestlers(wrestlersData);
       setDivisions(divisionsData);
     } catch (_err) {
       setError('Failed to load data');
@@ -113,7 +112,7 @@ export default function ManagePlayers() {
         uploadUrl = response.uploadUrl;
         imageUrl = response.imageUrl;
       } catch (err) {
-        logger.error('Failed to get upload URL for player image');
+        logger.error('Failed to get upload URL for wrestler image');
         if (err instanceof Error && err.message.includes('401')) {
           throw new Error('Session expired. Please log in again to upload images.');
         }
@@ -124,7 +123,7 @@ export default function ManagePlayers() {
       try {
         await imagesApi.uploadToS3(uploadUrl, selectedFile);
       } catch (err) {
-        logger.error('Failed to upload player image to storage');
+        logger.error('Failed to upload wrestler image to storage');
         if (err instanceof TypeError && err.message.includes('network')) {
           throw new Error('Network error during upload. Please check your internet connection and try again.');
         }
@@ -150,24 +149,21 @@ export default function ManagePlayers() {
 
       // Sanitize inputs before sending to API
       const sanitizedName = sanitizeName(formData.name, VALIDATION.MAX_NAME_LENGTH);
-      const sanitizedWrestler = sanitizeName(formData.currentWrestler, VALIDATION.MAX_NAME_LENGTH);
 
-      if (!sanitizedName || !sanitizedWrestler) {
-        setError('Name and wrestler fields cannot be empty');
+      if (!sanitizedName) {
+        setError('Name cannot be empty');
         return;
       }
 
-      if (editingPlayer) {
-        await playersApi.update(editingPlayer.playerId, {
+      if (editingWrestler) {
+        await wrestlersApi.update(editingWrestler.wrestlerId, {
           name: sanitizedName,
-          currentWrestler: sanitizedWrestler,
           imageUrl: imageUrl || undefined,
           divisionId: formData.divisionId || undefined,
         });
       } else {
-        await playersApi.create({
+        await wrestlersApi.create({
           name: sanitizedName,
-          currentWrestler: sanitizedWrestler,
           imageUrl: imageUrl || undefined,
           divisionId: formData.divisionId || undefined,
           wins: 0,
@@ -176,73 +172,72 @@ export default function ManagePlayers() {
         });
       }
 
-      setFormData({ name: '', currentWrestler: '', imageUrl: '', divisionId: '' });
+      setFormData({ name: '', imageUrl: '', divisionId: '' });
       setSelectedFile(null);
       setImagePreview(null);
       setShowAddForm(false);
-      setEditingPlayer(null);
-      setSuccess(editingPlayer ? 'Player updated successfully!' : 'Player created successfully!');
+      setEditingWrestler(null);
+      setSuccess(editingWrestler ? 'Wrestler updated successfully!' : 'Wrestler created successfully!');
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save player');
+      setError(err instanceof Error ? err.message : 'Failed to save wrestler');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleEdit = (player: Player) => {
-    setEditingPlayer(player);
+  const handleEdit = (wrestler: Wrestler) => {
+    setEditingWrestler(wrestler);
     setFormData({
-      name: player.name,
-      currentWrestler: player.currentWrestler,
-      imageUrl: player.imageUrl || '',
-      divisionId: player.divisionId || '',
+      name: wrestler.name,
+      imageUrl: wrestler.imageUrl || '',
+      divisionId: wrestler.divisionId || '',
     });
-    setImagePreview(player.imageUrl || null);
+    setImagePreview(wrestler.imageUrl || null);
     setSelectedFile(null);
     setShowAddForm(true);
   };
 
   const handleCancel = () => {
-    setFormData({ name: '', currentWrestler: '', imageUrl: '', divisionId: '' });
+    setFormData({ name: '', imageUrl: '', divisionId: '' });
     setSelectedFile(null);
     setImagePreview(null);
     setShowAddForm(false);
-    setEditingPlayer(null);
+    setEditingWrestler(null);
   };
 
-  const handleDelete = async (playerId: string, playerName: string) => {
-    if (!confirm(`Are you sure you want to delete ${playerName}? This action cannot be undone.`)) {
+  const handleDelete = async (wrestlerId: string, wrestlerName: string) => {
+    if (!confirm(`Are you sure you want to delete ${wrestlerName}? This action cannot be undone.`)) {
       return;
     }
 
-    setDeleting(playerId);
+    setDeleting(wrestlerId);
     setError(null);
     setSuccess(null);
 
     try {
-      await playersApi.delete(playerId);
-      setSuccess('Player deleted successfully!');
+      await wrestlersApi.delete(wrestlerId);
+      setSuccess('Wrestler deleted successfully!');
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete player');
+      setError(err instanceof Error ? err.message : 'Failed to delete wrestler');
     } finally {
       setDeleting(null);
     }
   };
 
   if (loading) {
-    return <div className="loading">Loading players...</div>;
+    return <div className="loading">Loading wrestlers...</div>;
   }
 
   return (
-    <div className="manage-players">
-      <div className="players-header">
+    <div className="manage-wrestlers">
+      <div className="wrestlers-header">
         <div>
-          <h2>Manage Players</h2>
-          <p className="players-subtext">
-            Edit existing players, assign divisions, and keep wrestler profiles current. Need process
-            details? <Link to="/guide/wiki/admin-manage-players">Learn more</Link>.
+          <h2>Manage Wrestlers</h2>
+          <p className="wrestlers-subtext">
+            Edit existing wrestlers, assign divisions, and keep wrestler profiles current. Need process
+            details? <Link to="/guide/wiki/admin-manage-wrestlers">Learn more</Link>.
           </p>
         </div>
       </div>
@@ -251,11 +246,11 @@ export default function ManagePlayers() {
       {success && <div className="success-message">{success}</div>}
 
       {showAddForm && (
-        <div className="player-form-container">
-          <h3>{editingPlayer ? 'Edit Player' : 'Add New Player'}</h3>
-          <form onSubmit={handleSubmit} className="player-form">
+        <div className="wrestler-form-container">
+          <h3>{editingWrestler ? 'Edit Wrestler' : 'Add New Wrestler'}</h3>
+          <form onSubmit={handleSubmit} className="wrestler-form">
             <div className="form-group">
-              <label htmlFor="name">Player Name</label>
+              <label htmlFor="name">Wrestler Name</label>
               <input
                 type="text"
                 id="name"
@@ -263,18 +258,6 @@ export default function ManagePlayers() {
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
                 placeholder="John Doe"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="wrestler">Wrestler</label>
-              <input
-                type="text"
-                id="wrestler"
-                value={formData.currentWrestler}
-                onChange={(e) => setFormData({ ...formData, currentWrestler: e.target.value })}
-                required
-                placeholder="Stone Cold Steve Austin"
               />
             </div>
 
@@ -324,7 +307,7 @@ export default function ManagePlayers() {
 
             <div className="form-actions">
               <button type="submit" disabled={submitting || uploading}>
-                {submitting ? 'Saving...' : uploading ? 'Uploading...' : editingPlayer ? 'Update Player' : 'Add Player'}
+                {submitting ? 'Saving...' : uploading ? 'Uploading...' : editingWrestler ? 'Update Wrestler' : 'Add Wrestler'}
               </button>
               <button type="button" onClick={handleCancel} className="cancel-btn" disabled={submitting || uploading}>
                 Cancel
@@ -334,68 +317,54 @@ export default function ManagePlayers() {
         </div>
       )}
 
-      <div className="players-list">
-        <h3>All Players ({players.length})</h3>
-        {players.length === 0 ? (
-          <p>No players yet. Add your first player!</p>
+      <div className="wrestlers-list">
+        <h3>All Wrestlers ({wrestlers.length})</h3>
+        {wrestlers.length === 0 ? (
+          <p>No wrestlers yet. Add your first wrestler!</p>
         ) : (
-          <div className="players-table-wrapper">
-          <table className="players-table">
+          <div className="wrestlers-table-wrapper">
+          <table className="wrestlers-table">
             <thead>
               <tr>
                 <th>Image</th>
-                <th>Player Name</th>
-                <th>Wrestler</th>
+                <th>Wrestler Name</th>
                 <th>Division</th>
                 <th>Record</th>
-                <th>Linked</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {players.map((player) => (
-                <tr key={player.playerId}>
+              {wrestlers.map((wrestler) => (
+                <tr key={wrestler.wrestlerId}>
                   <td>
                     <img
-                      src={resolveImageSrc(player.imageUrl, DEFAULT_WRESTLER_IMAGE)}
+                      src={resolveImageSrc(wrestler.imageUrl, DEFAULT_WRESTLER_IMAGE)}
                       onError={(event) => applyImageFallback(event, DEFAULT_WRESTLER_IMAGE)}
-                      alt={player.currentWrestler}
-                      className="player-thumbnail"
+                      alt={wrestler.name}
+                      className="wrestler-thumbnail"
                     />
                   </td>
-                  <td>{player.name}</td>
-                  <td>{player.currentWrestler}</td>
-                  <td className="division-cell">{getDivisionName(player.divisionId)}</td>
+                  <td>{wrestler.name}</td>
+                  <td className="division-cell">{getDivisionName(wrestler.divisionId)}</td>
                   <td>
                     <span className="record">
-                      {player.wins}W - {player.losses}L - {player.draws}D
+                      {wrestler.wins}W - {wrestler.losses}L - {wrestler.draws}D
                     </span>
-                  </td>
-                  <td>
-                    {player.userId ? (
-                      <span className="linked-badge" title="This player is linked to a user account">
-                        Linked
-                      </span>
-                    ) : (
-                      <span className="unlinked-badge" title="This player was created manually and is not linked to a user account">
-                        Manual
-                      </span>
-                    )}
                   </td>
                   <td>
                     <div className="actions-cell">
                       <button
-                        onClick={() => handleEdit(player)}
+                        onClick={() => handleEdit(wrestler)}
                         className="edit-btn"
                       >
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(player.playerId, player.name)}
+                        onClick={() => handleDelete(wrestler.wrestlerId, wrestler.name)}
                         className="delete-btn"
-                        disabled={deleting === player.playerId}
+                        disabled={deleting === wrestler.wrestlerId}
                       >
-                        {deleting === player.playerId ? 'Deleting...' : 'Delete'}
+                        {deleting === wrestler.wrestlerId ? 'Deleting...' : 'Delete'}
                       </button>
                     </div>
                   </td>

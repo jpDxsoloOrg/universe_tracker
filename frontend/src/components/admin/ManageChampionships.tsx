@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
-import { championshipsApi, divisionsApi, playersApi, imagesApi } from '../../services/api';
+import { championshipsApi, divisionsApi, wrestlersApi, imagesApi } from '../../services/api';
 import { sanitizeName } from '../../utils/sanitize';
 import { logger } from '../../utils/logger';
 import { FILE_UPLOAD_LIMITS, VALIDATION } from '../../constants';
@@ -8,7 +8,7 @@ import {
   applyImageFallback,
   resolveImageSrc,
 } from '../../constants/imageFallbacks';
-import type { Championship, Division, Player } from '../../types';
+import type { Championship, Division, Wrestler } from '../../types';
 import './ManageChampionships.css';
 
 export default function ManageChampionships() {
@@ -24,7 +24,7 @@ export default function ManageChampionships() {
   const [vacating, setVacating] = useState<string | null>(null);
 
   const [divisions, setDivisions] = useState<Division[]>([]);
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [wrestlers, setWrestlers] = useState<Wrestler[]>([]);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -40,7 +40,7 @@ export default function ManageChampionships() {
   useEffect(() => {
     loadChampionships();
     loadDivisions();
-    loadPlayers();
+    loadWrestlers();
   }, []);
 
   const loadChampionships = async () => {
@@ -64,10 +64,10 @@ export default function ManageChampionships() {
     }
   };
 
-  const loadPlayers = async () => {
+  const loadWrestlers = async () => {
     try {
-      const data = await playersApi.getAll();
-      setPlayers(data);
+      const data = await wrestlersApi.getAll();
+      setWrestlers(data);
     } catch (_err) {
       // Non-critical — used for champion display
     }
@@ -77,8 +77,8 @@ export default function ManageChampionships() {
     if (!currentChampion) return 'Vacant';
     const ids = Array.isArray(currentChampion) ? currentChampion : [currentChampion];
     const names = ids.map(id => {
-      const player = players.find(p => p.playerId === id);
-      return player ? player.name : 'Unknown';
+      const wrestler = wrestlers.find(p => p.wrestlerId === id);
+      return wrestler ? wrestler.name : 'Unknown';
     });
     return names.join(' & ');
   };

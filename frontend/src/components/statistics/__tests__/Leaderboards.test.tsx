@@ -28,7 +28,7 @@ vi.mock('react-i18next', () => ({
         'statistics.leaderboards.categories.championships': 'Championships',
         'statistics.leaderboards.categories.longestReign': 'Longest Reign',
         'statistics.leaderboards.noData': 'No data available yet.',
-        'statistics.nav.playerStats': 'Player Stats',
+        'statistics.nav.wrestlerStats': 'Wrestler Stats',
         'statistics.nav.headToHead': 'Head to Head',
         'statistics.nav.records': 'Records',
         'common.loading': 'Loading...',
@@ -47,14 +47,14 @@ import Leaderboards from '../Leaderboards';
 // --- Test data ---
 const mockLeaderboards = {
   mostWins: [
-    { playerId: 'p1', playerName: 'John Cena', wrestlerName: 'The Champ', value: 25, rank: 1 },
-    { playerId: 'p2', playerName: 'The Rock', wrestlerName: 'The Great One', value: 20, rank: 2 },
-    { playerId: 'p3', playerName: 'Undertaker', wrestlerName: 'The Deadman', value: 18, rank: 3 },
-    { playerId: 'p4', playerName: 'Triple H', wrestlerName: 'The Game', value: 12, rank: 4 },
+    { wrestlerId: 'p1', wrestlerName: 'John Cena', value: 25, rank: 1 },
+    { wrestlerId: 'p2', wrestlerName: 'The Rock', value: 20, rank: 2 },
+    { wrestlerId: 'p3', wrestlerName: 'Undertaker', value: 18, rank: 3 },
+    { wrestlerId: 'p4', wrestlerName: 'Triple H', value: 12, rank: 4 },
   ],
   bestWinPercentage: [
-    { playerId: 'p1', playerName: 'John Cena', wrestlerName: 'The Champ', value: 72.5, rank: 1 },
-    { playerId: 'p3', playerName: 'Undertaker', wrestlerName: 'The Deadman', value: 68.2, rank: 2 },
+    { wrestlerId: 'p1', wrestlerName: 'John Cena', value: 72.5, rank: 1 },
+    { wrestlerId: 'p3', wrestlerName: 'Undertaker', value: 68.2, rank: 2 },
   ],
   longestStreak: [],
   mostChampionships: [],
@@ -76,7 +76,7 @@ describe('Leaderboards', () => {
 
   it('renders leaderboard entries for the default Most Wins category with medal badges', async () => {
     mockGetLeaderboards.mockResolvedValue({
-      players: [],
+      wrestlers: [],
       leaderboards: mockLeaderboards,
     });
 
@@ -86,10 +86,10 @@ describe('Leaderboards', () => {
       expect(screen.getByText('Leaderboards')).toBeInTheDocument();
     });
 
-    // Default active tab is "Most Wins"
-    expect(screen.getByText('John Cena')).toBeInTheDocument();
-    expect(screen.getByText('The Rock')).toBeInTheDocument();
-    expect(screen.getByText('Undertaker')).toBeInTheDocument();
+    // Default active tab is "Most Wins" (names appear in both link and span)
+    expect(screen.getAllByText('John Cena').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('The Rock').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Undertaker').length).toBeGreaterThanOrEqual(1);
 
     // Medal badges for top 3
     expect(screen.getByText('1st')).toBeInTheDocument();
@@ -107,7 +107,7 @@ describe('Leaderboards', () => {
   it('switches category tabs and displays corresponding entries', async () => {
     const user = userEvent.setup();
     mockGetLeaderboards.mockResolvedValue({
-      players: [],
+      wrestlers: [],
       leaderboards: mockLeaderboards,
     });
 

@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { statisticsApi, seasonsApi } from '../../services/api';
-import type { StatsPlayer, HeadToHeadResponse } from '../../services/api';
+import type { StatsWrestler, HeadToHeadResponse } from '../../services/api';
 import type { Season } from '../../types';
 import Skeleton from '../ui/Skeleton';
 import SeasonSelector from './SeasonSelector';
@@ -10,32 +10,32 @@ import './HeadToHeadComparison.css';
 
 function HeadToHeadComparison() {
   const { t } = useTranslation();
-  const [players, setPlayers] = useState<StatsPlayer[]>([]);
-  const [player1Id, setPlayer1Id] = useState('');
-  const [player2Id, setPlayer2Id] = useState('');
+  const [wrestlers, setWrestlers] = useState<StatsWrestler[]>([]);
+  const [wrestler1Id, setWrestler1Id] = useState('');
+  const [wrestler2Id, setWrestler2Id] = useState('');
   const [data, setData] = useState<HeadToHeadResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [selectedSeasonId, setSelectedSeasonId] = useState('');
 
-  // Load player list and seasons on mount
+  // Load wrestler list and seasons on mount
   useEffect(() => {
     const abortController = new AbortController();
     const fetchData = async () => {
       try {
-        const [playersResult, seasonsResult] = await Promise.all([
-          statisticsApi.getHeadToHeadPlayers(abortController.signal),
+        const [wrestlersResult, seasonsResult] = await Promise.all([
+          statisticsApi.getHeadToHeadWrestlers(abortController.signal),
           seasonsApi.getAll(abortController.signal),
         ]);
-        setPlayers(playersResult.players);
+        setWrestlers(wrestlersResult.wrestlers);
         setSeasons(seasonsResult);
-        if (playersResult.players.length >= 2 && playersResult.players[0] && playersResult.players[1]) {
-          setPlayer1Id(playersResult.players[0].playerId);
-          setPlayer2Id(playersResult.players[1].playerId);
+        if (wrestlersResult.wrestlers.length >= 2 && wrestlersResult.wrestlers[0] && wrestlersResult.wrestlers[1]) {
+          setWrestler1Id(wrestlersResult.wrestlers[0].wrestlerId);
+          setWrestler2Id(wrestlersResult.wrestlers[1].wrestlerId);
         }
       } catch (err: unknown) {
         if (err instanceof Error && err.name !== 'AbortError') {
-          console.error('Failed to load players', err);
+          console.error('Failed to load wrestlers', err);
         }
       } finally {
         setLoading(false);
@@ -45,9 +45,9 @@ function HeadToHeadComparison() {
     return () => abortController.abort();
   }, []);
 
-  // Load H2H data when players or season change
+  // Load H2H data when wrestlers or season change
   useEffect(() => {
-    if (!player1Id || !player2Id || player1Id === player2Id) {
+    if (!wrestler1Id || !wrestler2Id || wrestler1Id === wrestler2Id) {
       setData(null);
       return;
     }
@@ -56,7 +56,7 @@ function HeadToHeadComparison() {
       setLoading(true);
       try {
         const result = await statisticsApi.getHeadToHead(
-          player1Id, player2Id, selectedSeasonId || undefined, abortController.signal
+          wrestler1Id, wrestler2Id, selectedSeasonId || undefined, abortController.signal
         );
         setData(result);
       } catch (err: unknown) {
@@ -69,18 +69,18 @@ function HeadToHeadComparison() {
     };
     fetchH2H();
     return () => abortController.abort();
-  }, [player1Id, player2Id, selectedSeasonId]);
+  }, [wrestler1Id, wrestler2Id, selectedSeasonId]);
 
-  const player1 = useMemo(() => players.find((p) => p.playerId === player1Id), [players, player1Id]);
-  const player2 = useMemo(() => players.find((p) => p.playerId === player2Id), [players, player2Id]);
+  const wrestler1 = useMemo(() => wrestlers.find((p) => p.wrestlerId === wrestler1Id), [wrestlers, wrestler1Id]);
+  const wrestler2 = useMemo(() => wrestlers.find((p) => p.wrestlerId === wrestler2Id), [wrestlers, wrestler2Id]);
 
-  const p1Stats = data?.player1Stats;
-  const p2Stats = data?.player2Stats;
+  const p1Stats = data?.wrestler1Stats;
+  const p2Stats = data?.wrestler2Stats;
   const h2h = data?.headToHead;
 
-  const isSwapped = h2h ? h2h.player1Id !== player1Id : false;
-  const p1H2HWins = h2h ? (isSwapped ? h2h.player2Wins : h2h.player1Wins) : 0;
-  const p2H2HWins = h2h ? (isSwapped ? h2h.player1Wins : h2h.player2Wins) : 0;
+  const isSwapped = h2h ? h2h.wrestler1Id !== wrestler1Id : false;
+  const p1H2HWins = h2h ? (isSwapped ? h2h.wrestler2Wins : h2h.wrestler1Wins) : 0;
+  const p2H2HWins = h2h ? (isSwapped ? h2h.wrestler1Wins : h2h.wrestler2Wins) : 0;
   const h2hDraws = h2h ? h2h.draws : 0;
 
   function renderStatBar(label: string, val1: number, val2: number, suffix: string = '') {
@@ -130,7 +130,7 @@ function HeadToHeadComparison() {
   const p1Advantages = edgeCategories.filter((c) => c.p1 > c.p2).length;
   const p2Advantages = edgeCategories.filter((c) => c.p2 > c.p1).length;
 
-  if (loading && players.length === 0) {
+  if (loading && wrestlers.length === 0) {
     return (
       <div className="h2h-comparison">
         <h2>{t('statistics.headToHead.title')}</h2>
@@ -144,7 +144,7 @@ function HeadToHeadComparison() {
       <div className="h2h-header">
         <h2>{t('statistics.headToHead.title')}</h2>
         <div className="h2h-nav-links">
-          <Link to="/stats">{t('statistics.nav.playerStats')}</Link>
+          <Link to="/stats">{t('statistics.nav.wrestlerStats')}</Link>
           <Link to="/stats/leaderboards">{t('statistics.nav.leaderboards')}</Link>
           <Link to="/stats/tale-of-tape">{t('statistics.nav.taleOfTape')}</Link>
         </div>
@@ -152,13 +152,13 @@ function HeadToHeadComparison() {
 
       <div className="h2h-selectors">
         <div className="h2h-selector">
-          <label>{t('statistics.headToHead.player1')}</label>
+          <label>{t('statistics.headToHead.wrestler1')}</label>
           <select
-            value={player1Id}
-            onChange={(e) => setPlayer1Id(e.target.value)}
+            value={wrestler1Id}
+            onChange={(e) => setWrestler1Id(e.target.value)}
           >
-            {players.map((p) => (
-              <option key={p.playerId} value={p.playerId}>
+            {wrestlers.map((p) => (
+              <option key={p.wrestlerId} value={p.wrestlerId}>
                 {p.name} ({p.wrestlerName})
               </option>
             ))}
@@ -166,13 +166,13 @@ function HeadToHeadComparison() {
         </div>
         <div className="h2h-vs">{t('common.vs')}</div>
         <div className="h2h-selector">
-          <label>{t('statistics.headToHead.player2')}</label>
+          <label>{t('statistics.headToHead.wrestler2')}</label>
           <select
-            value={player2Id}
-            onChange={(e) => setPlayer2Id(e.target.value)}
+            value={wrestler2Id}
+            onChange={(e) => setWrestler2Id(e.target.value)}
           >
-            {players.map((p) => (
-              <option key={p.playerId} value={p.playerId}>
+            {wrestlers.map((p) => (
+              <option key={p.wrestlerId} value={p.wrestlerId}>
                 {p.name} ({p.wrestlerName})
               </option>
             ))}
@@ -186,8 +186,8 @@ function HeadToHeadComparison() {
         onSeasonChange={setSelectedSeasonId}
       />
 
-      {player1Id === player2Id ? (
-        <div className="h2h-same-player">{t('statistics.headToHead.selectDifferent')}</div>
+      {wrestler1Id === wrestler2Id ? (
+        <div className="h2h-same-wrestler">{t('statistics.headToHead.selectDifferent')}</div>
       ) : loading ? (
         <Skeleton variant="block" count={4} />
       ) : (
@@ -195,9 +195,9 @@ function HeadToHeadComparison() {
           {p1Stats && p2Stats && (
             <div className="h2h-card h2h-stats-card">
               <h3>{t('statistics.headToHead.statComparison')}</h3>
-              <div className="h2h-player-names">
-                <span className="h2h-p1-name">{player1?.name} ({player1?.wrestlerName})</span>
-                <span className="h2h-p2-name">{player2?.name} ({player2?.wrestlerName})</span>
+              <div className="h2h-wrestler-names">
+                <span className="h2h-p1-name">{wrestler1?.name} ({wrestler1?.wrestlerName})</span>
+                <span className="h2h-p2-name">{wrestler2?.name} ({wrestler2?.wrestlerName})</span>
               </div>
               {renderStatBar(t('statistics.labels.wins'), p1Stats.wins, p2Stats.wins)}
               {renderStatBar(t('statistics.labels.losses'), p1Stats.losses, p2Stats.losses)}
@@ -214,17 +214,17 @@ function HeadToHeadComparison() {
             {h2h ? (
               <>
                 <div className="h2h-record-summary">
-                  <div className="h2h-record-player">
-                    <span className="h2h-record-name">{player1?.name}</span>
+                  <div className="h2h-record-wrestler">
+                    <span className="h2h-record-name">{wrestler1?.name}</span>
                     <span className="h2h-record-wins">{p1H2HWins}</span>
                   </div>
                   <div className="h2h-record-draws">
                     <span className="h2h-record-draws-num">{h2hDraws}</span>
                     <span className="h2h-record-draws-label">{t('statistics.labels.draws')}</span>
                   </div>
-                  <div className="h2h-record-player">
+                  <div className="h2h-record-wrestler">
                     <span className="h2h-record-wins">{p2H2HWins}</span>
-                    <span className="h2h-record-name">{player2?.name}</span>
+                    <span className="h2h-record-name">{wrestler2?.name}</span>
                   </div>
                 </div>
                 <div className="h2h-record-meta">
@@ -243,8 +243,8 @@ function HeadToHeadComparison() {
               <div className="h2h-recent-list">
                 {h2h.recentResults.map((result) => {
                   const winnerId = result.winnerId;
-                  const winner = players.find((p) => p.playerId === winnerId);
-                  const isP1Win = winnerId === player1Id;
+                  const winner = wrestlers.find((p) => p.wrestlerId === winnerId);
+                  const isP1Win = winnerId === wrestler1Id;
                   return (
                     <div
                       key={result.matchId}
@@ -255,7 +255,7 @@ function HeadToHeadComparison() {
                         {winner?.name} ({winner?.wrestlerName})
                       </span>
                       <span className="h2h-recent-badge">
-                        {isP1Win ? t('statistics.headToHead.player1Win') : t('statistics.headToHead.player2Win')}
+                        {isP1Win ? t('statistics.headToHead.wrestler1Win') : t('statistics.headToHead.wrestler2Win')}
                       </span>
                     </div>
                   );
@@ -268,14 +268,14 @@ function HeadToHeadComparison() {
             <div className="h2h-card h2h-edge-card">
               <h3>{t('statistics.headToHead.statisticalEdge')}</h3>
               <div className="h2h-edge-summary">
-                <div className={`h2h-edge-player ${p1Advantages > p2Advantages ? 'h2h-edge-leader' : ''}`}>
-                  <span className="h2h-edge-name">{player1?.name}</span>
+                <div className={`h2h-edge-wrestler ${p1Advantages > p2Advantages ? 'h2h-edge-leader' : ''}`}>
+                  <span className="h2h-edge-name">{wrestler1?.name}</span>
                   <span className="h2h-edge-count">{p1Advantages}</span>
                   <span className="h2h-edge-label">{t('statistics.headToHead.advantages')}</span>
                 </div>
                 <div className="h2h-edge-vs">{t('common.vs')}</div>
-                <div className={`h2h-edge-player ${p2Advantages > p1Advantages ? 'h2h-edge-leader' : ''}`}>
-                  <span className="h2h-edge-name">{player2?.name}</span>
+                <div className={`h2h-edge-wrestler ${p2Advantages > p1Advantages ? 'h2h-edge-leader' : ''}`}>
+                  <span className="h2h-edge-name">{wrestler2?.name}</span>
                   <span className="h2h-edge-count">{p2Advantages}</span>
                   <span className="h2h-edge-label">{t('statistics.headToHead.advantages')}</span>
                 </div>

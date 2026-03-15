@@ -19,7 +19,7 @@ vi.mock('../../../lib/dynamodb', () => ({
     queryAll: vi.fn(),
   },
   TableNames: {
-    PLAYERS: 'Players',
+    WRESTLERS: 'Wrestlers',
     MATCHES: 'Matches',
     CHAMPIONSHIPS: 'Championships',
     CHAMPIONSHIP_HISTORY: 'ChampionshipHistory',
@@ -51,11 +51,10 @@ function makeEvent(overrides: Partial<APIGatewayProxyEvent> = {}): APIGatewayPro
   };
 }
 
-function makePlayer(id: string, name: string, wrestler: string) {
+function makeWrestler(id: string, name: string) {
   return {
-    playerId: id,
+    wrestlerId: id,
     name,
-    currentWrestler: wrestler,
     wins: 0,
     losses: 0,
     draws: 0,
@@ -78,10 +77,10 @@ function makeMatch(overrides: Record<string, unknown> = {}) {
   };
 }
 
-// Base players for reuse
-const player1 = makePlayer('p1', 'Player One', 'Wrestler A');
-const player2 = makePlayer('p2', 'Player Two', 'Wrestler B');
-const player3 = makePlayer('p3', 'Player Three', 'Wrestler C');
+// Base wrestlers for reuse
+const wrestler1 = makeWrestler('p1', 'Wrestler One');
+const wrestler2 = makeWrestler('p2', 'Wrestler Two');
+const wrestler3 = makeWrestler('p3', 'Wrestler Three');
 
 // ─── Validation Tests ────────────────────────────────────────────────
 
@@ -99,7 +98,7 @@ describe('getStatistics - Validation', () => {
 
   it('returns 400 for an unknown section value', async () => {
     mockScanAll
-      .mockResolvedValueOnce([player1])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1])  // WRESTLERS
       .mockResolvedValueOnce([]);         // MATCHES
 
     const event = makeEvent({
@@ -112,9 +111,9 @@ describe('getStatistics - Validation', () => {
     expect(JSON.parse(result!.body).message).toContain('Unknown section: invalid-section');
   });
 
-  it('returns player list without stats when head-to-head is missing player IDs', async () => {
+  it('returns wrestler list without stats when head-to-head is missing wrestler IDs', async () => {
     mockScanAll
-      .mockResolvedValueOnce([player1, player2])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2])  // WRESTLERS
       .mockResolvedValueOnce([]);                  // MATCHES
 
     const event = makeEvent({
@@ -125,34 +124,33 @@ describe('getStatistics - Validation', () => {
 
     expect(result!.statusCode).toBe(200);
     const body = JSON.parse(result!.body);
-    expect(body.players).toHaveLength(2);
+    expect(body.wrestlers).toHaveLength(2);
     expect(body.headToHead).toBeUndefined();
   });
 });
 
-// ─── player-stats Section ────────────────────────────────────────────
+// ─── wrestler-stats Section ────────────────────────────────────────────
 
-describe('getStatistics - player-stats', () => {
+describe('getStatistics - wrestler-stats', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('returns only player list when no playerId is specified', async () => {
+  it('returns only wrestler list when no wrestlerId is specified', async () => {
     mockScanAll
-      .mockResolvedValueOnce([player1, player2])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2])  // WRESTLERS
       .mockResolvedValueOnce([]);                  // MATCHES
 
     const event = makeEvent({
-      queryStringParameters: { section: 'player-stats' },
+      queryStringParameters: { section: 'wrestler-stats' },
     });
 
     const result = await handler(event, ctx, cb);
 
     expect(result!.statusCode).toBe(200);
     const body = JSON.parse(result!.body);
-    expect(body.players).toHaveLength(2);
-    expect(body.players[0]).toMatchObject({
-      playerId: 'p1',
-      name: 'Player One',
-      wrestlerName: 'Wrestler A',
+    expect(body.wrestlers).toHaveLength(2);
+    expect(body.wrestlers[0]).toMatchObject({
+      wrestlerId: 'p1',
+      name: 'Wrestler One',
     });
     expect(body.statistics).toBeUndefined();
   });
@@ -167,13 +165,13 @@ describe('getStatistics - player-stats', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2])  // WRESTLERS
       .mockResolvedValueOnce(matches)              // MATCHES
       .mockResolvedValueOnce([])                   // CHAMPIONSHIP_HISTORY
       .mockResolvedValueOnce([]);                  // CHAMPIONSHIPS
 
     const event = makeEvent({
-      queryStringParameters: { section: 'player-stats', playerId: 'p1' },
+      queryStringParameters: { section: 'wrestler-stats', wrestlerId: 'p1' },
     });
 
     const result = await handler(event, ctx, cb);
@@ -241,13 +239,13 @@ describe('getStatistics - player-stats', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2])  // WRESTLERS
       .mockResolvedValueOnce(matches)              // MATCHES
       .mockResolvedValueOnce(champHistory)         // CHAMPIONSHIP_HISTORY
       .mockResolvedValueOnce(championships);       // CHAMPIONSHIPS
 
     const event = makeEvent({
-      queryStringParameters: { section: 'player-stats', playerId: 'p1' },
+      queryStringParameters: { section: 'wrestler-stats', wrestlerId: 'p1' },
     });
 
     const result = await handler(event, ctx, cb);
@@ -287,13 +285,13 @@ describe('getStatistics - player-stats', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2])  // WRESTLERS
       .mockResolvedValueOnce(matches)              // MATCHES
       .mockResolvedValueOnce(champHistory)         // CHAMPIONSHIP_HISTORY
       .mockResolvedValueOnce(championships);       // CHAMPIONSHIPS
 
     const event = makeEvent({
-      queryStringParameters: { section: 'player-stats', playerId: 'p1' },
+      queryStringParameters: { section: 'wrestler-stats', wrestlerId: 'p1' },
     });
 
     const result = await handler(event, ctx, cb);
@@ -305,8 +303,8 @@ describe('getStatistics - player-stats', () => {
     expect(body.championshipStats[0].currentlyHolding).toBe(true);
   });
 
-  it('includes computed achievements in player-stats response', async () => {
-    // Player with 3 wins qualifies for "First Victory" and potentially more
+  it('includes computed achievements in wrestler-stats response', async () => {
+    // Wrestler with 3 wins qualifies for "First Victory" and potentially more
     const matches = [
       makeMatch({ matchId: 'm1', date: '2024-01-01', participants: ['p1', 'p2'], winners: ['p1'], losers: ['p2'] }),
       makeMatch({ matchId: 'm2', date: '2024-02-01', participants: ['p1', 'p2'], winners: ['p1'], losers: ['p2'] }),
@@ -314,13 +312,13 @@ describe('getStatistics - player-stats', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2])  // WRESTLERS
       .mockResolvedValueOnce(matches)              // MATCHES
       .mockResolvedValueOnce([])                   // CHAMPIONSHIP_HISTORY
       .mockResolvedValueOnce([]);                  // CHAMPIONSHIPS
 
     const event = makeEvent({
-      queryStringParameters: { section: 'player-stats', playerId: 'p1' },
+      queryStringParameters: { section: 'wrestler-stats', wrestlerId: 'p1' },
     });
 
     const result = await handler(event, ctx, cb);
@@ -354,13 +352,13 @@ describe('getStatistics - player-stats', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1])        // PLAYERS
+      .mockResolvedValueOnce([wrestler1])        // WRESTLERS
       .mockResolvedValueOnce(matches)           // MATCHES
       .mockResolvedValueOnce(champHistory)      // CHAMPIONSHIP_HISTORY
       .mockResolvedValueOnce(championships);    // CHAMPIONSHIPS
 
     const event = makeEvent({
-      queryStringParameters: { section: 'player-stats', playerId: 'p1' },
+      queryStringParameters: { section: 'wrestler-stats', wrestlerId: 'p1' },
     });
 
     const result = await handler(event, ctx, cb);
@@ -379,7 +377,7 @@ describe('getStatistics - player-stats', () => {
 describe('getStatistics - head-to-head', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('computes head-to-head record between two players', async () => {
+  it('computes head-to-head record between two wrestlers', async () => {
     const matches = [
       makeMatch({ matchId: 'm1', date: '2024-01-01', participants: ['p1', 'p2'], winners: ['p1'], losers: ['p2'] }),
       makeMatch({ matchId: 'm2', date: '2024-02-01', participants: ['p1', 'p2'], winners: ['p2'], losers: ['p1'] }),
@@ -389,11 +387,11 @@ describe('getStatistics - head-to-head', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2, player3])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2, wrestler3])  // WRESTLERS
       .mockResolvedValueOnce(matches);                      // MATCHES
 
     const event = makeEvent({
-      queryStringParameters: { section: 'head-to-head', player1Id: 'p1', player2Id: 'p2' },
+      queryStringParameters: { section: 'head-to-head', wrestler1Id: 'p1', wrestler2Id: 'p2' },
     });
 
     const result = await handler(event, ctx, cb);
@@ -401,8 +399,8 @@ describe('getStatistics - head-to-head', () => {
     expect(result!.statusCode).toBe(200);
     const body = JSON.parse(result!.body);
     expect(body.headToHead).toBeDefined();
-    expect(body.headToHead.player1Wins).toBe(2);
-    expect(body.headToHead.player2Wins).toBe(1);
+    expect(body.headToHead.wrestler1Wins).toBe(2);
+    expect(body.headToHead.wrestler2Wins).toBe(1);
     expect(body.headToHead.draws).toBe(0);
     expect(body.headToHead.totalMatches).toBe(3);
     expect(body.headToHead.championshipMatches).toBe(1);
@@ -420,11 +418,11 @@ describe('getStatistics - head-to-head', () => {
     );
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2])  // WRESTLERS
       .mockResolvedValueOnce(matches);             // MATCHES
 
     const event = makeEvent({
-      queryStringParameters: { section: 'head-to-head', player1Id: 'p1', player2Id: 'p2' },
+      queryStringParameters: { section: 'head-to-head', wrestler1Id: 'p1', wrestler2Id: 'p2' },
     });
 
     const result = await handler(event, ctx, cb);
@@ -437,7 +435,7 @@ describe('getStatistics - head-to-head', () => {
     expect(body.headToHead.recentResults[4].date).toBe('2024-03-15');
   });
 
-  it('includes overall stats for both players in head-to-head response', async () => {
+  it('includes overall stats for both wrestlers in head-to-head response', async () => {
     const matches = [
       makeMatch({ matchId: 'm1', participants: ['p1', 'p2'], winners: ['p1'], losers: ['p2'] }),
       makeMatch({ matchId: 'm2', participants: ['p1', 'p3'], winners: ['p1'], losers: ['p3'] }),
@@ -445,11 +443,11 @@ describe('getStatistics - head-to-head', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2, player3])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2, wrestler3])  // WRESTLERS
       .mockResolvedValueOnce(matches);                      // MATCHES
 
     const event = makeEvent({
-      queryStringParameters: { section: 'head-to-head', player1Id: 'p1', player2Id: 'p2' },
+      queryStringParameters: { section: 'head-to-head', wrestler1Id: 'p1', wrestler2Id: 'p2' },
     });
 
     const result = await handler(event, ctx, cb);
@@ -457,25 +455,25 @@ describe('getStatistics - head-to-head', () => {
     expect(result!.statusCode).toBe(200);
     const body = JSON.parse(result!.body);
     // p1 overall: 2 wins (m1 + m2), 0 losses
-    expect(body.player1Stats.wins).toBe(2);
-    expect(body.player1Stats.losses).toBe(0);
+    expect(body.wrestler1Stats.wins).toBe(2);
+    expect(body.wrestler1Stats.losses).toBe(0);
     // p2 overall: 1 win (m3), 1 loss (m1)
-    expect(body.player2Stats.wins).toBe(1);
-    expect(body.player2Stats.losses).toBe(1);
+    expect(body.wrestler2Stats.wins).toBe(1);
+    expect(body.wrestler2Stats.losses).toBe(1);
   });
 
-  it('returns null headToHead when two players have no matches together', async () => {
+  it('returns null headToHead when two wrestlers have no matches together', async () => {
     const matches = [
       makeMatch({ matchId: 'm1', participants: ['p1', 'p3'], winners: ['p1'], losers: ['p3'] }),
       makeMatch({ matchId: 'm2', participants: ['p2', 'p3'], winners: ['p2'], losers: ['p3'] }),
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2, player3])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2, wrestler3])  // WRESTLERS
       .mockResolvedValueOnce(matches);                      // MATCHES
 
     const event = makeEvent({
-      queryStringParameters: { section: 'head-to-head', player1Id: 'p1', player2Id: 'p2' },
+      queryStringParameters: { section: 'head-to-head', wrestler1Id: 'p1', wrestler2Id: 'p2' },
     });
 
     const result = await handler(event, ctx, cb);
@@ -484,8 +482,8 @@ describe('getStatistics - head-to-head', () => {
     const body = JSON.parse(result!.body);
     expect(body.headToHead).toBeNull();
     // Overall stats should still be present
-    expect(body.player1Stats).toBeDefined();
-    expect(body.player2Stats).toBeDefined();
+    expect(body.wrestler1Stats).toBeDefined();
+    expect(body.wrestler2Stats).toBeDefined();
   });
 });
 
@@ -503,13 +501,13 @@ describe('getStatistics - seasonId filtering', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2])  // WRESTLERS
       .mockResolvedValueOnce(matches)              // MATCHES
       .mockResolvedValueOnce([])                   // CHAMPIONSHIP_HISTORY
       .mockResolvedValueOnce([]);                  // CHAMPIONSHIPS
 
     const event = makeEvent({
-      queryStringParameters: { section: 'player-stats', playerId: 'p1', seasonId: 's1' },
+      queryStringParameters: { section: 'wrestler-stats', wrestlerId: 'p1', seasonId: 's1' },
     });
 
     const result = await handler(event, ctx, cb);
@@ -531,11 +529,11 @@ describe('getStatistics - seasonId filtering', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2])  // WRESTLERS
       .mockResolvedValueOnce(matches);             // MATCHES
 
     const event = makeEvent({
-      queryStringParameters: { section: 'head-to-head', player1Id: 'p1', player2Id: 'p2', seasonId: 's1' },
+      queryStringParameters: { section: 'head-to-head', wrestler1Id: 'p1', wrestler2Id: 'p2', seasonId: 's1' },
     });
 
     const result = await handler(event, ctx, cb);
@@ -543,8 +541,8 @@ describe('getStatistics - seasonId filtering', () => {
     expect(result!.statusCode).toBe(200);
     const body = JSON.parse(result!.body);
     expect(body.headToHead.totalMatches).toBe(2);
-    expect(body.headToHead.player1Wins).toBe(1);
-    expect(body.headToHead.player2Wins).toBe(1);
+    expect(body.headToHead.wrestler1Wins).toBe(1);
+    expect(body.headToHead.wrestler2Wins).toBe(1);
   });
 
   it('filters leaderboard stats by seasonId', async () => {
@@ -555,7 +553,7 @@ describe('getStatistics - seasonId filtering', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2])  // WRESTLERS
       .mockResolvedValueOnce(matches)              // MATCHES
       .mockResolvedValueOnce([]);                  // CHAMPIONSHIP_HISTORY
 
@@ -569,8 +567,8 @@ describe('getStatistics - seasonId filtering', () => {
     const body = JSON.parse(result!.body);
     // In season s1 only m1 exists: p1 has 1 win, p2 has 0 wins
     const mostWins = body.leaderboards.mostWins;
-    const p1Entry = mostWins.find((e: Record<string, unknown>) => e.playerId === 'p1');
-    const p2Entry = mostWins.find((e: Record<string, unknown>) => e.playerId === 'p2');
+    const p1Entry = mostWins.find((e: Record<string, unknown>) => e.wrestlerId === 'p1');
+    const p2Entry = mostWins.find((e: Record<string, unknown>) => e.wrestlerId === 'p2');
     expect(p1Entry.value).toBe(1);
     expect(p2Entry.value).toBe(0);
   });
@@ -591,13 +589,13 @@ describe('getStatistics - seasonId filtering', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2])  // WRESTLERS
       .mockResolvedValueOnce(matches)              // MATCHES
       .mockResolvedValueOnce(champHistory)          // CHAMPIONSHIP_HISTORY
       .mockResolvedValueOnce(championships);        // CHAMPIONSHIPS
 
     const event = makeEvent({
-      queryStringParameters: { section: 'player-stats', playerId: 'p1', seasonId: 's1' },
+      queryStringParameters: { section: 'wrestler-stats', wrestlerId: 'p1', seasonId: 's1' },
     });
 
     const result = await handler(event, ctx, cb);
@@ -638,13 +636,13 @@ describe('getStatistics - seasonId filtering', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2])  // WRESTLERS
       .mockResolvedValueOnce(matches)              // MATCHES
       .mockResolvedValueOnce(champHistory)          // CHAMPIONSHIP_HISTORY
       .mockResolvedValueOnce(championships);        // CHAMPIONSHIPS
 
     const event = makeEvent({
-      queryStringParameters: { section: 'player-stats', playerId: 'p1', seasonId: 's1' },
+      queryStringParameters: { section: 'wrestler-stats', wrestlerId: 'p1', seasonId: 's1' },
     });
 
     const result = await handler(event, ctx, cb);
@@ -668,13 +666,13 @@ describe('getStatistics - seasonId filtering', () => {
     ];
 
     mockScanAll
-      .mockResolvedValueOnce([player1, player2])  // PLAYERS
+      .mockResolvedValueOnce([wrestler1, wrestler2])  // WRESTLERS
       .mockResolvedValueOnce(matches)              // MATCHES
       .mockResolvedValueOnce([])                   // CHAMPIONSHIP_HISTORY
       .mockResolvedValueOnce([]);                  // CHAMPIONSHIPS
 
     const event = makeEvent({
-      queryStringParameters: { section: 'player-stats', playerId: 'p1', seasonId: 'nonexistent' },
+      queryStringParameters: { section: 'wrestler-stats', wrestlerId: 'p1', seasonId: 'nonexistent' },
     });
 
     const result = await handler(event, ctx, cb);
@@ -697,7 +695,7 @@ describe('getStatistics - error handling', () => {
     mockScanAll.mockRejectedValueOnce(new Error('DynamoDB connection failed'));
 
     const event = makeEvent({
-      queryStringParameters: { section: 'player-stats' },
+      queryStringParameters: { section: 'wrestler-stats' },
     });
 
     const result = await handler(event, ctx, cb);

@@ -18,7 +18,7 @@ vi.mock('../../../lib/dynamodb', () => ({
     transactWrite: mockTransactWrite,
   },
   TableNames: {
-    MATCHES: 'Matches', PLAYERS: 'Players', CHAMPIONSHIPS: 'Championships',
+    MATCHES: 'Matches', WRESTLERS: 'Wrestlers', CHAMPIONSHIPS: 'Championships',
     CHAMPIONSHIP_HISTORY: 'ChampionshipHistory', TOURNAMENTS: 'Tournaments',
     SEASONS: 'Seasons', SEASON_STANDINGS: 'SeasonStandings',
     EVENTS: 'Events', CONTENDER_RANKINGS: 'ContenderRankings',

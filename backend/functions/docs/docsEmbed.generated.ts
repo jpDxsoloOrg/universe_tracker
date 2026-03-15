@@ -25,7 +25,7 @@ tags:
   - name: Users
   - name: Site Config
   - name: Profile
-  - name: Players
+  - name: Wrestlers
   - name: Matches
   - name: Championships
   - name: Tournaments
@@ -58,13 +58,12 @@ components:
       properties:
         message: { type: string }
 
-    Player:
+    Wrestler:
       type: object
       properties:
-        playerId: { type: string }
+        wrestlerId: { type: string }
         userId: { type: string }
         name: { type: string }
-        currentWrestler: { type: string }
         wins: { type: integer }
         losses: { type: integer }
         draws: { type: integer }
@@ -179,7 +178,7 @@ components:
     RoundRobinStanding:
       type: object
       properties:
-        playerId: { type: string }
+        wrestlerId: { type: string }
         wins: { type: integer }
         losses: { type: integer }
         draws: { type: integer }
@@ -188,7 +187,7 @@ components:
     Standings:
       type: object
       properties:
-        players: { type: array, items: { $ref: '#/components/schemas/Player' } }
+        wrestlers: { type: array, items: { $ref: '#/components/schemas/Wrestler' } }
         seasonId: { type: string }
         sortedByWins: { type: boolean }
 
@@ -318,18 +317,18 @@ components:
         createdAt: { type: string }
         updatedAt: { type: string }
 
-    ChallengeWithPlayers:
+    ChallengeWithWrestlers:
       allOf:
         - { $ref: '#/components/schemas/Challenge' }
         - type: object
           properties:
-            challenger: { $ref: '#/components/schemas/ChallengePlayerInfo' }
-            challenged: { $ref: '#/components/schemas/ChallengePlayerInfo' }
+            challenger: { $ref: '#/components/schemas/ChallengeWrestlerInfo' }
+            challenged: { $ref: '#/components/schemas/ChallengeWrestlerInfo' }
 
-    ChallengePlayerInfo:
+    ChallengeWrestlerInfo:
       type: object
       properties:
-        playerName: { type: string }
+        wrestlerName: { type: string }
         wrestlerName: { type: string }
         imageUrl: { type: string }
 
@@ -356,11 +355,11 @@ components:
       type: object
       properties:
         promoId: { type: string }
-        playerId: { type: string }
+        wrestlerId: { type: string }
         promoType: { type: string }
         title: { type: string }
         content: { type: string }
-        targetPlayerId: { type: string }
+        targetWrestlerId: { type: string }
         targetPromoId: { type: string }
         matchId: { type: string }
         championshipId: { type: string }
@@ -377,7 +376,7 @@ components:
         - { $ref: '#/components/schemas/Promo' }
         - type: object
           properties:
-            playerName: { type: string }
+            wrestlerName: { type: string }
             wrestlerName: { type: string }
             responseCount: { type: integer }
 
@@ -388,7 +387,7 @@ components:
         promoType: { type: string }
         title: { type: string }
         content: { type: string }
-        targetPlayerId: { type: string }
+        targetWrestlerId: { type: string }
         targetPromoId: { type: string }
         matchId: { type: string }
         championshipId: { type: string }
@@ -421,7 +420,7 @@ components:
     WrestlerCost:
       type: object
       properties:
-        playerId: { type: string }
+        wrestlerId: { type: string }
         currentCost: { type: integer }
         baseCost: { type: integer }
         costHistory: { type: array }
@@ -434,7 +433,6 @@ components:
         - type: object
           properties:
             name: { type: string }
-            currentWrestler: { type: string }
             divisionId: { type: string }
             imageUrl: { type: string }
             costTrend: { type: string, enum: [up, down, stable] }
@@ -558,10 +556,10 @@ components:
       properties:
         promoIds: { type: array, items: { type: string } }
 
-    PlayerStatistics:
+    WrestlerStatistics:
       type: object
       properties:
-        playerId: { type: string }
+        wrestlerId: { type: string }
         statType: { type: string }
         wins: { type: integer }
         losses: { type: integer }
@@ -578,10 +576,10 @@ components:
       type: object
       properties:
         matchupKey: { type: string }
-        player1Id: { type: string }
-        player2Id: { type: string }
-        player1Wins: { type: integer }
-        player2Wins: { type: integer }
+        wrestler1Id: { type: string }
+        wrestler2Id: { type: string }
+        wrestler1Wins: { type: integer }
+        wrestler2Wins: { type: integer }
         draws: { type: integer }
         totalMatches: { type: integer }
         recentResults: { type: array }
@@ -590,8 +588,8 @@ components:
     LeaderboardEntry:
       type: object
       properties:
-        playerId: { type: string }
-        playerName: { type: string }
+        wrestlerId: { type: string }
+        wrestlerName: { type: string }
         wrestlerName: { type: string }
         value: { type: number }
         rank: { type: integer }
@@ -609,7 +607,7 @@ components:
     Achievement:
       type: object
       properties:
-        playerId: { type: string }
+        wrestlerId: { type: string }
         achievementId: { type: string }
         achievementName: { type: string }
         achievementType: { type: string }
@@ -716,13 +714,13 @@ paths:
         '401': { description: 'Unauthorized', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
         '403': { description: 'Forbidden', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
 
-  /players/me:
+  /wrestlers/me:
     get:
       tags: [Profile]
       summary: Get my profile
       security: [{ BearerAuth: [] }]
       responses:
-        '200': { description: Current user player profile }
+        '200': { description: Current user wrestler profile }
         '401': { description: 'Unauthorized', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
     put:
       tags: [Profile]
@@ -731,45 +729,45 @@ paths:
       requestBody:
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/Player' }
+            schema: { $ref: '#/components/schemas/Wrestler' }
       responses:
         '200': { description: Updated }
         '401': { description: 'Unauthorized', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
 
-  /players:
+  /wrestlers:
     get:
-      tags: [Players]
-      summary: List players
+      tags: [Wrestlers]
+      summary: List wrestlers
       responses:
-        '200': { description: List of players }
+        '200': { description: List of wrestlers }
     post:
-      tags: [Players]
-      summary: Create player
+      tags: [Wrestlers]
+      summary: Create wrestler
       security: [{ BearerAuth: [] }]
       requestBody:
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/Player' }
+            schema: { $ref: '#/components/schemas/Wrestler' }
       responses:
         '201': { description: Created }
         '400': { description: 'Bad request', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
         '401': { description: 'Unauthorized', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
         '403': { description: 'Forbidden', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
 
-  /players/{playerId}:
+  /wrestlers/{wrestlerId}:
     put:
-      tags: [Players]
-      summary: Update player
+      tags: [Wrestlers]
+      summary: Update wrestler
       security: [{ BearerAuth: [] }]
       parameters:
-        - name: playerId
+        - name: wrestlerId
           in: path
           required: true
           schema: { type: string }
       requestBody:
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/Player' }
+            schema: { $ref: '#/components/schemas/Wrestler' }
       responses:
         '200': { description: Updated }
         '400': { description: 'Bad request', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
@@ -777,11 +775,11 @@ paths:
         '403': { description: 'Forbidden', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
         '404': { description: 'Not found', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
     delete:
-      tags: [Players]
-      summary: Delete player
+      tags: [Wrestlers]
+      summary: Delete wrestler
       security: [{ BearerAuth: [] }]
       parameters:
-        - name: playerId
+        - name: wrestlerId
           in: path
           required: true
           schema: { type: string }
@@ -1380,16 +1378,16 @@ paths:
         - name: section
           in: query
           schema: { type: string }
-        - name: playerId
+        - name: wrestlerId
           in: query
           schema: { type: string }
         - name: seasonId
           in: query
           schema: { type: string }
-        - name: player1Id
+        - name: wrestler1Id
           in: query
           schema: { type: string }
-        - name: player2Id
+        - name: wrestler2Id
           in: query
           schema: { type: string }
       responses:
@@ -1444,13 +1442,13 @@ paths:
         '401': { description: 'Unauthorized', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
         '403': { description: 'Forbidden', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
 
-  /admin/fantasy/wrestlers/{playerId}/cost:
+  /admin/fantasy/wrestlers/{wrestlerId}/cost:
     put:
       tags: [Fantasy]
       summary: Update wrestler cost
       security: [{ BearerAuth: [] }]
       parameters:
-        - name: playerId
+        - name: wrestlerId
           in: path
           required: true
           schema: { type: string }
@@ -1543,7 +1541,7 @@ paths:
         - name: status
           in: query
           schema: { type: string }
-        - name: playerId
+        - name: wrestlerId
           in: query
           schema: { type: string }
       responses:
@@ -1572,7 +1570,7 @@ paths:
           required: true
           schema: { type: string }
       responses:
-        '200': { description: Challenge with players }
+        '200': { description: Challenge with wrestlers }
         '404': { description: 'Not found', content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
     delete:
       tags: [Challenges]
@@ -1645,7 +1643,7 @@ paths:
       tags: [Promos]
       summary: List promos
       parameters:
-        - name: playerId
+        - name: wrestlerId
           in: query
           schema: { type: string }
         - name: promoType

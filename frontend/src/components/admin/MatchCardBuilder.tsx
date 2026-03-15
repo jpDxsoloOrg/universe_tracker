@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { MatchDesignation, MatchCardEntry, LeagueEvent } from '../../types/event';
-import type { Player } from '../../types';
-import { matchesApi, playersApi, eventsApi } from '../../services/api';
+import type { Wrestler } from '../../types';
+import { matchesApi, wrestlersApi, eventsApi } from '../../services/api';
 import SearchableSelect from './SearchableSelect';
 import './MatchCardBuilder.css';
 
@@ -48,20 +48,20 @@ export default function MatchCardBuilder() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [eventsList, matches, players] = await Promise.all([
+        const [eventsList, matches, wrestlers] = await Promise.all([
           eventsApi.getAll(),
           matchesApi.getAll({ status: 'scheduled' }),
-          playersApi.getAll(),
+          wrestlersApi.getAll(),
         ]);
-        const playerMap = new Map<string, Player>(
-          players.map((p) => [p.playerId, p])
+        const wrestlerMap = new Map<string, Wrestler>(
+          wrestlers.map((p) => [p.wrestlerId, p])
         );
 
         setEvents(eventsList);
 
         const available: AvailableMatch[] = matches.map((match) => {
           const participantNames = match.participants
-            .map((id) => playerMap.get(id)?.name ?? 'Unknown')
+            .map((id) => wrestlerMap.get(id)?.name ?? 'Unknown')
             .join(' vs ');
           const label = `${participantNames} (${match.matchFormat})`;
           return {

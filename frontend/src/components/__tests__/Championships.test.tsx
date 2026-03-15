@@ -3,9 +3,9 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 
 // --- Hoisted mocks ---
-const { mockGetAllChampionships, mockGetAllPlayers, mockGetHistory, mockGetAllDivisions } = vi.hoisted(() => ({
+const { mockGetAllChampionships, mockGetAllWrestlers, mockGetHistory, mockGetAllDivisions } = vi.hoisted(() => ({
   mockGetAllChampionships: vi.fn(),
-  mockGetAllPlayers: vi.fn(),
+  mockGetAllWrestlers: vi.fn(),
   mockGetHistory: vi.fn(),
   mockGetAllDivisions: vi.fn(),
 }));
@@ -15,8 +15,8 @@ vi.mock('../../services/api', () => ({
     getAll: mockGetAllChampionships,
     getHistory: mockGetHistory,
   },
-  playersApi: {
-    getAll: mockGetAllPlayers,
+  wrestlersApi: {
+    getAll: mockGetAllWrestlers,
   },
   divisionsApi: {
     getAll: mockGetAllDivisions,
@@ -62,10 +62,10 @@ vi.mock('../Championships.css', () => ({}));
 import Championships from '../Championships';
 
 // --- Test data ---
-const mockPlayers = [
-  { playerId: 'p1', name: 'John Cena', currentWrestler: 'John Cena', wins: 10, losses: 2, draws: 1, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
-  { playerId: 'p2', name: 'The Rock', currentWrestler: 'The Rock', wins: 8, losses: 3, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
-  { playerId: 'p3', name: 'Undertaker', currentWrestler: 'Undertaker', wins: 15, losses: 5, draws: 2, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+const mockWrestlers = [
+  { wrestlerId: 'p1', name: 'John Cena', wins: 10, losses: 2, draws: 1, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+  { wrestlerId: 'p2', name: 'The Rock', wins: 8, losses: 3, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+  { wrestlerId: 'p3', name: 'Undertaker', wins: 15, losses: 5, draws: 2, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
 ];
 
 const mockChampionships = [
@@ -104,7 +104,7 @@ describe('Championships', () => {
   it('shows loading state while data is being fetched', () => {
     // Never resolve the promises to keep loading state
     mockGetAllChampionships.mockReturnValue(new Promise(() => {}));
-    mockGetAllPlayers.mockReturnValue(new Promise(() => {}));
+    mockGetAllWrestlers.mockReturnValue(new Promise(() => {}));
     mockGetAllDivisions.mockReturnValue(new Promise(() => {}));
 
     renderChampionships();
@@ -114,7 +114,7 @@ describe('Championships', () => {
 
   it('renders championship list with current holders', async () => {
     mockGetAllChampionships.mockResolvedValue(mockChampionships);
-    mockGetAllPlayers.mockResolvedValue(mockPlayers);
+    mockGetAllWrestlers.mockResolvedValue(mockWrestlers);
     mockGetAllDivisions.mockResolvedValue([]);
 
     renderChampionships();
@@ -131,7 +131,7 @@ describe('Championships', () => {
     expect(screen.getByText('Singles')).toBeInTheDocument();
     expect(screen.getByText('Tag Team')).toBeInTheDocument();
 
-    // Current champion resolved to player name
+    // Current champion resolved to wrestler name
     expect(screen.getByText('John Cena')).toBeInTheDocument();
 
     // Vacant championship shows "Vacant"
@@ -144,7 +144,7 @@ describe('Championships', () => {
 
   it('handles empty state when no championships exist', async () => {
     mockGetAllChampionships.mockResolvedValue([]);
-    mockGetAllPlayers.mockResolvedValue(mockPlayers);
+    mockGetAllWrestlers.mockResolvedValue(mockWrestlers);
     mockGetAllDivisions.mockResolvedValue([]);
 
     renderChampionships();

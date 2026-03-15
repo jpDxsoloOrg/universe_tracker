@@ -9,13 +9,13 @@ Treten Sie in der Fantasy-Liga an, indem Sie Wrestler auswählen und Punkte samm
 1. Wenn eine Show für Tipps geöffnet wird, durchsuchen Sie die verfügbaren Wrestler und ihre Kosten.
 2. Wählen Sie Wrestler innerhalb Ihres Budgets pro Division.
 3. Ihre Tipps bringen Punkte, wenn die Wrestler gewinnen – wichtigere Matches bringen mehr Punkte.
-4. Klettern Sie in der Rangliste und kämpfen Sie um den Spitzenplatz unter allen Fantasy-Spielern.
+4. Klettern Sie in der Rangliste und kämpfen Sie um den Spitzenplatz unter allen Fantasy-Teilnehmern.
 
 ## Fantasy-Funktionen
 
 | Funktion | Beschreibung |
 |----------|--------------|
 | **Tipps abgeben** | Wählen Sie Wrestler innerhalb Ihres Gehaltsbudgets pro Show |
-| **Rangliste** | Sehen Sie, wo Sie im Vergleich zu anderen Fantasy-Spielern stehen |
+| **Rangliste** | Sehen Sie, wo Sie im Vergleich zu anderen Fantasy-Teilnehmern stehen |
 | **Wrestler-Kosten** | Preise anzeigen, die sich mit der Leistung ändern |
 | **Show-Ergebnisse** | Ihre Tipps prüfen und verdiente Punkte nach jeder Show sehen |

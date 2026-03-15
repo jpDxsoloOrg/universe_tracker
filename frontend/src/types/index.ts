@@ -1,8 +1,12 @@
-export interface Player {
-  playerId: string;
-  userId?: string;
+export interface Wrestler {
+  wrestlerId: string;
   name: string;
-  currentWrestler: string;
+  nickname?: string;
+  finisher?: string;
+  weight?: string;
+  height?: string;
+  hometown?: string;
+  alignment?: 'face' | 'heel' | 'tweener';
   wins: number;
   losses: number;
   draws: number;
@@ -21,10 +25,10 @@ export interface Match {
   date: string;
   matchFormat: string; // "singles", "tag", "triple-threat", etc.
   stipulationId?: string; // References Stipulations table
-  participants: string[]; // playerIds
-  teams?: string[][]; // Array of teams, each team is an array of playerIds (for tag team matches)
-  winners?: string[]; // playerIds
-  losers?: string[]; // playerIds
+  participants: string[]; // wrestlerIds
+  teams?: string[][]; // Array of teams, each team is an array of wrestlerIds (for tag team matches)
+  winners?: string[]; // wrestlerIds
+  losers?: string[]; // wrestlerIds
   winningTeam?: number; // Index of winning team (for tag team matches)
   isChampionship: boolean;
   isTitleDefense?: boolean;
@@ -57,7 +61,7 @@ export interface Championship {
   championshipId: string;
   name: string;
   type: 'singles' | 'tag';
-  currentChampion?: string | string[]; // playerId or array for tag teams
+  currentChampion?: string | string[]; // wrestlerId or array for tag teams
   divisionId?: string;
   imageUrl?: string;
   createdAt: string;
@@ -79,9 +83,9 @@ export interface Tournament {
   name: string;
   type: 'single-elimination' | 'round-robin';
   status: 'upcoming' | 'in-progress' | 'completed';
-  participants: string[]; // playerIds
+  participants: string[]; // wrestlerIds
   brackets?: TournamentBracket; // for single-elimination
-  standings?: Record<string, Omit<RoundRobinStanding, 'playerId'>>; // for round-robin
+  standings?: Record<string, Omit<RoundRobinStanding, 'wrestlerId'>>; // for round-robin
   winner?: string;
   createdAt: string;
 }
@@ -103,7 +107,7 @@ export interface BracketMatch {
 }
 
 export interface RoundRobinStanding {
-  playerId: string;
+  wrestlerId: string;
   wins: number;
   losses: number;
   draws: number;
@@ -111,7 +115,7 @@ export interface RoundRobinStanding {
 }
 
 export interface Standings {
-  players: Player[];
+  wrestlers: Wrestler[];
   seasonId?: string;
   sortedByWins: boolean;
 }
@@ -122,7 +126,7 @@ export interface DashboardChampion {
   championshipName: string;
   championName: string;
   championImageUrl?: string;
-  playerId: string;
+  wrestlerId: string;
   wonDate?: string;
   defenses?: number;
 }
@@ -163,10 +167,10 @@ export interface DashboardSeason {
 }
 
 export interface DashboardQuickStats {
-  totalPlayers: number;
+  totalWrestlers: number;
   totalMatches: number;
   activeChampionships: number;
-  mostWinsPlayer?: { name: string; wins: number };
+  mostWinsWrestler?: { name: string; wins: number };
 }
 
 export interface DashboardData {
@@ -218,8 +222,8 @@ export interface SeasonAward {
   seasonId: string;
   name: string;
   awardType: SeasonAwardType;
-  playerId: string;
-  playerName?: string;
+  wrestlerId: string;
+  wrestlerName?: string;
   description?: string;
   value?: string;
   createdAt: string;
@@ -227,7 +231,7 @@ export interface SeasonAward {
 
 export interface MatchFilters {
   status?: string;
-  playerId?: string;
+  wrestlerId?: string;
   matchType?: string;
   stipulationId?: string;
   championshipId?: string;
@@ -255,4 +259,3 @@ export interface ActivityFeedResponse {
   items: ActivityItem[];
   nextCursor: string | null;
 }
-

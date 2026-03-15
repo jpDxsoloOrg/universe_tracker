@@ -25,7 +25,7 @@ async function runVerification(): Promise<void> {
     { name: 'Matches Page', path: 'tests/public/matches.spec.ts' },
     { name: 'Tournaments Page', path: 'tests/public/tournaments.spec.ts' },
     { name: 'Admin Authentication', path: 'tests/admin/auth.spec.ts' },
-    { name: 'Player Management', path: 'tests/admin/players.crud.spec.ts' },
+    { name: 'Wrestler Management', path: 'tests/admin/players.crud.spec.ts' },
     { name: 'Championship Management', path: 'tests/admin/championships.crud.spec.ts' },
     { name: 'Division Management', path: 'tests/admin/divisions.crud.spec.ts' },
     { name: 'Season Management', path: 'tests/admin/seasons.spec.ts' },

@@ -152,7 +152,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       round: draft.currentRound,
       companyId,
       wrestlerId,
-      previousCompanyId: wrestler.companyId || undefined,
+      ...(wrestler.companyId ? { previousCompanyId: wrestler.companyId as string } : {}),
       pickedAt: now,
     };
 
@@ -203,13 +203,15 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     await dynamoDb.transactWrite({ TransactItems: transactItems });
 
+    // Fetch the updated draft to return full state
+    const updatedDraftResult = await dynamoDb.get({
+      TableName: TableNames.DRAFTS,
+      Key: { draftId },
+    });
+
     return success({
       pick,
-      draftState: {
-        currentRound: newRound,
-        currentPickIndex: newPickIndex,
-        status: newStatus,
-      },
+      draft: updatedDraftResult.Item,
     });
   } catch (err) {
     console.error('Error making pick:', err);

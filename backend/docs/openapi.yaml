@@ -13,10 +13,8 @@ security: []
 servers:
   - url: http://localhost:3001/dev
     description: Local (serverless-offline)
-  - url: https://dgsmskbzb2.execute-api.us-east-1.amazonaws.com/devtest
-    description: Devtest
-  - url: https://9pcccl0caj.execute-api.us-east-1.amazonaws.com/dev
-    description: Dev/Prod
+  - url: <TBD after first deploy>
+    description: Universe Tracker (dev)
 
 tags:
   - name: Auth

@@ -24,21 +24,21 @@ const client = new DynamoDBClient(
 const docClient = DynamoDBDocumentClient.from(client);
 
 const TABLES = {
-  PLAYERS: `wwe-2k-league-api-players-${STAGE}`,
-  MATCHES: `wwe-2k-league-api-matches-${STAGE}`,
-  CHAMPIONSHIPS: `wwe-2k-league-api-championships-${STAGE}`,
-  CHAMPIONSHIP_HISTORY: `wwe-2k-league-api-championship-history-${STAGE}`,
-  TOURNAMENTS: `wwe-2k-league-api-tournaments-${STAGE}`,
-  SEASONS: `wwe-2k-league-api-seasons-${STAGE}`,
-  SEASON_STANDINGS: `wwe-2k-league-api-season-standings-${STAGE}`,
-  DIVISIONS: `wwe-2k-league-api-divisions-${STAGE}`,
-  EVENTS: `wwe-2k-league-api-events-${STAGE}`,
-  CONTENDER_RANKINGS: `wwe-2k-league-api-contender-rankings-${STAGE}`,
-  RANKING_HISTORY: `wwe-2k-league-api-ranking-history-${STAGE}`,
-  FANTASY_CONFIG: `wwe-2k-league-api-fantasy-config-${STAGE}`,
-  WRESTLER_COSTS: `wwe-2k-league-api-wrestler-costs-${STAGE}`,
-  FANTASY_PICKS: `wwe-2k-league-api-fantasy-picks-${STAGE}`,
-  SITE_CONFIG: `wwe-2k-league-api-site-config-${STAGE}`,
+  PLAYERS: `universe-tracker-api-players-${STAGE}`,
+  MATCHES: `universe-tracker-api-matches-${STAGE}`,
+  CHAMPIONSHIPS: `universe-tracker-api-championships-${STAGE}`,
+  CHAMPIONSHIP_HISTORY: `universe-tracker-api-championship-history-${STAGE}`,
+  TOURNAMENTS: `universe-tracker-api-tournaments-${STAGE}`,
+  SEASONS: `universe-tracker-api-seasons-${STAGE}`,
+  SEASON_STANDINGS: `universe-tracker-api-season-standings-${STAGE}`,
+  DIVISIONS: `universe-tracker-api-divisions-${STAGE}`,
+  EVENTS: `universe-tracker-api-events-${STAGE}`,
+  CONTENDER_RANKINGS: `universe-tracker-api-contender-rankings-${STAGE}`,
+  RANKING_HISTORY: `universe-tracker-api-ranking-history-${STAGE}`,
+  FANTASY_CONFIG: `universe-tracker-api-fantasy-config-${STAGE}`,
+  WRESTLER_COSTS: `universe-tracker-api-wrestler-costs-${STAGE}`,
+  FANTASY_PICKS: `universe-tracker-api-fantasy-picks-${STAGE}`,
+  SITE_CONFIG: `universe-tracker-api-site-config-${STAGE}`,
 };
 
 const wrestlers = [

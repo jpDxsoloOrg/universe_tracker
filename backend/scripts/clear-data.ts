@@ -20,11 +20,11 @@ const client = new DynamoDBClient({
 const docClient = DynamoDBDocumentClient.from(client);
 
 const TABLES = {
-  PLAYERS: `wwe-2k-league-api-players-${STAGE}`,
-  MATCHES: `wwe-2k-league-api-matches-${STAGE}`,
-  CHAMPIONSHIPS: `wwe-2k-league-api-championships-${STAGE}`,
-  CHAMPIONSHIP_HISTORY: `wwe-2k-league-api-championship-history-${STAGE}`,
-  TOURNAMENTS: `wwe-2k-league-api-tournaments-${STAGE}`,
+  PLAYERS: `universe-tracker-api-players-${STAGE}`,
+  MATCHES: `universe-tracker-api-matches-${STAGE}`,
+  CHAMPIONSHIPS: `universe-tracker-api-championships-${STAGE}`,
+  CHAMPIONSHIP_HISTORY: `universe-tracker-api-championship-history-${STAGE}`,
+  TOURNAMENTS: `universe-tracker-api-tournaments-${STAGE}`,
 };
 
 async function clearTable(tableName: string, keyNames: string[]) {

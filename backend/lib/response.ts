@@ -2,7 +2,7 @@ import { APIGatewayProxyResult } from 'aws-lambda';
 
 const headers = {
   'Content-Type': 'application/json',
-  'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN || 'https://leagueszn.jpdxsolo.com',
+  'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN || 'https://universe.jpdxsolo.com',
   'Access-Control-Allow-Credentials': true,
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',

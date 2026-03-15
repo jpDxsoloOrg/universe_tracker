@@ -117,9 +117,8 @@ A serverless web application for managing a WWE 2K league with standings, champi
 
 | Technology | Description |
 |------------|-------------|
-| **GitHub Actions** | Automated CI/CD pipelines for dev and production deployments |
-| **deploy-dev.yml** | Triggered on pull requests to main -- deploys to devtest stage |
-| **deploy-prod.yml** | Manually triggered -- deploys to production |
+| **GitHub Actions** | Automated CI/CD pipeline for deployment |
+| **deploy-dev.yml** | Triggered on pull requests to main -- deploys to dev stage |
 | **Docker** | Used for running DynamoDB Local in development |
 | **Playwright** | End-to-end testing framework with Page Object Model |
 
@@ -629,7 +628,7 @@ VITE_API_BASE_URL=/dev
 
 The Vite dev server proxies `/dev/*` requests to `http://localhost:3001` automatically. Restart Vite after changing `.env` files.
 
-**Backend** -- no `.env` needed. The `serverless-offline` plugin sets `IS_OFFLINE=true` automatically, which configures the backend to use DynamoDB Local at `localhost:8000`. DynamoDB table names use the `-offline` suffix locally (e.g., `wwe-2k-league-api-players-offline`). The `create-tables`, `seed`, and `clear-data` scripts default to this suffix.
+**Backend** -- no `.env` needed. The `serverless-offline` plugin sets `IS_OFFLINE=true` automatically, which configures the backend to use DynamoDB Local at `localhost:8000`. DynamoDB table names use the `-offline` suffix locally (e.g., `universe-tracker-api-players-offline`). The `create-tables`, `seed`, and `clear-data` scripts default to this suffix.
 
 ### Ports
 
@@ -753,31 +752,11 @@ Checkout --> Node 24 Setup --> Install Frontend
     +--> Typecheck (tsc --noEmit)
     +--> Unit Tests (Vitest)
     |
-[Tests pass] --> Deploy Backend (Serverless Framework --> devtest stage)
-    |
-    +--> Extract Cognito IDs from CloudFormation
-    +--> Install & Build Frontend (Vite, --mode devtest)
-    +--> S3 Sync (deploy to dev.leagueszn.jpdxsolo.com)
-    +--> CloudFront Cache Invalidation
-    +--> Deployment Summary
-```
-
-### Prod Pipeline (`deploy-prod.yml`)
-
-**Trigger**: Manual dispatch (`workflow_dispatch`) after merging to `main`.
-
-```
-Checkout --> Node 24 Setup --> Install Frontend
-    |
-    +--> Lint (ESLint)
-    +--> Typecheck (tsc --noEmit)
-    +--> Unit Tests (Vitest)
-    |
 [Tests pass] --> Deploy Backend (Serverless Framework --> dev stage)
     |
-    +--> Extract Cognito IDs from CloudFormation
-    +--> Install & Build Frontend (Vite, production mode)
-    +--> S3 Sync (deploy to leagueszn.jpdxsolo.com)
+    +--> Set Cognito IDs (hardcoded)
+    +--> Install & Build Frontend (Vite, --mode universe)
+    +--> S3 Sync (deploy to universe.jpdxsolo.com)
     +--> CloudFront Cache Invalidation
     +--> Deployment Summary
 ```
@@ -800,8 +779,7 @@ Checkout --> Node 24 Setup --> Install Frontend
 
 | Environment | Frontend | Backend API |
 |-------------|----------|-------------|
-| **Production** | https://leagueszn.jpdxsolo.com | https://9pcccl0caj.execute-api.us-east-1.amazonaws.com/dev |
-| **Dev** | https://dev.leagueszn.jpdxsolo.com | https://dgsmskbzb2.execute-api.us-east-1.amazonaws.com/devtest |
+| **Dev** | https://universe.jpdxsolo.com | TBD after first deploy |
 
 ---
 

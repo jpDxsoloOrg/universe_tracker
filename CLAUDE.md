@@ -48,16 +48,15 @@ A serverless web application for managing a WWE 2K league with player standings,
 | **DynamoDB** | NoSQL database with 8 tables: Players, Matches (with TournamentIndex GSI), Championships, ChampionshipHistory, Tournaments, Seasons, SeasonStandings (with PlayerIndex GSI), Divisions - all use on-demand (PAY_PER_REQUEST) billing |
 | **Amazon S3** | Two purposes: (1) hosts frontend static files, (2) stores player/championship images with public read access and presigned URL uploads |
 | **CloudFront** | CDN in front of S3; custom error responses redirect 403/404 to /index.html for SPA routing; HTTPS enforced |
-| **AWS Cognito** | User Pool for admin authentication - username-based login (not email), 24hr access tokens, 30-day refresh tokens |
+| **AWS Cognito** | User Pool for admin authentication - username-based login (not email), 24hr access tokens, 30-day refresh tokens. **Shared from the league_szn devtest Cognito pool -- do NOT recreate it.** |
 | **ACM** | SSL/TLS certificates for CloudFront HTTPS |
 
 ### CI/CD & DevOps
 
 | Technology | How It's Used |
 |------------|---------------|
-| **GitHub Actions** | Two workflows automate deployment |
-| **deploy-dev.yml** | Triggered on PRs to main - builds frontend with `.env.devtest`, deploys backend to `devtest` stage, syncs to dev S3 bucket |
-| **deploy-prod.yml** | Triggered on merged PRs - builds frontend with `.env.production`, deploys backend to `dev` stage (production), syncs to prod S3 bucket, invalidates CloudFront cache |
+| **GitHub Actions** | One workflow automates deployment |
+| **deploy-dev.yml** | Triggered on PRs to main - builds frontend with `.env.universe`, deploys backend to `dev` stage, syncs to S3 bucket |
 | **Docker** | Runs DynamoDB Local (`amazon/dynamodb-local`) for offline development |
 
 ### Local Development Stack
@@ -120,7 +119,7 @@ wwe-2k-league/
   - **Index**: `frontend/public/wiki/index.json` — JSON array of `{ "slug": string, "titleKey": string, "file": string }`. The app fetches this to build the wiki index page.
   - **Articles**: Markdown files in `frontend/public/wiki/*.md` (e.g. `getting-started.md`, `faqs.md`). Each article is loaded at runtime by slug and current locale: German from `frontend/public/wiki/de/*.md` (when language is de), English from `frontend/public/wiki/*.md`. If a German file is missing, the app falls back to the English file.
 - **To add a wiki article**: (1) Add a new `.md` file under `frontend/public/wiki/` (English). (2) For German, add the same slug under `frontend/public/wiki/de/` (e.g. `wiki/de/my-topic.md`). (3) Append an entry to `frontend/public/wiki/index.json` with `slug`, `titleKey` (e.g. `wiki.articles.myTopic`), and `file` (e.g. `my-topic.md`). (4) Add the `titleKey` translation in `frontend/src/i18n/locales/en.json` and `frontend/src/i18n/locales/de.json` under `wiki.articles`.
-- **"Edit this page" link**: On article view, an "Edit this page" link points to the GitHub edit URL for that article’s markdown file. It is shown only when `VITE_GITHUB_REPO` is set (e.g. `jpDxsoloOrg/league_szn`). Optional `VITE_GITHUB_BRANCH` (default `main`) sets the branch in the edit URL. Add these to `.env` or deployment env so the link works in your environment.
+- **"Edit this page" link**: On article view, an "Edit this page" link points to the GitHub edit URL for that article’s markdown file. It is shown only when `VITE_GITHUB_REPO` is set (e.g. `jpDxsoloOrg/universe_tracker`). Optional `VITE_GITHUB_BRANCH` (default `main`) sets the branch in the edit URL. Add these to `.env` or deployment env so the link works in your environment.
 
 ## Data Model
 
@@ -346,10 +345,7 @@ aws configure set region us-east-1 --profile league-szn
 
 | Environment | Frontend URL | Backend API | S3 Bucket | Serverless Stage |
 |-------------|--------------|-------------|-----------|------------------|
-| **Prod** | http://leagueszn.jpdxsolo.com | https://9pcccl0caj.execute-api.us-east-1.amazonaws.com/dev | `leagueszn.jpdxsolo.com` | `dev` (default) |
-| **Dev** | http://dev.leagueszn.jpdxsolo.com | https://dgsmskbzb2.execute-api.us-east-1.amazonaws.com/devtest | `dev.leagueszn.jpdxsolo.com` | `devtest` |
-
-**Note**: Prod uses serverless stage `dev` for historical reasons (to preserve existing table names). Dev uses stage `devtest`.
+| **Universe Tracker** | https://universe.jpdxsolo.com | TBD after first deploy | `universe.jpdxsolo.com` | `dev` |
 
 ---
 
@@ -357,36 +353,19 @@ This deploys:
 - Lambda functions for all API endpoints
 - API Gateway
 - DynamoDB tables (Players, Matches, Championships, ChampionshipHistory, Tournaments, Seasons, SeasonStandings)
-### Deploy to PROD
+### Deploy
 
-Deploy backend and frontend to production:
+Deploy backend and frontend:
 
 ```bash
 # Backend only
 cd backend && npx serverless deploy --aws-profile league-szn
 
-# Frontend only
-cd frontend && npm run build && aws s3 sync dist s3://leagueszn.jpdxsolo.com --profile league-szn --delete
+# Frontend only (uses .env.universe)
+cd frontend && npm run build -- --mode universe && aws s3 sync dist s3://universe.jpdxsolo.com --profile league-szn --delete
 
 # Full deployment (both)
-cd backend && npx serverless deploy --aws-profile league-szn && cd ../frontend && npm run build && aws s3 sync dist s3://leagueszn.jpdxsolo.com --profile league-szn --delete
-```
-
----
-
-### Deploy to DEV
-
-Deploy backend and frontend to dev/testing environment:
-
-```bash
-# Backend only
-cd backend && npx serverless deploy --stage devtest --aws-profile league-szn
-
-# Frontend only (uses .env.devtest)
-cd frontend && npm run build -- --mode devtest && aws s3 sync dist s3://dev.leagueszn.jpdxsolo.com --profile league-szn --delete
-
-# Full deployment (both)
-cd backend && npx serverless deploy --stage devtest --aws-profile league-szn && cd ../frontend && npm run build -- --mode devtest && aws s3 sync dist s3://dev.leagueszn.jpdxsolo.com --profile league-szn --delete
+cd backend && npx serverless deploy --aws-profile league-szn && cd ../frontend && npm run build -- --mode universe && aws s3 sync dist s3://universe.jpdxsolo.com --profile league-szn --delete
 ```
 
 ---
@@ -398,18 +377,13 @@ Domain `jpdxsolo.com` DNS is managed in Namecheap.
 CNAME records for subdomains should point to CloudFront distributions (not S3 website endpoints):
 | Type | Host | Value |
 |------|------|-------|
-| CNAME | leagueszn | `<CloudFront-Distribution-Domain>.cloudfront.net` |
-| CNAME | dev.leagueszn | `<CloudFront-Distribution-Domain>.cloudfront.net` |
+| CNAME | universe | `<CloudFront-Distribution-Domain>.cloudfront.net` |
 
-**To get the CloudFront domain names:**
+After first deploy, create CNAME `universe` pointing to the CloudFront domain in Namecheap.
+
+**To get the CloudFront domain name:**
 ```bash
-# For production (dev stage)
-aws cloudformation describe-stacks --stack-name wwe-2k-league-api-dev \
-  --query "Stacks[0].Outputs[?OutputKey=='CloudFrontDomainName'].OutputValue" \
-  --output text --profile league-szn
-
-# For dev (devtest stage)
-aws cloudformation describe-stacks --stack-name wwe-2k-league-api-devtest \
+aws cloudformation describe-stacks --stack-name universe-tracker-api-dev \
   --query "Stacks[0].Outputs[?OutputKey=='CloudFrontDomainName'].OutputValue" \
   --output text --profile league-szn
 ```
@@ -470,5 +444,5 @@ Current active branches:
 
 ## Contact / Repository
 
-- GitHub: https://github.com/jpDxsolo/league_szn
+- GitHub: https://github.com/jpDxsoloOrg/universe_tracker
 - Owner: jpDxsolo

@@ -2,7 +2,7 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import { OPENAPI_YAML, SWAGGER_HTML } from './docsEmbed.generated';
 
 const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN || 'https://leagueszn.jpdxsolo.com',
+  'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN || 'https://universe.jpdxsolo.com',
   'Access-Control-Allow-Credentials': 'true',
   'X-Content-Type-Options': 'nosniff',
   'Cache-Control': 'no-store',

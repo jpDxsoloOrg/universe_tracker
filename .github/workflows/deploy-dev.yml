@@ -1,10 +1,6 @@
-name: Deploy to Dev
+name: Deploy Universe Tracker
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    branches:
-      - main
   workflow_dispatch:
 
 env:
@@ -74,28 +70,18 @@ jobs:
 
       - name: Deploy backend to dev
         working-directory: backend
-        run: npx serverless deploy --stage devtest
+        run: npx serverless deploy --stage dev
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          DEV_ACM_CERTIFICATE_ARN: ${{ secrets.DEV_ACM_CERTIFICATE_ARN }}
+          ACM_CERTIFICATE_ARN: ${{ secrets.ACM_CERTIFICATE_ARN }}
           ADMIN_SETUP_KEY: ${{ secrets.ADMIN_SETUP_KEY }}
 
-      - name: Extract Cognito IDs from CloudFormation
+      - name: Set Cognito IDs
         id: cognito
         run: |
-          USER_POOL_ID=$(aws cloudformation describe-stacks \
-            --stack-name wwe-2k-league-api-devtest \
-            --query "Stacks[0].Outputs[?OutputKey=='CognitoUserPoolId'].OutputValue" \
-            --output text)
-          CLIENT_ID=$(aws cloudformation describe-stacks \
-            --stack-name wwe-2k-league-api-devtest \
-            --query "Stacks[0].Outputs[?OutputKey=='CognitoUserPoolClientId'].OutputValue" \
-            --output text)
-          echo "user_pool_id=$USER_POOL_ID" >> $GITHUB_OUTPUT
-          echo "client_id=$CLIENT_ID" >> $GITHUB_OUTPUT
-          echo "Cognito User Pool ID: $USER_POOL_ID"
-          echo "Cognito Client ID: $CLIENT_ID"
+          echo "user_pool_id=us-east-1_5GZ9UY8V2" >> $GITHUB_OUTPUT
+          echo "client_id=5bn99khg7knh9v0t5dqbjpgh1d" >> $GITHUB_OUTPUT
 
       - name: Install frontend dependencies
         working-directory: frontend
@@ -103,22 +89,22 @@ jobs:
 
       - name: Build frontend
         working-directory: frontend
-        run: npm run build -- --mode devtest
+        run: npm run build -- --mode universe
         env:
-          VITE_API_BASE_URL: ${{ secrets.DEV_API_BASE_URL }}
+          VITE_API_BASE_URL: ${{ secrets.API_BASE_URL }}
           VITE_COGNITO_USER_POOL_ID: ${{ steps.cognito.outputs.user_pool_id }}
           VITE_COGNITO_CLIENT_ID: ${{ steps.cognito.outputs.client_id }}
           VITE_AWS_REGION: us-east-1
 
       - name: Deploy frontend to S3
         working-directory: frontend
-        run: aws s3 sync dist s3://dev.leagueszn.jpdxsolo.com --delete --exclude "*.map"
+        run: aws s3 sync dist s3://universe.jpdxsolo.com --delete --exclude "*.map"
 
       - name: Get CloudFront Distribution ID
         id: cloudfront
         run: |
           DISTRIBUTION_ID=$(aws cloudformation describe-stacks \
-            --stack-name wwe-2k-league-api-devtest \
+            --stack-name universe-tracker-api-dev \
             --query "Stacks[0].Outputs[?OutputKey=='CloudFrontDistributionId'].OutputValue" \
             --output text)
           echo "distribution_id=$DISTRIBUTION_ID" >> $GITHUB_OUTPUT
@@ -161,7 +147,7 @@ jobs:
       #   working-directory: e2e
       #   run: npm run screenshots
       #   env:
-      #     SCREENSHOT_BASE_URL: https://dev.leagueszn.jpdxsolo.com
+      #     SCREENSHOT_BASE_URL: https://universe.jpdxsolo.com
       #
       # - name: Upload screenshots
       #   uses: actions/upload-artifact@v4
@@ -174,8 +160,8 @@ jobs:
       - name: Deployment summary
         if: always()
         run: |
-          echo "## Dev Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "## Universe Tracker Deployment Complete" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Frontend**: https://dev.leagueszn.jpdxsolo.com" >> $GITHUB_STEP_SUMMARY
+          echo "- **Frontend**: https://universe.jpdxsolo.com" >> $GITHUB_STEP_SUMMARY
           echo "- **CloudFront Distribution**: ${{ steps.cloudfront.outputs.distribution_id }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit**: \`${GITHUB_SHA::7}\`" >> $GITHUB_STEP_SUMMARY

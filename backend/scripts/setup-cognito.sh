@@ -19,7 +19,7 @@ set -e
 USER_POOL_ID=${1:?"Usage: $0 <USER_POOL_ID> <STAGE>"}
 STAGE=${2:?"Usage: $0 <USER_POOL_ID> <STAGE>"}
 REGION=${AWS_REGION:-us-east-1}
-SERVICE_NAME="wwe-2k-league-api"
+SERVICE_NAME="universe-tracker-api"
 
 echo "=== Cognito Setup for ${STAGE} (${USER_POOL_ID}) ==="
 echo ""

@@ -138,7 +138,6 @@ describe('createCreateHandler', () => {
     expect(JSON.parse(result.body)).toEqual({
       divisionId: 'test-uuid-1234',
       name: 'Test',
-      description: null,
       createdAt: expect.any(String),
       updatedAt: expect.any(String),
     });

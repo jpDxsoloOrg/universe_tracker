@@ -46,7 +46,10 @@ export function handlerFactory(options: CreateHandlerOptions): APIGatewayProxyHa
             }, {} as Record<string, unknown>);
 
             const nullableFields = options.nullableFields?.reduce((acc, field) => {
-                acc[field] = body[field] ?? null;
+                const value = body[field] ?? null;
+                if (value !== null) {
+                    acc[field] = value;
+                }
                 return acc;
             }, {} as Record<string, unknown>);
 

@@ -21,10 +21,11 @@ import ManageSeasonAwards from './ManageSeasonAwards';
 import AdminContenderConfig from './AdminContenderConfig';
 import ManageCompanies from './ManageCompanies';
 import ManageShows from './ManageShows';
+import ManageDrafts from './ManageDrafts';
 
-type AdminTab = 'wrestlers' | 'divisions' | 'companies' | 'shows' | 'match-config' | 'schedule' | 'results' | 'championships' | 'tournaments' | 'seasons' | 'season-awards' | 'events' | 'contender-config' | 'danger' | 'features';
+type AdminTab = 'wrestlers' | 'divisions' | 'companies' | 'shows' | 'drafts' | 'match-config' | 'schedule' | 'results' | 'championships' | 'tournaments' | 'seasons' | 'season-awards' | 'events' | 'contender-config' | 'danger' | 'features';
 
-const VALID_TABS: AdminTab[] = ['wrestlers', 'divisions', 'companies', 'shows', 'match-config', 'schedule', 'results', 'championships', 'tournaments', 'seasons', 'season-awards', 'events', 'contender-config', 'danger', 'features'];
+const VALID_TABS: AdminTab[] = ['wrestlers', 'divisions', 'companies', 'shows', 'drafts', 'match-config', 'schedule', 'results', 'championships', 'tournaments', 'seasons', 'season-awards', 'events', 'contender-config', 'danger', 'features'];
 
 
 export default function AdminPanel() {
@@ -66,6 +67,7 @@ export default function AdminPanel() {
     divisions: <ManageDivisions />,
     companies: <ManageCompanies />,
     shows: <ManageShows />,
+    drafts: <ManageDrafts />,
     'match-config': <ManageMatchConfig />,
     schedule: <ScheduleMatch />,
     results: <RecordResult />,

@@ -28,6 +28,7 @@ provider:
     SEASON_AWARDS_TABLE: ${self:service}-season-awards-${self:provider.stage}
     COMPANIES_TABLE: ${self:service}-companies-${self:provider.stage}
     SHOWS_TABLE: ${self:service}-shows-${self:provider.stage}
+    DRAFTS_TABLE: ${self:service}-drafts-${self:provider.stage}
     DYNAMODB_ENDPOINT: ${env:DYNAMODB_ENDPOINT, 'http://localhost:8000'}
     COGNITO_USER_POOL_ID: 'us-east-1_5GZ9UY8V2'
     COGNITO_CLIENT_ID: '5bn99khg7knh9v0t5dqbjpgh1d'
@@ -69,6 +70,8 @@ provider:
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.COMPANIES_TABLE}
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.SHOWS_TABLE}
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.SHOWS_TABLE}/index/*
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DRAFTS_TABLE}
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DRAFTS_TABLE}/index/*
         - Effect: Allow
           Action:
             - s3:PutObject
@@ -482,6 +485,55 @@ functions:
       - http:
           path: shows/{showId}
           method: any
+          cors: *corsConfig
+          authorizer: adminAuthorizer
+
+  # Drafts (CRUD + draft actions: start, pick, protect, complete)
+  drafts:
+    handler: functions/drafts/handler.handler
+    timeout: 30
+    events:
+      - http:
+          path: drafts
+          method: get
+          cors: *corsConfig
+      - http:
+          path: drafts
+          method: post
+          cors: *corsConfig
+          authorizer: adminAuthorizer
+      - http:
+          path: drafts/{draftId}
+          method: get
+          cors: *corsConfig
+      - http:
+          path: drafts/{draftId}
+          method: put
+          cors: *corsConfig
+          authorizer: adminAuthorizer
+      - http:
+          path: drafts/{draftId}
+          method: delete
+          cors: *corsConfig
+          authorizer: adminAuthorizer
+      - http:
+          path: drafts/{draftId}/start
+          method: post
+          cors: *corsConfig
+          authorizer: adminAuthorizer
+      - http:
+          path: drafts/{draftId}/pick
+          method: post
+          cors: *corsConfig
+          authorizer: adminAuthorizer
+      - http:
+          path: drafts/{draftId}/protect
+          method: post
+          cors: *corsConfig
+          authorizer: adminAuthorizer
+      - http:
+          path: drafts/{draftId}/complete
+          method: post
           cors: *corsConfig
           authorizer: adminAuthorizer
 
@@ -913,6 +965,18 @@ resources:
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
+
+    DraftsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.DRAFTS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: draftId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: draftId
+            KeyType: HASH
 
     ImagesBucket:
       Type: AWS::S3::Bucket

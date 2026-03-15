@@ -1,0 +1,669 @@
+.manage-drafts {
+  width: 100%;
+}
+
+.draft-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-setup {
+  background-color: #555;
+  color: #ccc;
+}
+
+.status-active {
+  background-color: #166534;
+  color: #86efac;
+  animation: pulse-active 2s infinite;
+}
+
+@keyframes pulse-active {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.status-completed {
+  background-color: #1e3a5f;
+  color: #93c5fd;
+}
+
+/* Type badges */
+.type-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.type-global {
+  background-color: #4a2c6e;
+  color: #c4b5fd;
+}
+
+.type-inter-company {
+  background-color: #713f12;
+  color: #fcd34d;
+}
+
+/* Draft list */
+.draft-list {
+  margin-top: 1.5rem;
+}
+
+.draft-list h3 {
+  margin-bottom: 1rem;
+}
+
+.draft-list table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.draft-list th,
+.draft-list td {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #333;
+}
+
+.draft-list th {
+  color: #d4af37;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.draft-list tr:hover td {
+  background-color: #222;
+}
+
+.draft-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.draft-actions button {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.draft-view-btn {
+  background-color: #3b82f6;
+}
+.draft-view-btn:hover {
+  background-color: #2563eb;
+}
+
+.draft-edit-btn {
+  background-color: #d4af37;
+  color: #111;
+}
+.draft-edit-btn:hover {
+  background-color: #c9a02e;
+}
+
+.draft-delete-btn {
+  background-color: #7f1d1d !important;
+  color: #fecaca;
+}
+.draft-delete-btn:hover:not(:disabled) {
+  background-color: #991b1b !important;
+}
+.draft-delete-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.draft-start-btn {
+  background-color: #166534;
+  color: #86efac;
+}
+.draft-start-btn:hover {
+  background-color: #15803d;
+}
+
+/* Draft form */
+.draft-form-container {
+  background-color: #1a1a1a;
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.draft-form-container h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: #d4af37;
+}
+
+.draft-form {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.draft-form .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #ccc;
+  font-weight: 600;
+}
+
+.draft-form input[type="text"],
+.draft-form input[type="number"] {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #222;
+  border: 2px solid #444;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.draft-form input:focus {
+  outline: none;
+  border-color: #d4af37;
+}
+
+/* Radio buttons for type */
+.type-selector {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.type-selector label {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border: 2px solid #444;
+  border-radius: 6px;
+  transition: border-color 0.2s;
+}
+
+.type-selector label:has(input:checked) {
+  border-color: #d4af37;
+  background-color: #2a2200;
+}
+
+.type-selector input[type="radio"] {
+  accent-color: #d4af37;
+}
+
+/* Company checkboxes */
+.company-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.company-checkboxes label {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #444;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: normal !important;
+  transition: background-color 0.2s;
+}
+
+.company-checkboxes label:hover {
+  background-color: #2a2a2a;
+}
+
+.company-checkboxes input[type="checkbox"] {
+  accent-color: #d4af37;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.checkbox-row input[type="checkbox"] {
+  accent-color: #d4af37;
+}
+
+.help-text {
+  display: block;
+  margin-top: 0.35rem;
+  color: #888;
+  font-size: 0.8rem;
+}
+
+/* Draft order list */
+.draft-order-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
+}
+
+.draft-order-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #444;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  background-color: #222;
+}
+
+.draft-order-list .order-number {
+  color: #d4af37;
+  font-weight: bold;
+  min-width: 1.5rem;
+}
+
+.draft-order-list .order-name {
+  flex: 1;
+}
+
+.draft-order-list button {
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  background-color: #444;
+}
+
+.draft-order-list button:hover:not(:disabled) {
+  background-color: #555;
+}
+
+.draft-order-list button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.randomize-btn {
+  margin-top: 0.5rem;
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+  background-color: #4a2c6e;
+  color: #c4b5fd;
+}
+
+.randomize-btn:hover {
+  background-color: #5b3d7f;
+}
+
+/* Inter-company conditional fields */
+.inter-company-fields {
+  border: 1px dashed #555;
+  border-radius: 6px;
+  padding: 1rem;
+  background-color: #1e1e1e;
+}
+
+.inter-company-fields h4 {
+  margin: 0 0 1rem 0;
+  color: #fcd34d;
+  font-size: 0.9rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.cancel-btn {
+  background-color: #444 !important;
+  color: #ccc;
+}
+
+.cancel-btn:hover {
+  background-color: #555 !important;
+}
+
+/* Draft detail view */
+.draft-detail {
+  width: 100%;
+}
+
+.draft-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.draft-detail-header h2 {
+  margin: 0;
+}
+
+.draft-detail-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.back-btn {
+  background-color: #444;
+  color: #ccc;
+}
+
+.back-btn:hover {
+  background-color: #555;
+}
+
+/* Current pick banner */
+.current-pick-banner {
+  background: linear-gradient(135deg, #2a2000, #1a1200);
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #d4af37;
+}
+
+/* Draft board */
+.draft-board {
+  margin-bottom: 2rem;
+  overflow-x: auto;
+}
+
+.draft-board h3 {
+  margin-bottom: 1rem;
+  color: #d4af37;
+}
+
+.draft-board table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 500px;
+}
+
+.draft-board th {
+  padding: 0.75rem;
+  background-color: #2a2a2a;
+  color: #d4af37;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  border: 1px solid #444;
+  text-align: center;
+}
+
+.draft-board th:first-child {
+  width: 80px;
+  text-align: center;
+}
+
+.draft-board td {
+  padding: 0.6rem;
+  border: 1px solid #333;
+  text-align: center;
+  vertical-align: middle;
+  min-width: 120px;
+}
+
+.draft-board td.current-pick {
+  border: 2px solid #d4af37;
+  background-color: #2a2000;
+  box-shadow: inset 0 0 8px rgba(212, 175, 55, 0.2);
+}
+
+.draft-board td.empty {
+  color: #555;
+  font-style: italic;
+  font-size: 0.8rem;
+}
+
+.draft-board .round-label {
+  font-weight: bold;
+  color: #999;
+  background-color: #1e1e1e;
+}
+
+.pick-content {
+  font-size: 0.85rem;
+}
+
+.pick-content .pick-wrestler {
+  font-weight: bold;
+  color: #e0e0e0;
+}
+
+.pick-content .pick-source {
+  display: block;
+  font-size: 0.7rem;
+  color: #999;
+  margin-top: 2px;
+}
+
+/* Available wrestlers */
+.available-wrestlers {
+  margin-top: 1.5rem;
+}
+
+.available-wrestlers h3 {
+  margin-bottom: 1rem;
+  color: #d4af37;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #222;
+  border: 2px solid #444;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #d4af37;
+}
+
+.wrestlers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.wrestler-card {
+  padding: 0.75rem;
+  border: 2px solid #333;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+  background-color: #1a1a1a;
+}
+
+.wrestler-card:hover {
+  border-color: #666;
+  background-color: #222;
+}
+
+.wrestler-card.selected {
+  border-color: #d4af37;
+  background-color: #2a2000;
+}
+
+.wrestler-card .wrestler-name {
+  font-weight: bold;
+  color: #e0e0e0;
+  font-size: 0.9rem;
+}
+
+.wrestler-card .wrestler-company {
+  font-size: 0.75rem;
+  color: #888;
+  margin-top: 0.25rem;
+}
+
+.pick-action {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  align-items: center;
+}
+
+.pick-action button {
+  padding: 0.5rem 1.5rem;
+}
+
+.pick-btn {
+  background-color: #d4af37;
+  color: #111;
+  font-weight: bold;
+}
+
+.pick-btn:hover:not(:disabled) {
+  background-color: #c9a02e;
+}
+
+.pick-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Protection section */
+.protection-section {
+  margin-bottom: 2rem;
+  border: 2px solid #555;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background-color: #1e1e1e;
+}
+
+.protection-section h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #d4af37;
+}
+
+.protection-company {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #444;
+  border-radius: 6px;
+  background-color: #222;
+}
+
+.protection-company h4 {
+  margin: 0 0 0.5rem 0;
+  color: #e0e0e0;
+}
+
+.protection-count {
+  font-size: 0.85rem;
+  color: #999;
+  margin-bottom: 0.75rem;
+}
+
+.protected-wrestler {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  background-color: #2a2000;
+  border: 1px solid #d4af37;
+  border-radius: 4px;
+  margin: 0.25rem;
+  font-size: 0.8rem;
+  color: #d4af37;
+}
+
+.protection-wrestlers-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.protection-wrestlers-list button {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+  background-color: #444;
+}
+
+.protection-wrestlers-list button:hover:not(:disabled) {
+  background-color: #555;
+}
+
+.protection-wrestlers-list button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #888;
+}
+
+@media (max-width: 768px) {
+  .draft-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .draft-form-container {
+    padding: 1rem;
+  }
+
+  .type-selector {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .company-checkboxes {
+    grid-template-columns: 1fr;
+  }
+
+  .draft-detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .draft-detail-actions {
+    flex-wrap: wrap;
+  }
+
+  .wrestlers-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .draft-list table {
+    font-size: 0.85rem;
+  }
+
+  .draft-list th,
+  .draft-list td {
+    padding: 0.5rem;
+  }
+
+  .draft-actions {
+    flex-direction: column;
+  }
+}

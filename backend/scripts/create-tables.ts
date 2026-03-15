@@ -226,6 +226,12 @@ const tables = [
       },
     ],
   },
+  {
+    TableName: `universe-tracker-api-drafts-${STAGE}`,
+    KeySchema: [{ AttributeName: 'draftId', KeyType: 'HASH' }],
+    AttributeDefinitions: [{ AttributeName: 'draftId', AttributeType: 'S' }],
+    BillingMode: 'PAY_PER_REQUEST',
+  },
 ];
 
 async function createTables() {

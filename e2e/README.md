@@ -37,8 +37,7 @@ npm run test:dev
 Tests can run against different environments:
 
 - **Local**: `http://localhost:3000`
-- **Dev**: `http://dev.leagueszn.jpdxsolo.com`
-- **Prod**: `http://leagueszn.jpdxsolo.com`
+- **Dev**: `https://universe.jpdxsolo.com`
 
 Set the environment using `TEST_ENV`:
 

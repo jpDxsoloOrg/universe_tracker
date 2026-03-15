@@ -12,13 +12,8 @@ const environments: Record<string, Environment> = {
   },
   dev: {
     name: 'dev',
-    baseUrl: 'http://dev.leagueszn.jpdxsolo.com',
-    apiUrl: 'https://dgsmskbzb2.execute-api.us-east-1.amazonaws.com/devtest',
-  },
-  prod: {
-    name: 'prod',
-    baseUrl: 'http://leagueszn.jpdxsolo.com',
-    apiUrl: 'https://9pcccl0caj.execute-api.us-east-1.amazonaws.com/dev',
+    baseUrl: 'https://universe.jpdxsolo.com',
+    apiUrl: '<TBD after first deploy>',
   },
 };
 

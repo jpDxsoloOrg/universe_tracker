@@ -14,13 +14,13 @@ const client = new DynamoDBClient({
 
 const tables = [
   {
-    TableName: `wwe-2k-league-api-players-${STAGE}`,
+    TableName: `universe-tracker-api-players-${STAGE}`,
     KeySchema: [{ AttributeName: 'playerId', KeyType: 'HASH' }],
     AttributeDefinitions: [{ AttributeName: 'playerId', AttributeType: 'S' }],
     BillingMode: 'PAY_PER_REQUEST',
   },
   {
-    TableName: `wwe-2k-league-api-matches-${STAGE}`,
+    TableName: `universe-tracker-api-matches-${STAGE}`,
     KeySchema: [
       { AttributeName: 'matchId', KeyType: 'HASH' },
       { AttributeName: 'date', KeyType: 'RANGE' },
@@ -43,13 +43,13 @@ const tables = [
     ],
   },
   {
-    TableName: `wwe-2k-league-api-championships-${STAGE}`,
+    TableName: `universe-tracker-api-championships-${STAGE}`,
     KeySchema: [{ AttributeName: 'championshipId', KeyType: 'HASH' }],
     AttributeDefinitions: [{ AttributeName: 'championshipId', AttributeType: 'S' }],
     BillingMode: 'PAY_PER_REQUEST',
   },
   {
-    TableName: `wwe-2k-league-api-championship-history-${STAGE}`,
+    TableName: `universe-tracker-api-championship-history-${STAGE}`,
     KeySchema: [
       { AttributeName: 'championshipId', KeyType: 'HASH' },
       { AttributeName: 'wonDate', KeyType: 'RANGE' },
@@ -61,19 +61,19 @@ const tables = [
     BillingMode: 'PAY_PER_REQUEST',
   },
   {
-    TableName: `wwe-2k-league-api-tournaments-${STAGE}`,
+    TableName: `universe-tracker-api-tournaments-${STAGE}`,
     KeySchema: [{ AttributeName: 'tournamentId', KeyType: 'HASH' }],
     AttributeDefinitions: [{ AttributeName: 'tournamentId', AttributeType: 'S' }],
     BillingMode: 'PAY_PER_REQUEST',
   },
   {
-    TableName: `wwe-2k-league-api-seasons-${STAGE}`,
+    TableName: `universe-tracker-api-seasons-${STAGE}`,
     KeySchema: [{ AttributeName: 'seasonId', KeyType: 'HASH' }],
     AttributeDefinitions: [{ AttributeName: 'seasonId', AttributeType: 'S' }],
     BillingMode: 'PAY_PER_REQUEST',
   },
   {
-    TableName: `wwe-2k-league-api-season-standings-${STAGE}`,
+    TableName: `universe-tracker-api-season-standings-${STAGE}`,
     KeySchema: [
       { AttributeName: 'seasonId', KeyType: 'HASH' },
       { AttributeName: 'playerId', KeyType: 'RANGE' },
@@ -95,13 +95,13 @@ const tables = [
     ],
   },
   {
-    TableName: `wwe-2k-league-api-divisions-${STAGE}`,
+    TableName: `universe-tracker-api-divisions-${STAGE}`,
     KeySchema: [{ AttributeName: 'divisionId', KeyType: 'HASH' }],
     AttributeDefinitions: [{ AttributeName: 'divisionId', AttributeType: 'S' }],
     BillingMode: 'PAY_PER_REQUEST',
   },
   {
-    TableName: `wwe-2k-league-api-events-${STAGE}`,
+    TableName: `universe-tracker-api-events-${STAGE}`,
     KeySchema: [{ AttributeName: 'eventId', KeyType: 'HASH' }],
     AttributeDefinitions: [
       { AttributeName: 'eventId', AttributeType: 'S' },
@@ -139,7 +139,7 @@ const tables = [
     ],
   },
   {
-    TableName: `wwe-2k-league-api-contender-rankings-${STAGE}`,
+    TableName: `universe-tracker-api-contender-rankings-${STAGE}`,
     KeySchema: [
       { AttributeName: 'championshipId', KeyType: 'HASH' },
       { AttributeName: 'playerId', KeyType: 'RANGE' },
@@ -162,7 +162,7 @@ const tables = [
     ],
   },
   {
-    TableName: `wwe-2k-league-api-ranking-history-${STAGE}`,
+    TableName: `universe-tracker-api-ranking-history-${STAGE}`,
     KeySchema: [
       { AttributeName: 'playerId', KeyType: 'HASH' },
       { AttributeName: 'weekKey', KeyType: 'RANGE' },
@@ -185,19 +185,19 @@ const tables = [
     ],
   },
   {
-    TableName: `wwe-2k-league-api-fantasy-config-${STAGE}`,
+    TableName: `universe-tracker-api-fantasy-config-${STAGE}`,
     KeySchema: [{ AttributeName: 'configKey', KeyType: 'HASH' }],
     AttributeDefinitions: [{ AttributeName: 'configKey', AttributeType: 'S' }],
     BillingMode: 'PAY_PER_REQUEST',
   },
   {
-    TableName: `wwe-2k-league-api-wrestler-costs-${STAGE}`,
+    TableName: `universe-tracker-api-wrestler-costs-${STAGE}`,
     KeySchema: [{ AttributeName: 'playerId', KeyType: 'HASH' }],
     AttributeDefinitions: [{ AttributeName: 'playerId', AttributeType: 'S' }],
     BillingMode: 'PAY_PER_REQUEST',
   },
   {
-    TableName: `wwe-2k-league-api-fantasy-picks-${STAGE}`,
+    TableName: `universe-tracker-api-fantasy-picks-${STAGE}`,
     KeySchema: [
       { AttributeName: 'eventId', KeyType: 'HASH' },
       { AttributeName: 'fantasyUserId', KeyType: 'RANGE' },
@@ -219,13 +219,13 @@ const tables = [
     ],
   },
   {
-    TableName: `wwe-2k-league-api-site-config-${STAGE}`,
+    TableName: `universe-tracker-api-site-config-${STAGE}`,
     KeySchema: [{ AttributeName: 'configKey', KeyType: 'HASH' }],
     AttributeDefinitions: [{ AttributeName: 'configKey', AttributeType: 'S' }],
     BillingMode: 'PAY_PER_REQUEST',
   },
   {
-    TableName: `wwe-2k-league-api-challenges-${STAGE}`,
+    TableName: `universe-tracker-api-challenges-${STAGE}`,
     KeySchema: [{ AttributeName: 'challengeId', KeyType: 'HASH' }],
     AttributeDefinitions: [
       { AttributeName: 'challengeId', AttributeType: 'S' },
@@ -263,7 +263,7 @@ const tables = [
     ],
   },
   {
-    TableName: `wwe-2k-league-api-promos-${STAGE}`,
+    TableName: `universe-tracker-api-promos-${STAGE}`,
     KeySchema: [{ AttributeName: 'promoId', KeyType: 'HASH' }],
     AttributeDefinitions: [
       { AttributeName: 'promoId', AttributeType: 'S' },
@@ -292,13 +292,13 @@ const tables = [
     ],
   },
   {
-    TableName: `wwe-2k-league-api-stipulations-${STAGE}`,
+    TableName: `universe-tracker-api-stipulations-${STAGE}`,
     KeySchema: [{ AttributeName: 'stipulationId', KeyType: 'HASH' }],
     AttributeDefinitions: [{ AttributeName: 'stipulationId', AttributeType: 'S' }],
     BillingMode: 'PAY_PER_REQUEST',
   },
   {
-    TableName: `wwe-2k-league-api-match-types-${STAGE}`,
+    TableName: `universe-tracker-api-match-types-${STAGE}`,
     KeySchema: [{ AttributeName: 'matchTypeId', KeyType: 'HASH' }],
     AttributeDefinitions: [{ AttributeName: 'matchTypeId', AttributeType: 'S' }],
     BillingMode: 'PAY_PER_REQUEST',

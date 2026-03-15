@@ -59,13 +59,13 @@ When using MCP Playwright for browser automation, use the following tools:
 ### Example Workflow for Site Verification:
 
 1. Navigate to the site:
-   browser_navigate({ url: "http://dev.leagueszn.jpdxsolo.com" })
+   browser_navigate({ url: "https://universe.jpdxsolo.com" })
 
 2. Take a screenshot of standings:
    browser_screenshot()
 
 3. Navigate to admin:
-   browser_navigate({ url: "http://dev.leagueszn.jpdxsolo.com/admin" })
+   browser_navigate({ url: "https://universe.jpdxsolo.com/admin" })
 
 4. Login:
    browser_fill({ selector: "#username", value: "admin" })
@@ -123,12 +123,8 @@ export const mcpEnvironments = {
     apiUrl: 'http://localhost:3001/dev',
   },
   dev: {
-    baseUrl: 'http://dev.leagueszn.jpdxsolo.com',
-    apiUrl: 'https://dgsmskbzb2.execute-api.us-east-1.amazonaws.com/devtest',
-  },
-  prod: {
-    baseUrl: 'http://leagueszn.jpdxsolo.com',
-    apiUrl: 'https://9pcccl0caj.execute-api.us-east-1.amazonaws.com/dev',
+    baseUrl: 'https://universe.jpdxsolo.com',
+    apiUrl: '<TBD after first deploy>',
   },
 };
 

@@ -2,7 +2,7 @@ import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 
 const lambda = new LambdaClient({});
 
-const SERVICE_NAME = process.env.SERVICE_NAME || 'wwe-2k-league-api';
+const SERVICE_NAME = process.env.SERVICE_NAME || 'universe-tracker-api';
 const STAGE = process.env.STAGE || 'dev';
 
 /**

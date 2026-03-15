@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const baseURL = process.env.TEST_BASE_URL || 'http://dev.leagueszn.jpdxsolo.com';
+const baseURL = process.env.TEST_BASE_URL || 'https://universe.jpdxsolo.com';
 
 export default defineConfig({
   testDir: './tests',

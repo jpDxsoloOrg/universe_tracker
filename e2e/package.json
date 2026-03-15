@@ -19,7 +19,7 @@
     "report": "npx playwright show-report ./reports/html",
     "install-browsers": "npx playwright install",
     "screenshots": "npx ts-node take-screenshots.ts",
-    "screenshots:dev": "SCREENSHOT_BASE_URL=https://dev.leagueszn.jpdxsolo.com npx ts-node take-screenshots.ts"
+    "screenshots:dev": "SCREENSHOT_BASE_URL=https://universe.jpdxsolo.com npx ts-node take-screenshots.ts"
   },
   "dependencies": {
     "@playwright/test": "^1.56.0",

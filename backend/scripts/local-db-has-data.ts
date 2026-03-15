@@ -2,7 +2,7 @@ import { DynamoDBClient, ListTablesCommand, ScanCommand } from '@aws-sdk/client-
 
 const stage = process.env.STAGE || 'offline';
 const dynamoDbEndpoint = process.env.DYNAMODB_ENDPOINT || 'http://localhost:8000';
-const prefix = 'wwe-2k-league-api-';
+const prefix = 'universe-tracker-api-';
 const suffix = `-${stage}`;
 
 const client = new DynamoDBClient({

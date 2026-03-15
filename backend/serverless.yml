@@ -1,4 +1,4 @@
-service: wwe-2k-league-api
+service: universe-tracker-api
 
 frameworkVersion: '3'
 
@@ -32,10 +32,10 @@ provider:
     MATCH_TYPES_TABLE: ${self:service}-match-types-${self:provider.stage}
     SEASON_AWARDS_TABLE: ${self:service}-season-awards-${self:provider.stage}
     DYNAMODB_ENDPOINT: ${env:DYNAMODB_ENDPOINT, 'http://localhost:8000'}
-    COGNITO_USER_POOL_ID: !Ref LeagueUserPool
-    COGNITO_CLIENT_ID: !Ref LeagueUserPoolClient
+    COGNITO_USER_POOL_ID: 'us-east-1_5GZ9UY8V2'
+    COGNITO_CLIENT_ID: '5bn99khg7knh9v0t5dqbjpgh1d'
     ADMIN_SETUP_KEY: ${env:ADMIN_SETUP_KEY, 'default-dev-key-change-in-production'}
-    ALLOWED_ORIGIN: ${self:custom.allowedOrigin.${self:provider.stage}, 'https://leagueszn.jpdxsolo.com'}
+    ALLOWED_ORIGIN: ${self:custom.allowedOrigin.${self:provider.stage}, 'https://universe.jpdxsolo.com'}
   iam:
     role:
       statements:
@@ -97,7 +97,7 @@ provider:
             - cognito-idp:ListUsers
             - cognito-idp:ListUsersInGroup
           Resource:
-            - !GetAtt LeagueUserPool.Arn
+            - arn:aws:cognito-idp:us-east-1:435238036810:userpool/us-east-1_5GZ9UY8V2
         - Effect: Allow
           Action:
             - lambda:InvokeFunction
@@ -113,7 +113,6 @@ plugins:
 custom:
   splitStacksEnabled:
     dev: true
-    devtest: true
     offline: false
   splitStacks:
     perFunction: false
@@ -124,12 +123,10 @@ custom:
     environment:
       IS_OFFLINE: 'true'
   allowedOrigin:
-    dev: https://leagueszn.jpdxsolo.com
-    devtest: https://dev.leagueszn.jpdxsolo.com
-    prod: https://leagueszn.jpdxsolo.com
+    dev: https://universe.jpdxsolo.com
     offline: '*'
   corsConfig: &corsConfig
-    origin: ${self:custom.allowedOrigin.${self:provider.stage}, 'https://leagueszn.jpdxsolo.com'}
+    origin: ${self:custom.allowedOrigin.${self:provider.stage}, 'https://universe.jpdxsolo.com'}
     headers:
       - Content-Type
       - X-Amz-Date
@@ -139,19 +136,13 @@ custom:
       - X-Amz-User-Agent
     allowCredentials: true
   frontendBucket:
-    dev: leagueszn.jpdxsolo.com
-    devtest: dev.leagueszn.jpdxsolo.com
-    prod: leagueszn.jpdxsolo.com
+    dev: universe.jpdxsolo.com
     offline: 'localhost'
   frontendDomain:
-    dev: leagueszn.jpdxsolo.com
-    devtest: dev.leagueszn.jpdxsolo.com
-    prod: leagueszn.jpdxsolo.com
+    dev: universe.jpdxsolo.com
     offline: 'localhost'
   certificateArn:
-    dev: ${env:PROD_ACM_CERTIFICATE_ARN, ''}
-    devtest: ${env:DEV_ACM_CERTIFICATE_ARN, ''}
-    prod: ${env:PROD_ACM_CERTIFICATE_ARN, ''}
+    dev: ${env:ACM_CERTIFICATE_ARN, ''}
     offline: ''
 
 functions:
@@ -715,7 +706,7 @@ resources:
       Type: AWS::ApiGateway::GatewayResponse
       Properties:
         ResponseParameters:
-          gatewayresponse.header.Access-Control-Allow-Origin: "'${self:custom.allowedOrigin.${self:provider.stage}, 'https://leagueszn.jpdxsolo.com'}'"
+          gatewayresponse.header.Access-Control-Allow-Origin: "'${self:custom.allowedOrigin.${self:provider.stage}, 'https://universe.jpdxsolo.com'}'"
           gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
           gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
         ResponseType: DEFAULT_4XX
@@ -726,7 +717,7 @@ resources:
       Type: AWS::ApiGateway::GatewayResponse
       Properties:
         ResponseParameters:
-          gatewayresponse.header.Access-Control-Allow-Origin: "'${self:custom.allowedOrigin.${self:provider.stage}, 'https://leagueszn.jpdxsolo.com'}'"
+          gatewayresponse.header.Access-Control-Allow-Origin: "'${self:custom.allowedOrigin.${self:provider.stage}, 'https://universe.jpdxsolo.com'}'"
           gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
           gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
         ResponseType: DEFAULT_5XX
@@ -737,7 +728,7 @@ resources:
       Type: AWS::ApiGateway::GatewayResponse
       Properties:
         ResponseParameters:
-          gatewayresponse.header.Access-Control-Allow-Origin: "'${self:custom.allowedOrigin.${self:provider.stage}, 'https://leagueszn.jpdxsolo.com'}'"
+          gatewayresponse.header.Access-Control-Allow-Origin: "'${self:custom.allowedOrigin.${self:provider.stage}, 'https://universe.jpdxsolo.com'}'"
           gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
           gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
         ResponseType: UNAUTHORIZED
@@ -748,95 +739,12 @@ resources:
       Type: AWS::ApiGateway::GatewayResponse
       Properties:
         ResponseParameters:
-          gatewayresponse.header.Access-Control-Allow-Origin: "'${self:custom.allowedOrigin.${self:provider.stage}, 'https://leagueszn.jpdxsolo.com'}'"
+          gatewayresponse.header.Access-Control-Allow-Origin: "'${self:custom.allowedOrigin.${self:provider.stage}, 'https://universe.jpdxsolo.com'}'"
           gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
           gatewayresponse.header.Access-Control-Allow-Methods: "'GET,POST,PUT,DELETE,OPTIONS'"
         ResponseType: ACCESS_DENIED
         RestApiId:
           Ref: ApiGatewayRestApi
-
-    # New Cognito User Pool (v3) with email login and roles
-    # PostConfirmation trigger is attached via setup-cognito.sh after deploy
-    # (can't be in CloudFormation due to circular dep with shared IAM role)
-    LeagueUserPool:
-      Type: AWS::Cognito::UserPool
-      Properties:
-        UserPoolName: ${self:service}-pool-v3-${self:provider.stage}
-        AdminCreateUserConfig:
-          AllowAdminCreateUserOnly: false
-        AutoVerifiedAttributes:
-          - email
-        UsernameAttributes:
-          - email
-        Schema:
-          - Name: email
-            Required: true
-            Mutable: true
-          - Name: wrestler_name
-            AttributeDataType: String
-            Mutable: true
-            StringAttributeConstraints:
-              MinLength: '0'
-              MaxLength: '100'
-        Policies:
-          PasswordPolicy:
-            MinimumLength: 8
-            RequireLowercase: true
-            RequireNumbers: true
-            RequireSymbols: false
-            RequireUppercase: true
-
-    # Cognito Groups for role-based access
-    AdminGroup:
-      Type: AWS::Cognito::UserPoolGroup
-      Properties:
-        GroupName: Admin
-        UserPoolId: !Ref LeagueUserPool
-        Description: Full access to all features including user management
-        Precedence: 0
-
-    ModeratorGroup:
-      Type: AWS::Cognito::UserPoolGroup
-      Properties:
-        GroupName: Moderator
-        UserPoolId: !Ref LeagueUserPool
-        Description: Admin-level access except cannot manage Admin/Moderator roles or delete all data
-        Precedence: 1
-
-    WrestlerGroup:
-      Type: AWS::Cognito::UserPoolGroup
-      Properties:
-        GroupName: Wrestler
-        UserPoolId: !Ref LeagueUserPool
-        Description: Access to wrestler features (challenges, promos) plus fantasy
-        Precedence: 2
-
-    FantasyGroup:
-      Type: AWS::Cognito::UserPoolGroup
-      Properties:
-        GroupName: Fantasy
-        UserPoolId: !Ref LeagueUserPool
-        Description: Access to fantasy features and public data
-        Precedence: 3
-
-    LeagueUserPoolClient:
-      Type: AWS::Cognito::UserPoolClient
-      Properties:
-        ClientName: ${self:service}-client-v3-${self:provider.stage}
-        UserPoolId: !Ref LeagueUserPool
-        GenerateSecret: false
-        ExplicitAuthFlows:
-          - ALLOW_USER_PASSWORD_AUTH
-          - ALLOW_REFRESH_TOKEN_AUTH
-          - ALLOW_USER_SRP_AUTH
-        PreventUserExistenceErrors: ENABLED
-        AccessTokenValidity: 24
-        IdTokenValidity: 24
-        RefreshTokenValidity: 30
-        TokenValidityUnits:
-          AccessToken: hours
-          IdToken: hours
-          RefreshToken: days
 
     PlayersTable:
       Type: AWS::DynamoDB::Table
@@ -1297,13 +1205,13 @@ resources:
       Properties:
         DistributionConfig:
           Enabled: true
-          Comment: CloudFront distribution for ${self:custom.frontendDomain.${self:provider.stage}, 'leagueszn.jpdxsolo.com'}
+          Comment: CloudFront distribution for ${self:custom.frontendDomain.${self:provider.stage}, 'universe.jpdxsolo.com'}
           DefaultRootObject: index.html
           Aliases:
-            - ${self:custom.frontendDomain.${self:provider.stage}, 'leagueszn.jpdxsolo.com'}
+            - ${self:custom.frontendDomain.${self:provider.stage}, 'universe.jpdxsolo.com'}
           Origins:
             - Id: S3WebsiteOrigin
-              DomainName: ${self:custom.frontendBucket.${self:provider.stage}, 'leagueszn.jpdxsolo.com'}.s3-website-us-east-1.amazonaws.com
+              DomainName: ${self:custom.frontendBucket.${self:provider.stage}, 'universe.jpdxsolo.com'}.s3-website-us-east-1.amazonaws.com
               CustomOriginConfig:
                 HTTPPort: 80
                 HTTPSPort: 443
@@ -1353,13 +1261,3 @@ resources:
       Value: !GetAtt FrontendCloudFrontDistribution.DomainName
       Export:
         Name: ${self:service}-${self:provider.stage}-CloudFrontDomainName
-    CognitoUserPoolId:
-      Description: Cognito User Pool ID
-      Value: !Ref LeagueUserPool
-      Export:
-        Name: ${self:service}-${self:provider.stage}-CognitoUserPoolId
-    CognitoUserPoolClientId:
-      Description: Cognito User Pool Client ID
-      Value: !Ref LeagueUserPoolClient
-      Export:
-        Name: ${self:service}-${self:provider.stage}-CognitoUserPoolClientId

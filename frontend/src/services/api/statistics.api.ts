@@ -1,5 +1,5 @@
 import type {
-  PlayerStatistics,
+  WrestlerStatistics,
   HeadToHead,
   ChampionshipStats,
   Achievement,
@@ -8,28 +8,28 @@ import type {
 } from '../../types/statistics';
 import { API_BASE_URL, fetchWithAuth } from './apiClient';
 
-export interface StatsPlayer {
-  playerId: string;
+export interface StatsWrestler {
+  wrestlerId: string;
   name: string;
   wrestlerName: string;
 }
 
-export interface PlayerStatsResponse {
-  players: StatsPlayer[];
-  statistics?: PlayerStatistics[];
+export interface WrestlerStatsResponse {
+  wrestlers: StatsWrestler[];
+  statistics?: WrestlerStatistics[];
   championshipStats?: (ChampionshipStats & { championshipName?: string })[];
   achievements?: Achievement[];
 }
 
 export interface HeadToHeadResponse {
-  players: StatsPlayer[];
+  wrestlers: StatsWrestler[];
   headToHead: HeadToHead | null;
-  player1Stats: PlayerStatistics;
-  player2Stats: PlayerStatistics;
+  wrestler1Stats: WrestlerStatistics;
+  wrestler2Stats: WrestlerStatistics;
 }
 
 export interface LeaderboardsResponse {
-  players: StatsPlayer[];
+  wrestlers: StatsWrestler[];
   leaderboards: Record<string, LeaderboardEntry[]>;
 }
 
@@ -39,15 +39,15 @@ export interface RecordsResponse {
     recordName: string;
     currentHolder: string;
     currentValue: number | string;
-    threatPlayer: string;
+    threatWrestler: string;
     threatValue: number | string;
     gapDescription: string;
   }[];
 }
 
 export interface AchievementsResponse {
-  players: StatsPlayer[];
-  allAchievements: Omit<Achievement, 'playerId' | 'earnedAt'>[];
+  wrestlers: StatsWrestler[];
+  allAchievements: Omit<Achievement, 'wrestlerId' | 'earnedAt'>[];
   achievements?: Achievement[];
 }
 
@@ -61,20 +61,19 @@ export interface RatedMatchSummary {
   losers?: string[];
 }
 
-export interface PlayerAverageRating {
-  playerId: string;
+export interface WrestlerAverageRating {
+  wrestlerId: string;
   averageRating: number;
   matchCount: number;
 }
 
 export interface MatchRatingsResponse {
   highestRatedMatches: RatedMatchSummary[];
-  playerAverageRatings: PlayerAverageRating[];
+  wrestlerAverageRatings: WrestlerAverageRating[];
 }
 
 export interface MatchTypeStatsEntry {
-  playerId: string;
-  playerName: string;
+  wrestlerId: string;
   wrestlerName: string;
   wins: number;
   losses: number;
@@ -95,7 +94,7 @@ export interface MatchTypeLeaderboardsResponse {
   };
 }
 
-export interface PlayerMatchStatsByType {
+export interface WrestlerMatchStatsByType {
   wins: number;
   losses: number;
   draws: number;
@@ -103,30 +102,29 @@ export interface PlayerMatchStatsByType {
   winPercentage: number;
 }
 
-export interface PlayerMatchStatsResponse {
-  playerId: string;
-  playerName: string;
+export interface WrestlerMatchStatsResponse {
+  wrestlerId: string;
   wrestlerName: string;
-  overall: PlayerMatchStatsByType;
-  byMatchType: Record<string, PlayerMatchStatsByType>;
+  overall: WrestlerMatchStatsByType;
+  byMatchType: Record<string, WrestlerMatchStatsByType>;
   seasonId?: string;
 }
 
 export const statisticsApi = {
-  getPlayerStats: async (playerId?: string, seasonId?: string, signal?: AbortSignal): Promise<PlayerStatsResponse> => {
+  getWrestlerStats: async (wrestlerId?: string, seasonId?: string, signal?: AbortSignal): Promise<WrestlerStatsResponse> => {
     const params = new URLSearchParams({ section: 'player-stats' });
-    if (playerId) params.set('playerId', playerId);
+    if (wrestlerId) params.set('playerId', wrestlerId);
     if (seasonId) params.set('seasonId', seasonId);
     return fetchWithAuth(`${API_BASE_URL}/statistics?${params}`, {}, signal);
   },
 
-  getHeadToHead: async (player1Id: string, player2Id: string, seasonId?: string, signal?: AbortSignal): Promise<HeadToHeadResponse> => {
-    const params = new URLSearchParams({ section: 'head-to-head', player1Id, player2Id });
+  getHeadToHead: async (wrestler1Id: string, wrestler2Id: string, seasonId?: string, signal?: AbortSignal): Promise<HeadToHeadResponse> => {
+    const params = new URLSearchParams({ section: 'head-to-head', player1Id: wrestler1Id, player2Id: wrestler2Id });
     if (seasonId) params.set('seasonId', seasonId);
     return fetchWithAuth(`${API_BASE_URL}/statistics?${params}`, {}, signal);
   },
 
-  getHeadToHeadPlayers: async (signal?: AbortSignal): Promise<{ players: StatsPlayer[] }> => {
+  getHeadToHeadWrestlers: async (signal?: AbortSignal): Promise<{ wrestlers: StatsWrestler[] }> => {
     const params = new URLSearchParams({ section: 'head-to-head' });
     return fetchWithAuth(`${API_BASE_URL}/statistics?${params}`, {}, signal);
   },
@@ -142,9 +140,9 @@ export const statisticsApi = {
     return fetchWithAuth(`${API_BASE_URL}/statistics?${params}`, {}, signal);
   },
 
-  getAchievements: async (playerId?: string, signal?: AbortSignal): Promise<AchievementsResponse> => {
+  getAchievements: async (wrestlerId?: string, signal?: AbortSignal): Promise<AchievementsResponse> => {
     const params = new URLSearchParams({ section: 'achievements' });
-    if (playerId) params.set('playerId', playerId);
+    if (wrestlerId) params.set('playerId', wrestlerId);
     return fetchWithAuth(`${API_BASE_URL}/statistics?${params}`, {}, signal);
   },
 
@@ -164,10 +162,10 @@ export const statisticsApi = {
     return fetchWithAuth(`${API_BASE_URL}/statistics?${params}`, {}, signal);
   },
 
-  getPlayerMatchStats: async (playerId: string, seasonId?: string, signal?: AbortSignal): Promise<PlayerMatchStatsResponse> => {
+  getWrestlerMatchStats: async (wrestlerId: string, seasonId?: string, signal?: AbortSignal): Promise<WrestlerMatchStatsResponse> => {
     const params = new URLSearchParams();
     if (seasonId) params.set('seasonId', seasonId);
     const qs = params.toString();
-    return fetchWithAuth(`${API_BASE_URL}/players/${playerId}/statistics${qs ? `?${qs}` : ''}`, {}, signal);
+    return fetchWithAuth(`${API_BASE_URL}/wrestlers/${wrestlerId}/statistics${qs ? `?${qs}` : ''}`, {}, signal);
   },
 };

@@ -1,9 +1,9 @@
-.player-hover-card-trigger {
+.wrestler-hover-card-trigger {
   position: relative;
   display: inline-block;
 }
 
-.player-hover-card {
+.wrestler-hover-card {
   position: absolute;
   left: 50%;
   bottom: 100%;
@@ -18,17 +18,17 @@
   pointer-events: none;
 }
 
-.player-hover-card-row {
+.wrestler-hover-card-row {
   font-size: 0.8rem;
   color: #ccc;
   white-space: nowrap;
 }
 
-.player-hover-card-row + .player-hover-card-row {
+.wrestler-hover-card-row + .wrestler-hover-card-row {
   margin-top: 0.25rem;
 }
 
-.player-hover-card-label {
+.wrestler-hover-card-label {
   color: #888;
   margin-right: 0.5rem;
 }

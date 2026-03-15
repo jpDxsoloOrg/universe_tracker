@@ -15,7 +15,7 @@ function RecordBook() {
     recordName: string;
     currentHolder: string;
     currentValue: number | string;
-    threatPlayer: string;
+    threatWrestler: string;
     threatValue: number | string;
     gapDescription: string;
   }[]>([]);
@@ -64,7 +64,7 @@ function RecordBook() {
       <div className="rb-header">
         <h2>{t('statistics.recordBook.title')}</h2>
         <div className="rb-nav-links">
-          <Link to="/stats">{t('statistics.nav.playerStats')}</Link>
+          <Link to="/stats">{t('statistics.nav.wrestlerStats')}</Link>
           <Link to="/stats/leaderboards">{t('statistics.nav.leaderboards')}</Link>
           <Link to="/stats/achievements">{t('statistics.nav.achievements')}</Link>
         </div>
@@ -124,7 +124,7 @@ function RecordBook() {
                   <div className="rb-threat-arrow">vs</div>
                   <div className="rb-threat-challenger">
                     <span className="rb-threat-label">{t('statistics.recordBook.challenger')}</span>
-                    <span className="rb-threat-holder">{threat.threatPlayer}</span>
+                    <span className="rb-threat-holder">{threat.threatWrestler}</span>
                     <span className="rb-threat-value">{threat.threatValue}</span>
                   </div>
                 </div>

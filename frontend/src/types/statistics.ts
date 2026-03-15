@@ -1,5 +1,5 @@
-export interface PlayerStatistics {
-  playerId: string;
+export interface WrestlerStatistics {
+  wrestlerId: string;
   statType: 'overall' | 'singles' | 'tag' | 'ladder' | 'cage';
   wins: number;
   losses: number;
@@ -18,10 +18,10 @@ export interface PlayerStatistics {
 
 export interface HeadToHead {
   matchupKey: string;
-  player1Id: string;
-  player2Id: string;
-  player1Wins: number;
-  player2Wins: number;
+  wrestler1Id: string;
+  wrestler2Id: string;
+  wrestler1Wins: number;
+  wrestler2Wins: number;
   draws: number;
   totalMatches: number;
   lastMatchDate?: string;
@@ -36,7 +36,7 @@ export interface HeadToHead {
 }
 
 export interface ChampionshipStats {
-  playerId: string;
+  wrestlerId: string;
   championshipId: string;
   totalReigns: number;
   totalDaysHeld: number;
@@ -51,7 +51,7 @@ export interface ChampionshipStats {
 }
 
 export interface Achievement {
-  playerId: string;
+  wrestlerId: string;
   achievementId: string;
   achievementName: string;
   achievementType: 'milestone' | 'record' | 'special';
@@ -62,8 +62,7 @@ export interface Achievement {
 }
 
 export interface LeaderboardEntry {
-  playerId: string;
-  playerName: string;
+  wrestlerId: string;
   wrestlerName: string;
   value: number;
   rank: number;

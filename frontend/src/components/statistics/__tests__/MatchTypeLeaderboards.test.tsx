@@ -30,7 +30,7 @@ vi.mock('react-i18next', () => ({
     t: (key: string, options?: Record<string, string>) => {
       const map: Record<string, string> = {
         'statistics.matchTypeLeaderboards.title': 'Match Type Leaderboards',
-        'statistics.nav.playerStats': 'Player Stats',
+        'statistics.nav.wrestlerStats': 'Wrestler Stats',
         'statistics.nav.leaderboards': 'Leaderboards',
         'statistics.nav.records': 'Record Book',
         'statistics.labels.matchType': 'Match Type',
@@ -66,8 +66,8 @@ describe('MatchTypeLeaderboards', () => {
     mockGetMatchTypeLeaderboards.mockResolvedValue({
       leaderboard: [
         {
-          playerId: 'p1',
-          playerName: 'John Cena',
+          wrestlerId: 'p1',
+          wrestlerName: 'John Cena',
           wrestlerName: 'The Champ',
           wins: 5,
           losses: 1,
@@ -100,8 +100,8 @@ describe('MatchTypeLeaderboards', () => {
       .mockResolvedValueOnce({
         leaderboard: [
           {
-            playerId: 'p1',
-            playerName: 'John Cena',
+            wrestlerId: 'p1',
+            wrestlerName: 'John Cena',
             wrestlerName: 'The Champ',
             wins: 5,
             losses: 1,

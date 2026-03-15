@@ -3,14 +3,14 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 
 // --- Hoisted mocks ---
-const { mockGetAllPlayers, mockCreateTournament } = vi.hoisted(() => ({
-  mockGetAllPlayers: vi.fn(),
+const { mockGetAllWrestlers, mockCreateTournament } = vi.hoisted(() => ({
+  mockGetAllWrestlers: vi.fn(),
   mockCreateTournament: vi.fn(),
 }));
 
 vi.mock('../../../services/api', () => ({
-  playersApi: {
-    getAll: mockGetAllPlayers,
+  wrestlersApi: {
+    getAll: mockGetAllWrestlers,
   },
   tournamentsApi: {
     create: mockCreateTournament,
@@ -23,12 +23,12 @@ vi.mock('../CreateTournament.css', () => ({}));
 import CreateTournament from '../CreateTournament';
 
 // --- Test data ---
-const mockPlayers = [
-  { playerId: 'p1', name: 'John Cena', currentWrestler: 'The Doctor of Thuganomics', wins: 10, losses: 2, draws: 1, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
-  { playerId: 'p2', name: 'The Rock', currentWrestler: 'The Great One', wins: 8, losses: 3, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
-  { playerId: 'p3', name: 'Undertaker', currentWrestler: 'The Deadman', wins: 15, losses: 5, draws: 2, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
-  { playerId: 'p4', name: 'Triple H', currentWrestler: 'The Game', wins: 12, losses: 4, draws: 1, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
-  { playerId: 'p5', name: 'Stone Cold', currentWrestler: 'The Rattlesnake', wins: 20, losses: 5, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+const mockWrestlers = [
+  { wrestlerId: 'p1', name: 'John Cena', wins: 10, losses: 2, draws: 1, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+  { wrestlerId: 'p2', name: 'The Rock', wins: 8, losses: 3, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+  { wrestlerId: 'p3', name: 'Undertaker', wins: 15, losses: 5, draws: 2, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+  { wrestlerId: 'p4', name: 'Triple H', wins: 12, losses: 4, draws: 1, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+  { wrestlerId: 'p5', name: 'Stone Cold', wins: 20, losses: 5, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
 ];
 
 function renderCreateTournament() {
@@ -45,7 +45,7 @@ describe('CreateTournament', () => {
   });
 
   it('renders form with type selection and participant list', async () => {
-    mockGetAllPlayers.mockResolvedValue(mockPlayers);
+    mockGetAllWrestlers.mockResolvedValue(mockWrestlers);
 
     renderCreateTournament();
 
@@ -69,14 +69,14 @@ describe('CreateTournament', () => {
     // Participants header with count
     expect(screen.getByText('Participants (Selected: 0)')).toBeInTheDocument();
 
-    // All player cards rendered (name appears in participant-name div)
+    // All wrestler cards rendered (name appears in participant-name div)
     expect(screen.getByText('John Cena')).toBeInTheDocument();
     expect(screen.getByText('The Rock')).toBeInTheDocument();
     expect(screen.getByText('Undertaker')).toBeInTheDocument();
     expect(screen.getByText('Triple H')).toBeInTheDocument();
     expect(screen.getByText('Stone Cold')).toBeInTheDocument();
 
-    // Player records displayed as compound text within participant-record divs
+    // Wrestler records displayed as compound text within participant-record divs
     const recordDivs = document.querySelectorAll('.participant-record');
     expect(recordDivs.length).toBe(5);
 
@@ -85,7 +85,7 @@ describe('CreateTournament', () => {
   });
 
   it('validates minimum number of participants for single elimination', async () => {
-    mockGetAllPlayers.mockResolvedValue(mockPlayers);
+    mockGetAllWrestlers.mockResolvedValue(mockWrestlers);
 
     renderCreateTournament();
 
@@ -116,7 +116,7 @@ describe('CreateTournament', () => {
   });
 
   it('submits tournament creation with valid data', async () => {
-    mockGetAllPlayers.mockResolvedValue(mockPlayers);
+    mockGetAllWrestlers.mockResolvedValue(mockWrestlers);
     mockCreateTournament.mockResolvedValue({
       tournamentId: 't1',
       name: 'King of the Ring',
@@ -169,7 +169,7 @@ describe('CreateTournament', () => {
   });
 
   it('validates power-of-two participant count for single elimination', async () => {
-    mockGetAllPlayers.mockResolvedValue(mockPlayers);
+    mockGetAllWrestlers.mockResolvedValue(mockWrestlers);
 
     renderCreateTournament();
 

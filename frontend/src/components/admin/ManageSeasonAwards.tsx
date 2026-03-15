@@ -1,14 +1,14 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { seasonAwardsApi, seasonsApi, playersApi } from '../../services/api';
+import { seasonAwardsApi, seasonsApi, wrestlersApi } from '../../services/api';
 import type { SeasonAwardsResponse } from '../../services/api';
-import type { Season, Player, SeasonAward } from '../../types';
+import type { Season, Wrestler, SeasonAward } from '../../types';
 import './ManageSeasonAwards.css';
 
 export default function ManageSeasonAwards() {
   const { t } = useTranslation();
   const [seasons, setSeasons] = useState<Season[]>([]);
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [wrestlers, setWrestlers] = useState<Wrestler[]>([]);
   const [selectedSeasonId, setSelectedSeasonId] = useState('');
   const [awardsData, setAwardsData] = useState<SeasonAwardsResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -16,7 +16,7 @@ export default function ManageSeasonAwards() {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ name: '', playerId: '', description: '' });
+  const [formData, setFormData] = useState({ name: '', wrestlerId: '', description: '' });
 
   useEffect(() => {
     loadInitialData();
@@ -33,12 +33,12 @@ export default function ManageSeasonAwards() {
   const loadInitialData = async () => {
     try {
       setLoading(true);
-      const [seasonsData, playersData] = await Promise.all([
+      const [seasonsData, wrestlersData] = await Promise.all([
         seasonsApi.getAll(),
-        playersApi.getAll(),
+        wrestlersApi.getAll(),
       ]);
       setSeasons(seasonsData);
-      setPlayers(playersData);
+      setWrestlers(wrestlersData);
       const firstSeason = seasonsData[0];
       if (firstSeason) {
         setSelectedSeasonId(firstSeason.seasonId);
@@ -64,17 +64,17 @@ export default function ManageSeasonAwards() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!selectedSeasonId || !formData.name || !formData.playerId) return;
+    if (!selectedSeasonId || !formData.name || !formData.wrestlerId) return;
 
     try {
       setError(null);
       await seasonAwardsApi.create(selectedSeasonId, {
         name: formData.name,
-        playerId: formData.playerId,
+        wrestlerId: formData.wrestlerId,
         description: formData.description || undefined,
       });
       setSuccessMsg(t('seasonAwards.admin.createSuccess'));
-      setFormData({ name: '', playerId: '', description: '' });
+      setFormData({ name: '', wrestlerId: '', description: '' });
       setShowForm(false);
       await loadAwards(selectedSeasonId);
     } catch (err) {
@@ -142,16 +142,16 @@ export default function ManageSeasonAwards() {
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="award-player">{t('seasonAwards.admin.awardPlayer')}</label>
+                <label htmlFor="award-wrestler">{t('seasonAwards.admin.awardWrestler')}</label>
                 <select
-                  id="award-player"
-                  value={formData.playerId}
-                  onChange={e => setFormData({ ...formData, playerId: e.target.value })}
+                  id="award-wrestler"
+                  value={formData.wrestlerId}
+                  onChange={e => setFormData({ ...formData, wrestlerId: e.target.value })}
                   required
                 >
-                  <option value="">{t('seasonAwards.admin.choosePlayer')}</option>
-                  {players.map(p => (
-                    <option key={p.playerId} value={p.playerId}>
+                  <option value="">{t('seasonAwards.admin.chooseWrestler')}</option>
+                  {wrestlers.map(p => (
+                    <option key={p.wrestlerId} value={p.wrestlerId}>
                       {p.name}
                     </option>
                   ))}
@@ -183,7 +183,7 @@ export default function ManageSeasonAwards() {
                     <thead>
                       <tr>
                         <th>{t('seasonAwards.admin.awardName')}</th>
-                        <th>{t('seasonAwards.admin.awardPlayer')}</th>
+                        <th>{t('seasonAwards.admin.awardWrestler')}</th>
                         <th>{t('seasonAwards.admin.value')}</th>
                       </tr>
                     </thead>
@@ -191,7 +191,7 @@ export default function ManageSeasonAwards() {
                       {awardsData.autoAwards.map(award => (
                         <tr key={award.awardId}>
                           <td>{award.name}</td>
-                          <td>{award.playerName}</td>
+                          <td>{award.wrestlerName}</td>
                           <td>{award.value || '-'}</td>
                         </tr>
                       ))}
@@ -207,7 +207,7 @@ export default function ManageSeasonAwards() {
                     <thead>
                       <tr>
                         <th>{t('seasonAwards.admin.awardName')}</th>
-                        <th>{t('seasonAwards.admin.awardPlayer')}</th>
+                        <th>{t('seasonAwards.admin.awardWrestler')}</th>
                         <th>{t('seasonAwards.admin.description')}</th>
                         <th>{t('common.delete')}</th>
                       </tr>
@@ -216,7 +216,7 @@ export default function ManageSeasonAwards() {
                       {awardsData.customAwards.map(award => (
                         <tr key={award.awardId}>
                           <td>{award.name}</td>
-                          <td>{award.playerName}</td>
+                          <td>{award.wrestlerName}</td>
                           <td>{award.description || '-'}</td>
                           <td>
                             <button

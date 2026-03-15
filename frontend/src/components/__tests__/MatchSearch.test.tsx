@@ -5,14 +5,14 @@ import { MemoryRouter } from 'react-router-dom';
 // --- Hoisted mocks ---
 const {
   mockGetAllMatches,
-  mockGetAllPlayers,
+  mockGetAllWrestlers,
   mockGetAllSeasons,
   mockGetAllChampionships,
   mockGetAllStipulations,
   mockGetAllMatchTypes,
 } = vi.hoisted(() => ({
   mockGetAllMatches: vi.fn(),
-  mockGetAllPlayers: vi.fn(),
+  mockGetAllWrestlers: vi.fn(),
   mockGetAllSeasons: vi.fn(),
   mockGetAllChampionships: vi.fn(),
   mockGetAllStipulations: vi.fn(),
@@ -21,7 +21,7 @@ const {
 
 vi.mock('../../services/api', () => ({
   matchesApi: { getAll: mockGetAllMatches },
-  playersApi: { getAll: mockGetAllPlayers },
+  wrestlersApi: { getAll: mockGetAllWrestlers },
   seasonsApi: { getAll: mockGetAllSeasons },
   championshipsApi: { getAll: mockGetAllChampionships },
   stipulationsApi: { getAll: mockGetAllStipulations },
@@ -34,7 +34,7 @@ vi.mock('react-i18next', () => ({
       const translations: Record<string, string> = {
         'matchSearch.title': 'Match Search',
         'matchSearch.filtersLabel': 'Match filters',
-        'matchSearch.filters.player': 'Player',
+        'matchSearch.filters.wrestler': 'Wrestler',
         'matchSearch.filters.matchType': 'Match Type',
         'matchSearch.filters.stipulation': 'Stipulation',
         'matchSearch.filters.status': 'Status',
@@ -79,9 +79,9 @@ vi.mock('../ui/EmptyState', () => ({
 import MatchSearch from '../MatchSearch';
 
 // --- Test data ---
-const mockPlayers = [
-  { playerId: 'p1', name: 'John Cena', currentWrestler: 'John Cena', wins: 10, losses: 5, draws: 0, createdAt: '', updatedAt: '' },
-  { playerId: 'p2', name: 'The Rock', currentWrestler: 'The Rock', wins: 8, losses: 3, draws: 1, createdAt: '', updatedAt: '' },
+const mockWrestlers = [
+  { wrestlerId: 'p1', name: 'John Cena', wins: 10, losses: 5, draws: 0, createdAt: '', updatedAt: '' },
+  { wrestlerId: 'p2', name: 'The Rock', wins: 8, losses: 3, draws: 1, createdAt: '', updatedAt: '' },
 ];
 
 const mockSeasons = [
@@ -138,7 +138,7 @@ function renderWithRouter(initialEntries = ['/matches']) {
 describe('MatchSearch', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockGetAllPlayers.mockResolvedValue(mockPlayers);
+    mockGetAllWrestlers.mockResolvedValue(mockWrestlers);
     mockGetAllSeasons.mockResolvedValue(mockSeasons);
     mockGetAllChampionships.mockResolvedValue(mockChampionships);
     mockGetAllStipulations.mockResolvedValue(mockStipulations);
@@ -167,7 +167,7 @@ describe('MatchSearch', () => {
   it('renders filter dropdowns with options', async () => {
     renderWithRouter();
     await waitFor(() => {
-      expect(screen.getByLabelText('Player')).toBeInTheDocument();
+      expect(screen.getByLabelText('Wrestler')).toBeInTheDocument();
     });
     expect(screen.getByLabelText('Match Type')).toBeInTheDocument();
     expect(screen.getByLabelText('Status')).toBeInTheDocument();
@@ -178,11 +178,11 @@ describe('MatchSearch', () => {
     expect(screen.getByLabelText('To')).toBeInTheDocument();
   });
 
-  it('populates player dropdown with fetched players', async () => {
+  it('populates wrestler dropdown with fetched wrestlers', async () => {
     renderWithRouter();
     await waitFor(() => {
-      const playerSelect = screen.getByLabelText('Player') as HTMLSelectElement;
-      const options = Array.from(playerSelect.options).map((o) => o.text);
+      const wrestlerSelect = screen.getByLabelText('Wrestler') as HTMLSelectElement;
+      const options = Array.from(wrestlerSelect.options).map((o) => o.text);
       expect(options).toContain('John Cena');
       expect(options).toContain('The Rock');
     });

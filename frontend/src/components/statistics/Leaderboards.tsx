@@ -103,7 +103,7 @@ function Leaderboards() {
       <div className="lb-header">
         <h2>{t('statistics.leaderboards.title')}</h2>
         <div className="lb-nav-links">
-          <Link to="/stats">{t('statistics.nav.playerStats')}</Link>
+          <Link to="/stats">{t('statistics.nav.wrestlerStats')}</Link>
           <Link to="/stats/head-to-head">{t('statistics.nav.headToHead')}</Link>
           <Link to="/stats/match-types">{t('statistics.nav.matchTypeLeaderboards')}</Link>
           <Link to="/stats/records">{t('statistics.nav.records')}</Link>
@@ -135,7 +135,7 @@ function Leaderboards() {
           const medalColor = getMedalColor(entry.rank);
           return (
             <div
-              key={entry.playerId}
+              key={entry.wrestlerId}
               className={`lb-entry ${medalColor ? 'lb-entry-medal' : ''}`}
               style={medalColor ? { borderLeftColor: medalColor } : undefined}
             >
@@ -148,9 +148,9 @@ function Leaderboards() {
                   <span className="lb-rank-num">{entry.rank}</span>
                 )}
               </div>
-              <div className="lb-player-info">
-                <Link to={`/stats/player/${entry.playerId}`} className="lb-player-name">
-                  {entry.playerName}
+              <div className="lb-wrestler-info">
+                <Link to={`/stats/wrestler/${entry.wrestlerId}`} className="lb-wrestler-name">
+                  {entry.wrestlerName}
                 </Link>
                 <span className="lb-wrestler-name">{entry.wrestlerName}</span>
               </div>

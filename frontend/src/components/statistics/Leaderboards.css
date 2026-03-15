@@ -147,20 +147,20 @@
   color: #888;
 }
 
-.lb-player-info {
+.lb-wrestler-info {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-.lb-player-name {
+.lb-wrestler-name {
   font-weight: bold;
   color: #fff;
   text-decoration: none;
   font-size: 1rem;
 }
 
-.lb-player-name:hover {
+.lb-wrestler-name:hover {
   color: #d4af37;
 }
 

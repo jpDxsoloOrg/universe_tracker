@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { tournamentsApi, playersApi } from '../services/api';
-import type { Tournament, Player } from '../types';
+import { tournamentsApi, wrestlersApi } from '../services/api';
+import type { Tournament, Wrestler } from '../types';
 import Skeleton from './ui/Skeleton';
 import EmptyState from './ui/EmptyState';
 import './Tournaments.css';
@@ -9,7 +9,7 @@ import './Tournaments.css';
 export default function Tournaments() {
   const { t } = useTranslation();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [wrestlers, setWrestlers] = useState<Wrestler[]>([]);
   const [selectedTournament, setSelectedTournament] = useState<Tournament | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,12 +19,12 @@ export default function Tournaments() {
     try {
       setLoading(true);
       setError(null);
-      const [tournamentData, playerData] = await Promise.all([
+      const [tournamentData, wrestlerData] = await Promise.all([
         tournamentsApi.getAll(),
-        playersApi.getAll(),
+        wrestlersApi.getAll(),
       ]);
       setTournaments(tournamentData);
-      setPlayers(playerData);
+      setWrestlers(wrestlerData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load tournaments');
     } finally {
@@ -39,13 +39,13 @@ export default function Tournaments() {
       try {
         setLoading(true);
         setError(null);
-        const [tournamentData, playerData] = await Promise.all([
+        const [tournamentData, wrestlerData] = await Promise.all([
           tournamentsApi.getAll(abortController.signal),
-          playersApi.getAll(abortController.signal),
+          wrestlersApi.getAll(abortController.signal),
         ]);
         if (!abortController.signal.aborted) {
           setTournaments(tournamentData);
-          setPlayers(playerData);
+          setWrestlers(wrestlerData);
         }
       } catch (err) {
         if (err instanceof Error && err.name !== 'AbortError') {
@@ -71,9 +71,9 @@ export default function Tournaments() {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [selectedTournament]);
 
-  const getPlayerName = (playerId: string) => {
-    const player = players.find(p => p.playerId === playerId);
-    return player ? player.name : t('common.unknown');
+  const getWrestlerName = (wrestlerId: string) => {
+    const wrestler = wrestlers.find(p => p.wrestlerId === wrestlerId);
+    return wrestler ? wrestler.name : t('common.unknown');
   };
 
   const getStatusBadge = (status: string) => {
@@ -93,8 +93,8 @@ export default function Tournaments() {
   const renderRoundRobinStandings = (tournament: Tournament) => {
     if (!tournament.standings) return null;
 
-    const standingsArray = Object.entries(tournament.standings).map(([playerId, stats]) => ({
-      playerId,
+    const standingsArray = Object.entries(tournament.standings).map(([wrestlerId, stats]) => ({
+      wrestlerId,
       ...stats,
     }));
 
@@ -111,7 +111,7 @@ export default function Tournaments() {
           <div className="round-robin-summary">
             <div className="summary-card">
               <span className="summary-label">{t('tournaments.summaryLeader')}</span>
-              <span className="summary-value">{getPlayerName(leader.playerId)}</span>
+              <span className="summary-value">{getWrestlerName(leader.wrestlerId)}</span>
             </div>
             <div className="summary-card">
               <span className="summary-label">{t('tournaments.summaryPoints')}</span>
@@ -129,7 +129,7 @@ export default function Tournaments() {
           <thead>
             <tr>
               <th>{t('tournaments.table.rank')}</th>
-              <th>{t('tournaments.table.player')}</th>
+              <th>{t('tournaments.table.wrestler')}</th>
               <th>{t('tournaments.table.w')}</th>
               <th>{t('tournaments.table.l')}</th>
               <th>{t('tournaments.table.d')}</th>
@@ -138,9 +138,9 @@ export default function Tournaments() {
           </thead>
           <tbody>
             {standingsArray.map((standing, index) => (
-              <tr key={standing.playerId}>
+              <tr key={standing.wrestlerId}>
                 <td>{index + 1}</td>
-                <td>{getPlayerName(standing.playerId)}</td>
+                <td>{getWrestlerName(standing.wrestlerId)}</td>
                 <td className="wins">{standing.wins}</td>
                 <td className="losses">{standing.losses}</td>
                 <td className="draws">{standing.draws}</td>
@@ -167,12 +167,12 @@ export default function Tournaments() {
                 {round.matches.map((match, idx) => (
                   <div key={`round-${round.roundNumber}-match-${idx}`} className="bracket-match">
                     <div className="bracket-participant">
-                      {match.participant1 ? getPlayerName(match.participant1) : t('common.tbd')}
+                      {match.participant1 ? getWrestlerName(match.participant1) : t('common.tbd')}
                       {match.winner === match.participant1 && <span className="winner-indicator">✓</span>}
                     </div>
                     <div className="vs">{t('common.vs')}</div>
                     <div className="bracket-participant">
-                      {match.participant2 ? getPlayerName(match.participant2) : t('common.tbd')}
+                      {match.participant2 ? getWrestlerName(match.participant2) : t('common.tbd')}
                       {match.winner === match.participant2 && <span className="winner-indicator">✓</span>}
                     </div>
                   </div>
@@ -229,7 +229,7 @@ export default function Tournaments() {
               </p>
               {tournament.winner && (
                 <p className="tournament-winner">
-                  <strong>{t('tournaments.winner')}:</strong> {getPlayerName(tournament.winner)}
+                  <strong>{t('tournaments.winner')}:</strong> {getWrestlerName(tournament.winner)}
                 </p>
               )}
             </div>
@@ -276,8 +276,8 @@ export default function Tournaments() {
                 <strong>{t('tournaments.participants')}:</strong>
               </p>
               <ul className="participants-list">
-                {selectedTournament.participants.map((playerId) => (
-                  <li key={playerId}>{getPlayerName(playerId)}</li>
+                {selectedTournament.participants.map((wrestlerId) => (
+                  <li key={wrestlerId}>{getWrestlerName(wrestlerId)}</li>
                 ))}
               </ul>
             </div>

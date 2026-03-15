@@ -289,8 +289,8 @@ export default function Dashboard() {
         <h3>{t('dashboard.quickStats')}</h3>
         <div className="dashboard-quick-stats">
           <div className="dashboard-stat-card">
-            <div className="stat-value">{data.quickStats.totalPlayers}</div>
-            <div className="stat-label">{t('standings.table.player')}</div>
+            <div className="stat-value">{data.quickStats.totalWrestlers}</div>
+            <div className="stat-label">{t('standings.table.wrestler')}</div>
           </div>
           <div className="dashboard-stat-card">
             <div className="stat-value">{data.quickStats.totalMatches}</div>
@@ -300,10 +300,10 @@ export default function Dashboard() {
             <div className="stat-value">{data.quickStats.activeChampionships}</div>
             <div className="stat-label">{t('dashboard.champions')}</div>
           </div>
-          {data.quickStats.mostWinsPlayer && (
+          {data.quickStats.mostWinsWrestler && (
             <div className="dashboard-stat-card">
-              <div className="stat-value">{data.quickStats.mostWinsPlayer.wins}</div>
-              <div className="stat-label">{t('dashboard.mostWins')}: {data.quickStats.mostWinsPlayer.name}</div>
+              <div className="stat-value">{data.quickStats.mostWinsWrestler.wins}</div>
+              <div className="stat-label">{t('dashboard.mostWins')}: {data.quickStats.mostWinsWrestler.name}</div>
             </div>
           )}
         </div>

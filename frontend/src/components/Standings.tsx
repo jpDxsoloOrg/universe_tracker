@@ -4,8 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { standingsApi, seasonsApi, divisionsApi } from '../services/api';
 import { logger } from '../utils/logger';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
-import type { Standings as StandingsType, Season, Division, Player } from '../types';
-import PlayerHoverCard from './PlayerHoverCard';
+import type { Standings as StandingsType, Season, Division, Wrestler } from '../types';
+import WrestlerHoverCard from './WrestlerHoverCard';
 import DivisionFilter from './DivisionFilter';
 import Skeleton from './ui/Skeleton';
 import EmptyState from './ui/EmptyState';
@@ -92,31 +92,31 @@ export default function Standings() {
     return () => abortController.abort();
   }, [selectedSeasonId]);
 
-  // Memoize filtered players to avoid recalculation on every render
-  const filteredPlayers = useMemo((): Player[] => {
+  // Memoize filtered wrestlers to avoid recalculation on every render
+  const filteredWrestlers = useMemo((): Wrestler[] => {
     if (!standings) return [];
 
     if (selectedDivision === 'all') {
-      return standings.players;
+      return standings.wrestlers;
     }
 
     if (selectedDivision === 'none') {
-      return standings.players.filter(p => !p.divisionId);
+      return standings.wrestlers.filter(p => !p.divisionId);
     }
 
-    return standings.players.filter(p => p.divisionId === selectedDivision);
+    return standings.wrestlers.filter(p => p.divisionId === selectedDivision);
   }, [standings, selectedDivision]);
 
-  // Memoize player data with calculated win percentages
-  const playersWithStats = useMemo(() => {
-    return filteredPlayers.map(player => {
-      const totalMatches = player.wins + player.losses + player.draws;
+  // Memoize wrestler data with calculated win percentages
+  const wrestlersWithStats = useMemo(() => {
+    return filteredWrestlers.map(wrestler => {
+      const totalMatches = wrestler.wins + wrestler.losses + wrestler.draws;
       const winPercentage = totalMatches > 0
-        ? ((player.wins / totalMatches) * 100).toFixed(1)
+        ? ((wrestler.wins / totalMatches) * 100).toFixed(1)
         : '0.0';
-      return { ...player, winPercentage };
+      return { ...wrestler, winPercentage };
     });
-  }, [filteredPlayers]);
+  }, [filteredWrestlers]);
 
   const getDivisionName = useCallback((divisionId?: string) => {
     if (!divisionId) return null;
@@ -143,11 +143,11 @@ export default function Standings() {
     );
   }
 
-  if (!standings || standings.players.length === 0) {
+  if (!standings || standings.wrestlers.length === 0) {
     return (
       <EmptyState
         title={t('standings.pageTitle')}
-        description={t('standings.noPlayers')}
+        description={t('standings.noWrestlers')}
       />
     );
   }
@@ -203,7 +203,6 @@ export default function Standings() {
             <tr>
               <th>{t('standings.table.rank')}</th>
               <th className="image-header">{t('standings.table.image')}</th>
-              <th>{t('standings.table.player')}</th>
               <th>{t('standings.table.wrestler')}</th>
               {selectedDivision === 'all' && <th>{t('standings.table.division')}</th>}
               <th>{t('standings.table.wins')}</th>
@@ -215,55 +214,54 @@ export default function Standings() {
             </tr>
           </thead>
           <tbody>
-            {playersWithStats.map((player, index) => (
+            {wrestlersWithStats.map((wrestler, index) => (
               <tr
-                key={player.playerId}
+                key={wrestler.wrestlerId}
                 className="standings-row-clickable"
                 role="button"
                 tabIndex={0}
-                onClick={() => navigate(`/stats/player/${player.playerId}`)}
+                onClick={() => navigate(`/stats/wrestler/${wrestler.wrestlerId}`)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    navigate(`/stats/player/${player.playerId}`);
+                    navigate(`/stats/wrestler/${wrestler.wrestlerId}`);
                   }
                 }}
-                aria-label={t('standings.table.player')}
+                aria-label={t('standings.table.wrestler')}
               >
                 <td className="rank">{index + 1}</td>
                 <td className="wrestler-image-cell">
                   <img
-                    src={resolveImageSrc(player.imageUrl, DEFAULT_WRESTLER_IMAGE)}
+                    src={resolveImageSrc(wrestler.imageUrl, DEFAULT_WRESTLER_IMAGE)}
                     onError={(event) => applyImageFallback(event, DEFAULT_WRESTLER_IMAGE)}
-                    alt={player.currentWrestler}
+                    alt={wrestler.name}
                     className="wrestler-thumbnail"
                   />
                 </td>
-                <td className="player-name">
-                  <PlayerHoverCard player={player} divisions={divisions}>
+                <td className="wrestler-name">
+                  <WrestlerHoverCard wrestler={wrestler} divisions={divisions}>
                     <Link
-                      to={`/stats/player/${player.playerId}`}
-                      className="player-name-link"
+                      to={`/stats/wrestler/${wrestler.wrestlerId}`}
+                      className="wrestler-name-link"
                       onClick={(e) => e.stopPropagation()}
                     >
-                      {player.name}
+                      {wrestler.name}
                     </Link>
-                  </PlayerHoverCard>
+                  </WrestlerHoverCard>
                 </td>
-                <td className="wrestler-name">{player.currentWrestler}</td>
                 {selectedDivision === 'all' && (
                   <td className="division-name">
-                    {getDivisionName(player.divisionId) || <span className="no-division">-</span>}
+                    {getDivisionName(wrestler.divisionId) || <span className="no-division">-</span>}
                   </td>
                 )}
-                <td className="wins">{player.wins}</td>
-                <td className="losses">{player.losses}</td>
-                <td className="draws">{player.draws}</td>
-                <td className="win-percentage">{player.winPercentage}%</td>
+                <td className="wins">{wrestler.wins}</td>
+                <td className="losses">{wrestler.losses}</td>
+                <td className="draws">{wrestler.draws}</td>
+                <td className="win-percentage">{wrestler.winPercentage}%</td>
                 <td className="form-cell">
-                  {player.recentForm && player.recentForm.length > 0 ? (
-                    <span className="form-dots" aria-label={player.recentForm.join(', ')}>
-                      {player.recentForm.map((r, i) => (
+                  {wrestler.recentForm && wrestler.recentForm.length > 0 ? (
+                    <span className="form-dots" aria-label={wrestler.recentForm.join(', ')}>
+                      {wrestler.recentForm.map((r, i) => (
                         <span
                           key={i}
                           className={`form-dot ${r === 'W' ? 'win' : r === 'L' ? 'loss' : 'draw'}`}
@@ -276,22 +274,22 @@ export default function Standings() {
                   )}
                 </td>
                 <td className="streak-cell">
-                  {player.currentStreak && player.currentStreak.count >= 3 ? (
+                  {wrestler.currentStreak && wrestler.currentStreak.count >= 3 ? (
                     <span
-                      className={`streak-badge ${player.currentStreak.type === 'W' ? 'hot' : player.currentStreak.type === 'L' ? 'cold' : 'neutral'}`}
+                      className={`streak-badge ${wrestler.currentStreak.type === 'W' ? 'hot' : wrestler.currentStreak.type === 'L' ? 'cold' : 'neutral'}`}
                       title={
-                        player.currentStreak.type === 'W'
+                        wrestler.currentStreak.type === 'W'
                           ? t('standings.winStreak')
-                          : player.currentStreak.type === 'L'
+                          : wrestler.currentStreak.type === 'L'
                             ? t('standings.lossStreak')
                             : t('standings.drawStreak')
                       }
                     >
-                      {player.currentStreak.type === 'W' && '🔥 '}
-                      {player.currentStreak.type === 'L' && '❄️ '}
-                      {player.currentStreak.type === 'D' && '➖ '}
-                      {player.currentStreak.count}
-                      {player.currentStreak.type === 'W' ? 'W' : player.currentStreak.type === 'L' ? 'L' : 'D'}
+                      {wrestler.currentStreak.type === 'W' && '\u{1f525} '}
+                      {wrestler.currentStreak.type === 'L' && '\u{2744}\u{fe0f} '}
+                      {wrestler.currentStreak.type === 'D' && '\u{2796} '}
+                      {wrestler.currentStreak.count}
+                      {wrestler.currentStreak.type === 'W' ? 'W' : wrestler.currentStreak.type === 'L' ? 'L' : 'D'}
                     </span>
                   ) : (
                     <span className="streak-empty">-</span>

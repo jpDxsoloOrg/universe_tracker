@@ -2,33 +2,33 @@ import { useState, useEffect, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
-import { playersApi } from '../../services/api';
-import type { Player } from '../../types';
+import { wrestlersApi } from '../../services/api';
+import type { Wrestler } from '../../types';
 import './Auth.css';
 
 function DevLogin() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { devSignIn } = useAuth();
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [loadingPlayers, setLoadingPlayers] = useState(true);
+  const [wrestlers, setWrestlers] = useState<Wrestler[]>([]);
+  const [loadingWrestlers, setLoadingWrestlers] = useState(true);
 
   useEffect(() => {
-    playersApi.getAll()
-      .then(setPlayers)
-      .catch(() => setPlayers([]))
-      .finally(() => setLoadingPlayers(false));
+    wrestlersApi.getAll()
+      .then(setWrestlers)
+      .catch(() => setWrestlers([]))
+      .finally(() => setLoadingWrestlers(false));
   }, []);
 
   if (!devSignIn) return null;
 
-  const handleDevLogin = (player: Player) => {
-    devSignIn(player);
+  const handleDevLogin = (wrestler: Wrestler) => {
+    devSignIn(wrestler);
     navigate('/');
   };
 
   const handleDevAdminLogin = () => {
-    devSignIn({ playerId: 'dev-admin', name: 'Dev Admin' }, ['Admin']);
+    devSignIn({ wrestlerId: 'dev-admin', name: 'Dev Admin' }, ['Admin']);
     navigate('/');
   };
 
@@ -45,20 +45,20 @@ function DevLogin() {
         {t('auth.signInAsAdmin')}
       </button>
 
-      {loadingPlayers ? (
-        <p>{t('auth.loadingPlayers')}</p>
-      ) : players.length === 0 ? (
-        <p>{t('auth.noPlayersFound')}</p>
+      {loadingWrestlers ? (
+        <p>{t('auth.loadingWrestlers')}</p>
+      ) : wrestlers.length === 0 ? (
+        <p>{t('auth.noWrestlersFound')}</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          {players.map((p) => (
+          {wrestlers.map((p) => (
             <button
-              key={p.playerId}
+              key={p.wrestlerId}
               onClick={() => handleDevLogin(p)}
               className="btn-submit"
               style={{ textAlign: 'left' }}
             >
-              {p.name} — {p.currentWrestler}
+              {p.name} — {p.name}
             </button>
           ))}
         </div>

@@ -1,24 +1,24 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import type { StatsPlayer } from '../../services/api';
-import type { PlayerStatistics as PlayerStatisticsType, ChampionshipStats, Achievement } from '../../types/statistics';
-import './PlayerStats.css';
+import type { StatsWrestler } from '../../services/api';
+import type { WrestlerStatistics as WrestlerStatisticsType, ChampionshipStats, Achievement } from '../../types/statistics';
+import './WrestlerStats.css';
 
-interface PlayerStatsContentProps {
-  player: StatsPlayer;
-  overallStats: PlayerStatisticsType;
-  matchTypeStats: PlayerStatisticsType[];
+interface WrestlerStatsContentProps {
+  wrestler: StatsWrestler;
+  overallStats: WrestlerStatisticsType;
+  matchTypeStats: WrestlerStatisticsType[];
   championshipStats: (ChampionshipStats & { championshipName?: string })[];
   achievements: Achievement[];
 }
 
-function PlayerStatsContent({
-  player,
+function WrestlerStatsContent({
+  wrestler,
   overallStats,
   matchTypeStats,
   championshipStats,
   achievements,
-}: PlayerStatsContentProps) {
+}: WrestlerStatsContentProps) {
   const { t } = useTranslation();
 
   const matchTypeLabels: Record<string, string> = {
@@ -28,7 +28,7 @@ function PlayerStatsContent({
     cage: t('statistics.matchTypes.cage'),
   };
 
-  function renderBarChart(stat: PlayerStatisticsType) {
+  function renderBarChart(stat: WrestlerStatisticsType) {
     return (
       <div className="ps-bar-row" key={stat.statType}>
         <span className="ps-bar-label">
@@ -43,7 +43,7 @@ function PlayerStatsContent({
           </div>
         </div>
         <span className="ps-bar-matches">
-          {t('statistics.playerStats.matchCount', { count: stat.matchesPlayed })}
+          {t('statistics.wrestlerStats.matchCount', { count: stat.matchesPlayed })}
         </span>
       </div>
     );
@@ -54,7 +54,7 @@ function PlayerStatsContent({
       <div className="ps-grid">
         {/* W-L-D Record Card */}
         <div className="ps-card ps-record-card">
-          <h3>{player.name} ({player.wrestlerName})</h3>
+          <h3>{wrestler.name} ({wrestler.wrestlerName})</h3>
           <div className="ps-wld">
             <div className="ps-wld-item ps-wins">
               <span className="ps-wld-number">{overallStats.wins}</span>
@@ -82,7 +82,7 @@ function PlayerStatsContent({
 
         {/* Streak Stats */}
         <div className="ps-card ps-streak-card">
-          <h3>{t('statistics.playerStats.streaks')}</h3>
+          <h3>{t('statistics.wrestlerStats.streaks')}</h3>
           <div className="ps-streak-grid">
             <div className="ps-streak-item">
               <span className="ps-streak-value" data-positive={overallStats.currentWinStreak > 0}>
@@ -113,8 +113,8 @@ function PlayerStatsContent({
 
       {/* Match Type Breakdown */}
       <div className="ps-card ps-breakdown-card">
-        <h3>{t('statistics.playerStats.matchTypeBreakdown')}</h3>
-        <h4 className="ps-bar-subheading">{t('statistics.playerStats.winRateByMatchType')}</h4>
+        <h3>{t('statistics.wrestlerStats.matchTypeBreakdown')}</h3>
+        <h4 className="ps-bar-subheading">{t('statistics.wrestlerStats.winRateByMatchType')}</h4>
         <div className="ps-bar-chart">
           {matchTypeStats.map((stat) => renderBarChart(stat))}
         </div>
@@ -145,7 +145,7 @@ function PlayerStatsContent({
       {/* Championship History */}
       {championshipStats.length > 0 && (
         <div className="ps-card ps-championship-card">
-          <h3>{t('statistics.playerStats.championshipHistory')}</h3>
+          <h3>{t('statistics.wrestlerStats.championshipHistory')}</h3>
           <div className="ps-champ-list">
             {championshipStats.map((cs) => (
               <div key={cs.championshipId} className="ps-champ-item">
@@ -170,7 +170,7 @@ function PlayerStatsContent({
       {/* Recent Achievements */}
       {achievements.length > 0 && (
         <div className="ps-card ps-achievements-card">
-          <h3>{t('statistics.playerStats.recentAchievements')}</h3>
+          <h3>{t('statistics.wrestlerStats.recentAchievements')}</h3>
           <div className="ps-achievement-list">
             {achievements.slice(0, 5).map((ach) => (
               <div key={ach.achievementId} className="ps-achievement-item">
@@ -184,7 +184,7 @@ function PlayerStatsContent({
             ))}
           </div>
           <Link to="/stats/achievements" className="ps-view-all-link">
-            {t('statistics.playerStats.viewAllAchievements')}
+            {t('statistics.wrestlerStats.viewAllAchievements')}
           </Link>
         </div>
       )}
@@ -192,4 +192,4 @@ function PlayerStatsContent({
   );
 }
 
-export default PlayerStatsContent;
+export default WrestlerStatsContent;

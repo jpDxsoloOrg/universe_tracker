@@ -1,7 +1,7 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { tournamentsApi, playersApi } from '../../services/api';
+import { tournamentsApi, wrestlersApi } from '../../services/api';
 import { sanitizeName } from '../../utils/sanitize';
-import type { Player } from '../../types';
+import type { Wrestler } from '../../types';
 import './CreateTournament.css';
 
 function isPowerOfTwo(value: number): boolean {
@@ -13,7 +13,7 @@ function isValidSingleEliminationParticipantCount(count: number): boolean {
 }
 
 export default function CreateTournament() {
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [wrestlers, setWrestlers] = useState<Wrestler[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,16 +26,16 @@ export default function CreateTournament() {
   });
 
   useEffect(() => {
-    loadPlayers();
+    loadWrestlers();
   }, []);
 
-  const loadPlayers = async () => {
+  const loadWrestlers = async () => {
     try {
       setLoading(true);
-      const data = await playersApi.getAll();
-      setPlayers(data);
+      const data = await wrestlersApi.getAll();
+      setWrestlers(data);
     } catch (_err) {
-      setError('Failed to load players');
+      setError('Failed to load wrestlers');
     } finally {
       setLoading(false);
     }
@@ -96,18 +96,18 @@ export default function CreateTournament() {
     }
   };
 
-  const handleParticipantToggle = (playerId: string) => {
+  const handleParticipantToggle = (wrestlerId: string) => {
     setFormData(prev => ({
       ...prev,
-      participants: prev.participants.includes(playerId)
-        ? prev.participants.filter(id => id !== playerId)
-        : [...prev.participants, playerId],
+      participants: prev.participants.includes(wrestlerId)
+        ? prev.participants.filter(id => id !== wrestlerId)
+        : [...prev.participants, wrestlerId],
     }));
   };
 
-  const moveParticipantById = (playerId: string, direction: -1 | 1) => {
+  const moveParticipantById = (wrestlerId: string, direction: -1 | 1) => {
     setFormData((prev) => {
-      const fromIndex = prev.participants.indexOf(playerId);
+      const fromIndex = prev.participants.indexOf(wrestlerId);
       if (fromIndex < 0) return prev;
       const toIndex = fromIndex + direction;
       if (toIndex < 0 || toIndex >= prev.participants.length) return prev;
@@ -119,9 +119,9 @@ export default function CreateTournament() {
     });
   };
 
-  const selectedPlayers = formData.participants
-    .map((playerId) => players.find((player) => player.playerId === playerId))
-    .filter((player): player is Player => !!player);
+  const selectedWrestlers = formData.participants
+    .map((wrestlerId) => wrestlers.find((wrestler) => wrestler.wrestlerId === wrestlerId))
+    .filter((wrestler): wrestler is Wrestler => !!wrestler);
 
   if (loading) {
     return <div className="loading">Loading...</div>;
@@ -168,16 +168,16 @@ export default function CreateTournament() {
         <div className="form-group">
           <label>Participants (Selected: {formData.participants.length})</label>
           <div className="participants-grid">
-            {players.map(player => (
+            {wrestlers.map(wrestler => (
               <div
-                key={player.playerId}
-                className={`participant-card ${formData.participants.includes(player.playerId) ? 'selected' : ''}`}
-                onClick={() => handleParticipantToggle(player.playerId)}
+                key={wrestler.wrestlerId}
+                className={`participant-card ${formData.participants.includes(wrestler.wrestlerId) ? 'selected' : ''}`}
+                onClick={() => handleParticipantToggle(wrestler.wrestlerId)}
               >
-                <div className="participant-name">{player.name}</div>
-                <div className="participant-wrestler">{player.currentWrestler}</div>
+                <div className="participant-name">{wrestler.name}</div>
+                <div className="participant-wrestler">{wrestler.name}</div>
                 <div className="participant-record">
-                  {player.wins}W-{player.losses}L-{player.draws}D
+                  {wrestler.wins}W-{wrestler.losses}L-{wrestler.draws}D
                 </div>
               </div>
             ))}
@@ -192,28 +192,28 @@ export default function CreateTournament() {
               This order controls first-round matchups (1 vs 2, 3 vs 4, etc.).
             </small>
             <div className="seed-list">
-              {selectedPlayers.map((player, index) => (
-                <div key={player.playerId} className="seed-item">
+              {selectedWrestlers.map((wrestler, index) => (
+                <div key={wrestler.wrestlerId} className="seed-item">
                   <div className="seed-item-left">
                     <span className="seed-badge">Seed {index + 1}</span>
-                    <span className="seed-name">{player.name}</span>
+                    <span className="seed-name">{wrestler.name}</span>
                   </div>
                   <div className="seed-item-actions">
                     <button
                       type="button"
                       className="seed-move-btn"
-                      onClick={() => moveParticipantById(player.playerId, -1)}
+                      onClick={() => moveParticipantById(wrestler.wrestlerId, -1)}
                       disabled={index === 0}
-                      aria-label={`Move ${player.name} up`}
+                      aria-label={`Move ${wrestler.name} up`}
                     >
                       ↑
                     </button>
                     <button
                       type="button"
                       className="seed-move-btn"
-                      onClick={() => moveParticipantById(player.playerId, 1)}
-                      disabled={index === selectedPlayers.length - 1}
-                      aria-label={`Move ${player.name} down`}
+                      onClick={() => moveParticipantById(wrestler.wrestlerId, 1)}
+                      disabled={index === selectedWrestlers.length - 1}
+                      aria-label={`Move ${wrestler.name} down`}
                     >
                       ↓
                     </button>

@@ -7,7 +7,7 @@
  * global.fetch was invoked.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { authApi, playersApi } from '../api';
+import { authApi, wrestlersApi } from '../api';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 
@@ -36,7 +36,7 @@ beforeEach(() => {
 });
 
 // ===========================================================================
-// fetchWithAuth (tested indirectly via playersApi.getAll)
+// fetchWithAuth (tested indirectly via wrestlersApi.getAll)
 // ===========================================================================
 
 describe('fetchWithAuth (indirect)', () => {
@@ -44,10 +44,10 @@ describe('fetchWithAuth (indirect)', () => {
     sessionStorage.setItem('accessToken', 'test-jwt-token');
     global.fetch = mockFetchResponse([]);
 
-    await playersApi.getAll();
+    await wrestlersApi.getAll();
 
     expect(global.fetch).toHaveBeenCalledWith(
-      `${API_BASE}/players`,
+      `${API_BASE}/wrestlers`,
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: 'Bearer test-jwt-token',
@@ -60,7 +60,7 @@ describe('fetchWithAuth (indirect)', () => {
   it('omits Authorization header when no token in sessionStorage', async () => {
     global.fetch = mockFetchResponse([]);
 
-    await playersApi.getAll();
+    await wrestlersApi.getAll();
 
     const callArgs = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
     const headers = callArgs[1].headers as Record<string, string>;
@@ -76,7 +76,7 @@ describe('fetchWithAuth (indirect)', () => {
       text: vi.fn().mockResolvedValue(''),
     });
 
-    const result = await playersApi.delete('player-1');
+    const result = await wrestlersApi.delete('wrestler-1');
 
     expect(result).toBeUndefined();
   });
@@ -85,11 +85,11 @@ describe('fetchWithAuth (indirect)', () => {
     global.fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 400,
-      json: vi.fn().mockResolvedValue({ message: 'Player name is required' }),
+      json: vi.fn().mockResolvedValue({ message: 'Wrestler name is required' }),
     });
 
-    await expect(playersApi.create({ name: '', currentWrestler: 'X' } as never))
-      .rejects.toThrow('Player name is required');
+    await expect(wrestlersApi.create({ name: '' } as never))
+      .rejects.toThrow('Wrestler name is required');
   });
 
   it('throws generic message when error body is not JSON', async () => {
@@ -99,14 +99,14 @@ describe('fetchWithAuth (indirect)', () => {
       json: vi.fn().mockRejectedValue(new Error('not JSON')),
     });
 
-    await expect(playersApi.getAll()).rejects.toThrow('Request failed');
+    await expect(wrestlersApi.getAll()).rejects.toThrow('Request failed');
   });
 
   it('passes AbortSignal through to fetch', async () => {
     global.fetch = mockFetchResponse([]);
     const controller = new AbortController();
 
-    await playersApi.getAll(controller.signal);
+    await wrestlersApi.getAll(controller.signal);
 
     expect(global.fetch).toHaveBeenCalledWith(
       expect.any(String),

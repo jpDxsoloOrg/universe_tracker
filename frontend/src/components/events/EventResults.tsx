@@ -144,10 +144,10 @@ export default function EventResults() {
         {completedMatches.map((match, index) => {
           const { matchData, designation } = match;
           const winnerNames = matchData.participants
-            .filter((p) => matchData.winners?.includes(p.playerId))
+            .filter((p) => matchData.winners?.includes(p.wrestlerId))
             .map((p) => p.wrestlerName);
           const loserNames = matchData.participants
-            .filter((p) => matchData.losers?.includes(p.playerId))
+            .filter((p) => matchData.losers?.includes(p.wrestlerId))
             .map((p) => p.wrestlerName);
 
           return (

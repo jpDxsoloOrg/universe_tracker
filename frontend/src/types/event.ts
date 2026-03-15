@@ -39,8 +39,7 @@ export interface EnrichedMatchData {
   stipulationId?: string;
   stipulationName?: string;
   participants: {
-    playerId: string;
-    playerName: string;
+    wrestlerId: string;
     wrestlerName: string;
   }[];
   winners?: string[];

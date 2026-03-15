@@ -1,19 +1,19 @@
 import { API_BASE_URL, fetchWithAuth } from './apiClient';
 
-export interface RivalryPlayer {
-  playerId: string;
+export interface RivalryWrestler {
+  wrestlerId: string;
   name: string;
   wrestlerName: string;
   imageUrl?: string;
 }
 
 export interface Rivalry {
-  player1Id: string;
-  player2Id: string;
-  player1?: RivalryPlayer;
-  player2?: RivalryPlayer;
-  player1Wins: number;
-  player2Wins: number;
+  wrestler1Id: string;
+  wrestler2Id: string;
+  wrestler1?: RivalryWrestler;
+  wrestler2?: RivalryWrestler;
+  wrestler1Wins: number;
+  wrestler2Wins: number;
   draws: number;
   matchCount: number;
   lastMatchDate: string;

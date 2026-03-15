@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { matchesApi, playersApi, eventsApi, stipulationsApi } from '../../services/api';
-import type { Match, Player, Stipulation } from '../../types';
+import { matchesApi, wrestlersApi, eventsApi, stipulationsApi } from '../../services/api';
+import type { Match, Wrestler, Stipulation } from '../../types';
 import type { LeagueEvent } from '../../types/event';
 import SearchableSelect from './SearchableSelect';
 import Skeleton from '../ui/Skeleton';
@@ -13,7 +13,7 @@ const STANDALONE_FILTER = '__standalone__';
 export default function RecordResult() {
   const { t } = useTranslation();
   const [matches, setMatches] = useState<Match[]>([]);
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [wrestlers, setWrestlers] = useState<Wrestler[]>([]);
   const [events, setEvents] = useState<LeagueEvent[]>([]);
   const [stipulations, setStipulations] = useState<Stipulation[]>([]);
   const [selectedEventFilter, setSelectedEventFilter] = useState<string>('');
@@ -34,14 +34,14 @@ export default function RecordResult() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [matchesData, playersData, eventsData, stipulationsData] = await Promise.all([
+      const [matchesData, wrestlersData, eventsData, stipulationsData] = await Promise.all([
         matchesApi.getAll({ status: 'scheduled' }),
-        playersApi.getAll(),
+        wrestlersApi.getAll(),
         eventsApi.getAll(),
         stipulationsApi.getAll(),
       ]);
       setMatches(matchesData);
-      setPlayers(playersData);
+      setWrestlers(wrestlersData);
       setStipulations(stipulationsData);
 
       // Only show events that have scheduled matches or are upcoming/in-progress
@@ -116,9 +116,9 @@ export default function RecordResult() {
     return matches;
   }, [matches, selectedEventFilter, events, matchEventMap]);
 
-  const getPlayerName = (playerId: string) => {
-    const player = players.find(p => p.playerId === playerId);
-    return player ? `${player.name} (${player.currentWrestler})` : 'Unknown';
+  const getWrestlerName = (wrestlerId: string) => {
+    const wrestler = wrestlers.find(p => p.wrestlerId === wrestlerId);
+    return wrestler ? `${wrestler.name} (${wrestler.name})` : 'Unknown';
   };
 
   const getStipulationName = (stipulationId: string): string => {
@@ -135,11 +135,11 @@ export default function RecordResult() {
 
   const isTagTeamMatch = selectedMatch?.teams && selectedMatch.teams.length >= 2;
 
-  const handleWinnerToggle = (playerId: string) => {
+  const handleWinnerToggle = (wrestlerId: string) => {
     setWinners(prev =>
-      prev.includes(playerId)
-        ? prev.filter(id => id !== playerId)
-        : [...prev, playerId]
+      prev.includes(wrestlerId)
+        ? prev.filter(id => id !== wrestlerId)
+        : [...prev, wrestlerId]
     );
   };
 
@@ -158,9 +158,9 @@ export default function RecordResult() {
     }
   };
 
-  const getPlayerNameShort = (playerId: string): string => {
-    const player = players.find(p => p.playerId === playerId);
-    return player ? player.name : t('common.unknown');
+  const getWrestlerNameShort = (wrestlerId: string): string => {
+    const wrestler = wrestlers.find(p => p.wrestlerId === wrestlerId);
+    return wrestler ? wrestler.name : t('common.unknown');
   };
 
   const handleSubmit = async () => {
@@ -299,7 +299,7 @@ export default function RecordResult() {
                     <div className="match-participants-preview">
                       {match.participants.map((pid, i) => (
                         <span key={pid}>
-                          {getPlayerNameShort(pid)}{i < match.participants.length - 1 ? ' vs ' : ''}
+                          {getWrestlerNameShort(pid)}{i < match.participants.length - 1 ? ' vs ' : ''}
                         </span>
                       ))}
                     </div>
@@ -344,9 +344,9 @@ export default function RecordResult() {
                             <div className="team-info">
                               <div className="team-label">{t('recordResult.team')} {teamIndex + 1}</div>
                               <div className="team-members-list">
-                                {team.map(playerId => (
-                                  <span key={playerId} className="team-member-name">
-                                    {getPlayerNameShort(playerId)}
+                                {team.map(wrestlerId => (
+                                  <span key={wrestlerId} className="team-member-name">
+                                    {getWrestlerNameShort(wrestlerId)}
                                   </span>
                                 ))}
                               </div>
@@ -362,16 +362,16 @@ export default function RecordResult() {
                     <>
                       <h4>{t('recordResult.selectWinners')}</h4>
                       <div className="participants-list">
-                        {selectedMatch.participants.map(playerId => (
+                        {selectedMatch.participants.map(wrestlerId => (
                           <div
-                            key={playerId}
-                            className={`participant-option ${winners.includes(playerId) ? 'winner' : ''}`}
-                            onClick={() => handleWinnerToggle(playerId)}
+                            key={wrestlerId}
+                            className={`participant-option ${winners.includes(wrestlerId) ? 'winner' : ''}`}
+                            onClick={() => handleWinnerToggle(wrestlerId)}
                           >
                             <div className="participant-info">
-                              {getPlayerName(playerId)}
+                              {getWrestlerName(wrestlerId)}
                             </div>
-                            {winners.includes(playerId) && (
+                            {winners.includes(wrestlerId) && (
                               <span className="winner-badge">{t('recordResult.winner')}</span>
                             )}
                           </div>

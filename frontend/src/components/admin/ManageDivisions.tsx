@@ -158,7 +158,7 @@ export default function ManageDivisions() {
       <div className="divisions-list">
         <h3>All Divisions ({divisions.length})</h3>
         {divisions.length === 0 ? (
-          <p>No divisions yet. Create your first division to group players!</p>
+          <p>No divisions yet. Create your first division to group wrestlers!</p>
         ) : (
           <div className="divisions-grid">
             {divisions.map(division => (

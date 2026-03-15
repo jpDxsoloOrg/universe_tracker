@@ -4,9 +4,9 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 
 // --- Hoisted mocks ---
-const { mockGetAllMatches, mockGetAllPlayers, mockGetAllEvents, mockRecordResult, mockGetAllStipulations } = vi.hoisted(() => ({
+const { mockGetAllMatches, mockGetAllWrestlers, mockGetAllEvents, mockRecordResult, mockGetAllStipulations } = vi.hoisted(() => ({
   mockGetAllMatches: vi.fn(),
-  mockGetAllPlayers: vi.fn(),
+  mockGetAllWrestlers: vi.fn(),
   mockGetAllEvents: vi.fn(),
   mockRecordResult: vi.fn(),
   mockGetAllStipulations: vi.fn(),
@@ -17,7 +17,7 @@ vi.mock('../../../services/api', () => ({
     getAll: mockGetAllMatches,
     recordResult: mockRecordResult,
   },
-  playersApi: { getAll: mockGetAllPlayers },
+  wrestlersApi: { getAll: mockGetAllWrestlers },
   eventsApi: { getAll: mockGetAllEvents },
   stipulationsApi: { getAll: mockGetAllStipulations },
 }));
@@ -52,11 +52,11 @@ vi.mock('../SearchableSelect.css', () => ({}));
 import RecordResult from '../RecordResult';
 
 // --- Test data ---
-const mockPlayers = [
-  { playerId: 'p1', name: 'John Cena', currentWrestler: 'John Cena', wins: 10, losses: 2, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
-  { playerId: 'p2', name: 'The Rock', currentWrestler: 'The Rock', wins: 8, losses: 3, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
-  { playerId: 'p3', name: 'Undertaker', currentWrestler: 'Undertaker', wins: 15, losses: 5, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
-  { playerId: 'p4', name: 'Triple H', currentWrestler: 'Triple H', wins: 12, losses: 4, draws: 1, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+const mockWrestlers = [
+  { wrestlerId: 'p1', name: 'John Cena', wins: 10, losses: 2, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+  { wrestlerId: 'p2', name: 'The Rock', wins: 8, losses: 3, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+  { wrestlerId: 'p3', name: 'Undertaker', wins: 15, losses: 5, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+  { wrestlerId: 'p4', name: 'Triple H', wins: 12, losses: 4, draws: 1, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
 ];
 
 const singlesMatch = {
@@ -106,7 +106,7 @@ const mockEvents = [
 
 function setupDefaultMocks() {
   mockGetAllMatches.mockResolvedValue([singlesMatch, tagMatch, matchForEvent]);
-  mockGetAllPlayers.mockResolvedValue(mockPlayers);
+  mockGetAllWrestlers.mockResolvedValue(mockWrestlers);
   mockGetAllEvents.mockResolvedValue(mockEvents);
   mockGetAllStipulations.mockResolvedValue([
     { stipulationId: 'stip-1', name: 'Steel Cage', createdAt: '', updatedAt: '' },
@@ -129,7 +129,7 @@ describe('RecordResult', () => {
 
   it('shows loading state while data is being fetched', () => {
     mockGetAllMatches.mockReturnValue(new Promise(() => {}));
-    mockGetAllPlayers.mockReturnValue(new Promise(() => {}));
+    mockGetAllWrestlers.mockReturnValue(new Promise(() => {}));
     mockGetAllEvents.mockReturnValue(new Promise(() => {}));
     mockGetAllStipulations.mockReturnValue(new Promise(() => {}));
 
@@ -158,7 +158,7 @@ describe('RecordResult', () => {
     const user = userEvent.setup();
     // Only return standalone matches (no event) for simplicity
     mockGetAllMatches.mockResolvedValue([singlesMatch]);
-    mockGetAllPlayers.mockResolvedValue(mockPlayers);
+    mockGetAllWrestlers.mockResolvedValue(mockWrestlers);
     mockGetAllEvents.mockResolvedValue([]);
     mockGetAllStipulations.mockResolvedValue([]);
 
@@ -190,7 +190,7 @@ describe('RecordResult', () => {
   it('submits result for a singles match after selecting a winner', async () => {
     const user = userEvent.setup();
     mockGetAllMatches.mockResolvedValue([singlesMatch]);
-    mockGetAllPlayers.mockResolvedValue(mockPlayers);
+    mockGetAllWrestlers.mockResolvedValue(mockWrestlers);
     mockGetAllEvents.mockResolvedValue([]);
     mockGetAllStipulations.mockResolvedValue([]);
     mockRecordResult.mockResolvedValue({ ...singlesMatch, status: 'completed', winners: ['p1'], losers: ['p2'] });
@@ -238,7 +238,7 @@ describe('RecordResult', () => {
   it('handles API error when recording result', async () => {
     const user = userEvent.setup();
     mockGetAllMatches.mockResolvedValue([singlesMatch]);
-    mockGetAllPlayers.mockResolvedValue(mockPlayers);
+    mockGetAllWrestlers.mockResolvedValue(mockWrestlers);
     mockGetAllEvents.mockResolvedValue([]);
     mockGetAllStipulations.mockResolvedValue([]);
     mockRecordResult.mockRejectedValue(new Error('Server error'));

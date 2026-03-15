@@ -1,8 +1,8 @@
 import type {
   ContenderConfig,
-  ContenderWithPlayer,
+  ContenderWithWrestler,
   ChampionshipContenders,
-  PlayerContenderStatus,
+  WrestlerContenderStatus,
 } from '../types/contender';
 
 // Mock Contender Configs
@@ -34,11 +34,10 @@ export const mockContenderConfigs: ContenderConfig[] = [
 ];
 
 // Mock WWE Championship Contenders
-const mockWWEChampionshipContenders: ContenderWithPlayer[] = [
+const mockWWEChampionshipContenders: ContenderWithWrestler[] = [
   {
     championshipId: 'champ-001',
-    playerId: 'player-001',
-    playerName: 'John',
+    wrestlerId: 'wrestler-001',
     wrestlerName: 'Stone Cold Steve Austin',
     rank: 1,
     rankingScore: 95.5,
@@ -58,8 +57,7 @@ const mockWWEChampionshipContenders: ContenderWithPlayer[] = [
   },
   {
     championshipId: 'champ-001',
-    playerId: 'player-002',
-    playerName: 'Mike',
+    wrestlerId: 'wrestler-002',
     wrestlerName: 'The Rock',
     rank: 2,
     rankingScore: 91.8,
@@ -79,8 +77,7 @@ const mockWWEChampionshipContenders: ContenderWithPlayer[] = [
   },
   {
     championshipId: 'champ-001',
-    playerId: 'player-003',
-    playerName: 'Chris',
+    wrestlerId: 'wrestler-003',
     wrestlerName: 'Triple H',
     rank: 3,
     rankingScore: 85.2,
@@ -100,8 +97,7 @@ const mockWWEChampionshipContenders: ContenderWithPlayer[] = [
   },
   {
     championshipId: 'champ-001',
-    playerId: 'player-004',
-    playerName: 'Dave',
+    wrestlerId: 'wrestler-004',
     wrestlerName: 'Undertaker',
     rank: 4,
     rankingScore: 78.5,
@@ -121,8 +117,7 @@ const mockWWEChampionshipContenders: ContenderWithPlayer[] = [
   },
   {
     championshipId: 'champ-001',
-    playerId: 'player-006',
-    playerName: 'Ryan',
+    wrestlerId: 'wrestler-006',
     wrestlerName: 'John Cena',
     rank: 5,
     rankingScore: 72.3,
@@ -142,8 +137,7 @@ const mockWWEChampionshipContenders: ContenderWithPlayer[] = [
   },
   {
     championshipId: 'champ-001',
-    playerId: 'player-010',
-    playerName: 'Kevin',
+    wrestlerId: 'wrestler-010',
     wrestlerName: 'Shawn Michaels',
     rank: 6,
     rankingScore: 68.7,
@@ -164,11 +158,10 @@ const mockWWEChampionshipContenders: ContenderWithPlayer[] = [
 ];
 
 // Mock Intercontinental Championship Contenders
-const mockICChampionshipContenders: ContenderWithPlayer[] = [
+const mockICChampionshipContenders: ContenderWithWrestler[] = [
   {
     championshipId: 'champ-002',
-    playerId: 'player-007',
-    playerName: 'Steve',
+    wrestlerId: 'wrestler-007',
     wrestlerName: 'Edge',
     rank: 1,
     rankingScore: 88.2,
@@ -188,8 +181,7 @@ const mockICChampionshipContenders: ContenderWithPlayer[] = [
   },
   {
     championshipId: 'champ-002',
-    playerId: 'player-009',
-    playerName: 'Jake',
+    wrestlerId: 'wrestler-009',
     wrestlerName: 'Finn Balor',
     rank: 2,
     rankingScore: 84.5,
@@ -209,8 +201,7 @@ const mockICChampionshipContenders: ContenderWithPlayer[] = [
   },
   {
     championshipId: 'champ-002',
-    playerId: 'player-011',
-    playerName: 'Brian',
+    wrestlerId: 'wrestler-011',
     wrestlerName: 'Bret Hart',
     rank: 3,
     rankingScore: 79.8,
@@ -230,8 +221,7 @@ const mockICChampionshipContenders: ContenderWithPlayer[] = [
   },
   {
     championshipId: 'champ-002',
-    playerId: 'player-012',
-    playerName: 'Mark',
+    wrestlerId: 'wrestler-012',
     wrestlerName: 'Randy Orton',
     rank: 4,
     rankingScore: 73.2,
@@ -251,8 +241,7 @@ const mockICChampionshipContenders: ContenderWithPlayer[] = [
   },
   {
     championshipId: 'champ-002',
-    playerId: 'player-002',
-    playerName: 'Mike',
+    wrestlerId: 'wrestler-002',
     wrestlerName: 'The Rock',
     rank: 5,
     rankingScore: 68.5,
@@ -273,11 +262,10 @@ const mockICChampionshipContenders: ContenderWithPlayer[] = [
 ];
 
 // Mock Tag Team Championship Contenders
-const mockTagChampionshipContenders: ContenderWithPlayer[] = [
+const mockTagChampionshipContenders: ContenderWithWrestler[] = [
   {
     championshipId: 'champ-003',
-    playerId: 'player-008',
-    playerName: 'Tom',
+    wrestlerId: 'wrestler-008',
     wrestlerName: 'Roman Reigns',
     rank: 1,
     rankingScore: 92.5,
@@ -297,8 +285,7 @@ const mockTagChampionshipContenders: ContenderWithPlayer[] = [
   },
   {
     championshipId: 'champ-003',
-    playerId: 'player-001',
-    playerName: 'John',
+    wrestlerId: 'wrestler-001',
     wrestlerName: 'Stone Cold Steve Austin',
     rank: 2,
     rankingScore: 86.3,
@@ -318,8 +305,7 @@ const mockTagChampionshipContenders: ContenderWithPlayer[] = [
   },
   {
     championshipId: 'champ-003',
-    playerId: 'player-003',
-    playerName: 'Chris',
+    wrestlerId: 'wrestler-003',
     wrestlerName: 'Triple H',
     rank: 3,
     rankingScore: 81.7,
@@ -339,8 +325,7 @@ const mockTagChampionshipContenders: ContenderWithPlayer[] = [
   },
   {
     championshipId: 'champ-003',
-    playerId: 'player-006',
-    playerName: 'Ryan',
+    wrestlerId: 'wrestler-006',
     wrestlerName: 'John Cena',
     rank: 4,
     rankingScore: 75.8,
@@ -360,8 +345,7 @@ const mockTagChampionshipContenders: ContenderWithPlayer[] = [
   },
   {
     championshipId: 'champ-003',
-    playerId: 'player-009',
-    playerName: 'Jake',
+    wrestlerId: 'wrestler-009',
     wrestlerName: 'Finn Balor',
     rank: 5,
     rankingScore: 70.2,
@@ -381,8 +365,7 @@ const mockTagChampionshipContenders: ContenderWithPlayer[] = [
   },
   {
     championshipId: 'champ-003',
-    playerId: 'player-011',
-    playerName: 'Brian',
+    wrestlerId: 'wrestler-011',
     wrestlerName: 'Bret Hart',
     rank: 6,
     rankingScore: 65.5,
@@ -408,8 +391,7 @@ export const mockChampionshipContenders: ChampionshipContenders[] = [
     championshipId: 'champ-001',
     championshipName: 'WWE Championship',
     currentChampion: {
-      playerId: 'player-005',
-      playerName: 'Alex',
+      wrestlerId: 'wrestler-005',
       wrestlerName: 'CM Punk',
       imageUrl: undefined,
     },
@@ -421,8 +403,7 @@ export const mockChampionshipContenders: ChampionshipContenders[] = [
     championshipId: 'champ-002',
     championshipName: 'Intercontinental Championship',
     currentChampion: {
-      playerId: 'player-004',
-      playerName: 'Dave',
+      wrestlerId: 'wrestler-004',
       wrestlerName: 'Undertaker',
       imageUrl: undefined,
     },
@@ -434,8 +415,7 @@ export const mockChampionshipContenders: ChampionshipContenders[] = [
     championshipId: 'champ-003',
     championshipName: 'Tag Team Championship',
     currentChampion: {
-      playerId: 'player-010',
-      playerName: 'Kevin',
+      wrestlerId: 'wrestler-010',
       wrestlerName: 'Shawn Michaels',
       imageUrl: undefined,
     },
@@ -445,10 +425,10 @@ export const mockChampionshipContenders: ChampionshipContenders[] = [
   },
 ];
 
-// Mock Player Contender Status (for a current player view)
-export const mockPlayerContenderStatus: PlayerContenderStatus = {
-  playerId: 'player-001',
-  playerName: 'John',
+// Mock Wrestler Contender Status (for a current wrestler view)
+export const mockWrestlerContenderStatus: WrestlerContenderStatus = {
+  wrestlerId: 'wrestler-001',
+  wrestlerName: 'John',
   championships: [
     {
       championshipId: 'champ-001',
@@ -493,11 +473,11 @@ export function getContenderConfigByChampionship(
   return mockContenderConfigs.find((c) => c.championshipId === championshipId);
 }
 
-export function getPlayerContenderStatus(playerId: string): PlayerContenderStatus | undefined {
-  // In a real app, this would fetch player-specific data
-  // For now, return mock data for player-001
-  if (playerId === 'player-001') {
-    return mockPlayerContenderStatus;
+export function getWrestlerContenderStatus(wrestlerId: string): WrestlerContenderStatus | undefined {
+  // In a real app, this would fetch wrestler-specific data
+  // For now, return mock data for wrestler-001
+  if (wrestlerId === 'wrestler-001') {
+    return mockWrestlerContenderStatus;
   }
   return undefined;
 }

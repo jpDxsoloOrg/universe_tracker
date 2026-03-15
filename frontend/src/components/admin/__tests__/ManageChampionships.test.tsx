@@ -10,7 +10,7 @@ const {
   mockDeleteChampionship,
   mockVacateChampionship,
   mockGetAllDivisions,
-  mockGetAllPlayers,
+  mockGetAllWrestlers,
   mockGenerateUploadUrl,
   mockUploadToS3,
 } = vi.hoisted(() => ({
@@ -20,7 +20,7 @@ const {
   mockDeleteChampionship: vi.fn(),
   mockVacateChampionship: vi.fn(),
   mockGetAllDivisions: vi.fn(),
-  mockGetAllPlayers: vi.fn(),
+  mockGetAllWrestlers: vi.fn(),
   mockGenerateUploadUrl: vi.fn(),
   mockUploadToS3: vi.fn(),
 }));
@@ -36,8 +36,8 @@ vi.mock('../../../services/api', () => ({
   divisionsApi: {
     getAll: mockGetAllDivisions,
   },
-  playersApi: {
-    getAll: mockGetAllPlayers,
+  wrestlersApi: {
+    getAll: mockGetAllWrestlers,
   },
   imagesApi: {
     generateUploadUrl: mockGenerateUploadUrl,
@@ -51,9 +51,9 @@ vi.mock('../ManageChampionships.css', () => ({}));
 import ManageChampionships from '../ManageChampionships';
 
 // --- Test data ---
-const mockPlayers = [
-  { playerId: 'p1', name: 'John Cena', currentWrestler: 'John Cena', wins: 10, losses: 2, draws: 1, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
-  { playerId: 'p2', name: 'The Rock', currentWrestler: 'The Rock', wins: 8, losses: 3, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+const mockWrestlers = [
+  { wrestlerId: 'p1', name: 'John Cena', wins: 10, losses: 2, draws: 1, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
+  { wrestlerId: 'p2', name: 'The Rock', wins: 8, losses: 3, draws: 0, createdAt: '2024-01-01', updatedAt: '2024-01-01' },
 ];
 
 const mockDivisions = [
@@ -94,7 +94,7 @@ function renderManageChampionships() {
 function setupDefaultMocks() {
   mockGetAllChampionships.mockResolvedValue(mockChampionships);
   mockGetAllDivisions.mockResolvedValue(mockDivisions);
-  mockGetAllPlayers.mockResolvedValue(mockPlayers);
+  mockGetAllWrestlers.mockResolvedValue(mockWrestlers);
 }
 
 describe('ManageChampionships', () => {
@@ -120,7 +120,7 @@ describe('ManageChampionships', () => {
     // Count header
     expect(screen.getByText('All Championships (2)')).toBeInTheDocument();
 
-    // Champion resolved to player name
+    // Champion resolved to wrestler name
     expect(screen.getByText('Champion: John Cena')).toBeInTheDocument();
     // Vacant for title with no champion
     expect(screen.getByText('Champion: Vacant')).toBeInTheDocument();

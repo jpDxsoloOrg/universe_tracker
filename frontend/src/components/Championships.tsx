@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback, useRef, useMemo} from 'react';
 import { useTranslation } from 'react-i18next';
-import { championshipsApi, divisionsApi, playersApi } from '../services/api';
+import { championshipsApi, divisionsApi, wrestlersApi } from '../services/api';
 import { formatDate } from '../utils/dateUtils';
 import { logger } from '../utils/logger';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
-import { type Division, type Championship, type ChampionshipReign, type Player } from '../types';
+import { type Division, type Championship, type ChampionshipReign, type Wrestler } from '../types';
 import DivisionFilter from './DivisionFilter';
 import Skeleton from './ui/Skeleton';
 import EmptyState from './ui/EmptyState';
@@ -19,7 +19,7 @@ export default function Championships() {
   const { t } = useTranslation();
   useDocumentTitle(t('nav.championships'));
   const [championships, setChampionships] = useState<Championship[]>([]);
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [wrestlers, setWrestlers] = useState<Wrestler[]>([]);
   const [divisions, setDivisions] = useState<Division[]>([]);
   const [selectedDivision, setSelectedDivision] = useState<string>('all');
   const [selectedChampionship, setSelectedChampionship] = useState<string | null>(null);
@@ -34,13 +34,13 @@ export default function Championships() {
     try {
       setLoading(true);
       setError(null);
-      const [champData, playerData, divisionsData] = await Promise.all([
+      const [champData, wrestlerData, divisionsData] = await Promise.all([
         championshipsApi.getAll(),
-        playersApi.getAll(),
+        wrestlersApi.getAll(),
         divisionsApi.getAll(),
       ]);
       setChampionships(champData);
-      setPlayers(playerData);
+      setWrestlers(wrestlerData);
       setDivisions(divisionsData);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load championships');
@@ -56,14 +56,14 @@ export default function Championships() {
       try {
         setLoading(true);
         setError(null);
-        const [champData, playerData, divisionsData] = await Promise.all([
+        const [champData, wrestlerData, divisionsData] = await Promise.all([
           championshipsApi.getAll(abortController.signal),
-          playersApi.getAll(abortController.signal),
+          wrestlersApi.getAll(abortController.signal),
           divisionsApi.getAll(abortController.signal),
         ]);
         if (!abortController.signal.aborted) {
           setChampionships(champData);
-          setPlayers(playerData);
+          setWrestlers(wrestlerData);
           setDivisions(divisionsData);
         }
       } catch (err) {
@@ -124,15 +124,15 @@ export default function Championships() {
     return championships.filter(c => c.divisionId === selectedDivision);
   }, [championships, selectedDivision]);
 
-  const getPlayerName = (playerId: string | string[]) => {
-    if (Array.isArray(playerId)) {
-      return playerId.map(id => {
-        const player = players.find(p => p.playerId === id);
-        return player ? player.name : t('common.unknown');
+  const getWrestlerName = (wrestlerId: string | string[]) => {
+    if (Array.isArray(wrestlerId)) {
+      return wrestlerId.map(id => {
+        const wrestler = wrestlers.find(p => p.wrestlerId === id);
+        return wrestler ? wrestler.name : t('common.unknown');
       }).join(' & ');
     }
-    const player = players.find(p => p.playerId === playerId);
-    return player ? player.name : t('common.unknown');
+    const wrestler = wrestlers.find(p => p.wrestlerId === wrestlerId);
+    return wrestler ? wrestler.name : t('common.unknown');
   };
 
   if (loading) {
@@ -191,7 +191,7 @@ export default function Championships() {
               <label>{t('championships.currentChampion')}:</label>
               <p>
                 {championship.currentChampion
-                  ? getPlayerName(championship.currentChampion)
+                  ? getWrestlerName(championship.currentChampion)
                   : t('common.vacant')}
               </p>
             </div>
@@ -248,7 +248,7 @@ export default function Championships() {
                     {history.map((reign, index) => (
                       <tr key={index}>
                         <td className="champion-name">
-                          {getPlayerName(reign.champion)}
+                          {getWrestlerName(reign.champion)}
                         </td>
                         <td>{formatDate(reign.wonDate)}</td>
                         <td>

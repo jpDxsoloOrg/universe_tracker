@@ -24,7 +24,7 @@ import AdminPanel from './components/admin/AdminPanel';
 // Auth components
 import Login from './components/auth/Login';
 // Statistics components
-import PlayerStats from './components/statistics/PlayerStats';
+import WrestlerStats from './components/statistics/WrestlerStats';
 import HeadToHeadComparison from './components/statistics/HeadToHeadComparison';
 import Leaderboards from './components/statistics/Leaderboards';
 import RecordBook from './components/statistics/RecordBook';
@@ -98,10 +98,10 @@ function AppLayout() {
 
             {/* Statistics Routes - feature-gated */}
             <Route path="/stats" element={
-              <FeatureRoute feature="statistics"><PlayerStats /></FeatureRoute>
+              <FeatureRoute feature="statistics"><WrestlerStats /></FeatureRoute>
             } />
-            <Route path="/stats/player/:playerId" element={
-              <FeatureRoute feature="statistics"><PlayerStats /></FeatureRoute>
+            <Route path="/stats/wrestler/:wrestlerId" element={
+              <FeatureRoute feature="statistics"><WrestlerStats /></FeatureRoute>
             } />
             <Route path="/stats/head-to-head" element={
               <FeatureRoute feature="statistics"><HeadToHeadComparison /></FeatureRoute>

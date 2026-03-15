@@ -33,7 +33,7 @@ vi.mock('react-i18next', () => ({
         'common.loading': 'Loading...',
       };
       if (key === 'contenders.noContendersHint') {
-        return `Players need at least ${opts?.minMatches || 3} matches`;
+        return `Wrestlers need at least ${opts?.minMatches || 3} matches`;
       }
       return map[key] || key;
     },
@@ -82,16 +82,16 @@ const mockContenderData = {
   championshipName: 'World Heavyweight',
   divisionId: 'div1',
   currentChampion: {
-    playerId: 'p1',
-    playerName: 'John Cena',
+    wrestlerId: 'p1',
+    wrestlerName: 'John Cena',
     wrestlerName: 'The Champ',
     imageUrl: undefined,
   },
   contenders: [
     {
       championshipId: 'ch1',
-      playerId: 'p2',
-      playerName: 'The Rock',
+      wrestlerId: 'p2',
+      wrestlerName: 'The Rock',
       wrestlerName: 'The Great One',
       rank: 1,
       rankingScore: 85.5,
@@ -111,8 +111,8 @@ const mockContenderData = {
     },
     {
       championshipId: 'ch1',
-      playerId: 'p3',
-      playerName: 'Undertaker',
+      wrestlerId: 'p3',
+      wrestlerName: 'Undertaker',
       wrestlerName: 'The Deadman',
       rank: 2,
       rankingScore: 75.2,
@@ -171,7 +171,7 @@ describe('ContenderRankings', () => {
       expect(screen.getByText('Current Champion')).toBeInTheDocument();
     });
 
-    // Champion card shows wrestler and player name
+    // Champion card shows wrestler and wrestler name
     const championCard = document.querySelector('.champion-card');
     expect(championCard).toBeTruthy();
     expect(championCard).toHaveTextContent('The Champ');

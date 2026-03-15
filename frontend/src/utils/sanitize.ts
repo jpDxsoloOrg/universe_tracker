@@ -23,7 +23,7 @@ export const sanitizeInput = (input: string, maxLength: number = 100): string =>
 };
 
 /**
- * Sanitizes a name field (player name, championship name, etc.)
+ * Sanitizes a name field (wrestler name, championship name, etc.)
  * Allows alphanumeric characters, spaces, hyphens, apostrophes, and periods.
  *
  * @param name - The name to sanitize

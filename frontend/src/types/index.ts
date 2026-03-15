@@ -282,3 +282,37 @@ export interface ActivityFeedResponse {
   items: ActivityItem[];
   nextCursor: string | null;
 }
+
+export interface DraftPick {
+  pickNumber: number;
+  round: number;
+  companyId: string;
+  wrestlerId: string;
+  previousCompanyId?: string;
+  pickedAt: string;
+}
+
+export interface DraftProtection {
+  companyId: string;
+  wrestlerId: string;
+  protectedAt: string;
+}
+
+export interface Draft {
+  draftId: string;
+  name: string;
+  type: 'global' | 'inter-company';
+  status: 'setup' | 'active' | 'completed';
+  participatingCompanyIds: string[];
+  rounds: number;
+  currentRound: number;
+  currentPickIndex: number;
+  draftOrder: string[];
+  snakeOrder: boolean;
+  protectedPicksPerCompany: number;
+  includeGlobalPool: boolean;
+  picks: DraftPick[];
+  protections: DraftProtection[];
+  createdAt: string;
+  updatedAt: string;
+}

@@ -6,24 +6,29 @@ import { parseBody } from '../../lib/parseBody';
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
-    const playerId = event.pathParameters?.playerId;
+    const wrestlerId = event.pathParameters?.wrestlerId;
 
-    if (!playerId) {
-      return badRequest('Player ID is required');
+    if (!wrestlerId) {
+      return badRequest('Wrestler ID is required');
     }
 
     const { data: body, error: parseError } = parseBody(event);
     if (parseError) return parseError;
 
-    const playerResult = await getOrNotFound(TableNames.PLAYERS, { playerId }, 'Player not found');
-    if ('notFoundResponse' in playerResult) {
-      return playerResult.notFoundResponse;
+    const wrestlerResult = await getOrNotFound(TableNames.WRESTLERS, { wrestlerId }, 'Wrestler not found');
+    if ('notFoundResponse' in wrestlerResult) {
+      return wrestlerResult.notFoundResponse;
     }
 
     const updateFields: Record<string, unknown> = {
-      currentWrestler: body.currentWrestler,
       name: body.name,
       imageUrl: body.imageUrl,
+      nickname: body.nickname,
+      finisher: body.finisher,
+      weight: body.weight,
+      height: body.height,
+      hometown: body.hometown,
+      alignment: body.alignment,
     };
     const removeFields: string[] = [];
 
@@ -54,8 +59,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     }
 
     const result = await dynamoDb.update({
-      TableName: TableNames.PLAYERS,
-      Key: { playerId },
+      TableName: TableNames.WRESTLERS,
+      Key: { wrestlerId },
       UpdateExpression: updateExpr.UpdateExpression,
       ExpressionAttributeNames: updateExpr.ExpressionAttributeNames,
       ExpressionAttributeValues: updateExpr.ExpressionAttributeValues,
@@ -64,7 +69,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     return success(result.Attributes);
   } catch (err) {
-    console.error('Error updating player:', err);
-    return serverError('Failed to update player');
+    console.error('Error updating wrestler:', err);
+    return serverError('Failed to update wrestler');
   }
 };

@@ -16,18 +16,17 @@ interface MatchRecord {
   seasonId?: string;
 }
 
-interface PlayerRecord {
-  playerId: string;
+interface WrestlerRecord {
+  wrestlerId: string;
   name: string;
-  currentWrestler: string;
   imageUrl?: string;
 }
 
 interface RivalryAgg {
-  player1Id: string;
-  player2Id: string;
-  player1Wins: number;
-  player2Wins: number;
+  wrestler1Id: string;
+  wrestler2Id: string;
+  wrestler1Wins: number;
+  wrestler2Wins: number;
   draws: number;
   matchCount: number;
   lastMatchDate: string;
@@ -49,20 +48,19 @@ export const handler: APIGatewayProxyHandler = async (event) => {
   try {
     const seasonId = event.queryStringParameters?.seasonId;
 
-    const [playersResult, matchesResult] = await Promise.all([
-      dynamoDb.scanAll({ TableName: TableNames.PLAYERS }),
+    const [wrestlersResult, matchesResult] = await Promise.all([
+      dynamoDb.scanAll({ TableName: TableNames.WRESTLERS }),
       dynamoDb.scanAll({ TableName: TableNames.MATCHES }),
     ]);
 
-    // Only include players who have a wrestler assigned (exclude Fantasy-only users)
-    const players = (playersResult as unknown as PlayerRecord[]).filter((p) => p.currentWrestler);
+    const wrestlers = wrestlersResult as unknown as WrestlerRecord[];
     const allMatches = matchesResult as unknown as MatchRecord[];
     let completed = allMatches.filter((m) => m.status === 'completed');
     if (seasonId) {
       completed = completed.filter((m) => m.seasonId === seasonId);
     }
 
-    const playerMap = new Map(players.map((p) => [p.playerId, p]));
+    const wrestlerMap = new Map(wrestlers.map((w) => [w.wrestlerId, w]));
 
     const aggMap = new Map<string, RivalryAgg>();
 
@@ -72,16 +70,16 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       const [a, b] = participants;
       const key = pairKey(a, b);
       const existing = aggMap.get(key);
-      const p1Won = match.winners?.includes(a);
-      const p2Won = match.winners?.includes(b);
-      const isDraw = !p1Won && !p2Won;
+      const w1Won = match.winners?.includes(a);
+      const w2Won = match.winners?.includes(b);
+      const isDraw = !w1Won && !w2Won;
 
       if (!existing) {
         aggMap.set(key, {
-          player1Id: a,
-          player2Id: b,
-          player1Wins: p1Won ? 1 : 0,
-          player2Wins: p2Won ? 1 : 0,
+          wrestler1Id: a,
+          wrestler2Id: b,
+          wrestler1Wins: w1Won ? 1 : 0,
+          wrestler2Wins: w2Won ? 1 : 0,
           draws: isDraw ? 1 : 0,
           matchCount: 1,
           lastMatchDate: match.date,
@@ -89,8 +87,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           recentMatchIds: [match.matchId],
         });
       } else {
-        existing.player1Wins += p1Won ? 1 : 0;
-        existing.player2Wins += p2Won ? 1 : 0;
+        existing.wrestler1Wins += w1Won ? 1 : 0;
+        existing.wrestler2Wins += w2Won ? 1 : 0;
         existing.draws += isDraw ? 1 : 0;
         existing.matchCount += 1;
         if (new Date(match.date) > new Date(existing.lastMatchDate)) {
@@ -125,15 +123,15 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       })
       .slice(0, MAX_RIVALRIES_RETURNED)
       .map((r) => {
-        const p1 = playerMap.get(r.player1Id);
-        const p2 = playerMap.get(r.player2Id);
+        const w1 = wrestlerMap.get(r.wrestler1Id);
+        const w2 = wrestlerMap.get(r.wrestler2Id);
         return {
-          player1Id: r.player1Id,
-          player2Id: r.player2Id,
-          player1: p1 ? { playerId: p1.playerId, name: p1.name, wrestlerName: p1.currentWrestler, imageUrl: p1.imageUrl } : undefined,
-          player2: p2 ? { playerId: p2.playerId, name: p2.name, wrestlerName: p2.currentWrestler, imageUrl: p2.imageUrl } : undefined,
-          player1Wins: r.player1Wins,
-          player2Wins: r.player2Wins,
+          wrestler1Id: r.wrestler1Id,
+          wrestler2Id: r.wrestler2Id,
+          wrestler1: w1 ? { wrestlerId: w1.wrestlerId, wrestlerName: w1.name, imageUrl: w1.imageUrl } : undefined,
+          wrestler2: w2 ? { wrestlerId: w2.wrestlerId, wrestlerName: w2.name, imageUrl: w2.imageUrl } : undefined,
+          wrestler1Wins: r.wrestler1Wins,
+          wrestler2Wins: r.wrestler2Wins,
           draws: r.draws,
           matchCount: r.matchCount,
           lastMatchDate: r.lastMatchDate,

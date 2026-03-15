@@ -25,7 +25,7 @@
   {"slug":"admin-fantasy-config","titleKey":"wiki.articles.adminFantasyConfig","file":"admin-fantasy-config.md","adminOnly":true},
   {"slug":"admin-user-management","titleKey":"wiki.articles.adminUserManagement","file":"admin-user-management.md","adminOnly":true},
   {"slug":"admin-divisions","titleKey":"wiki.articles.adminDivisions","file":"admin-divisions.md","adminOnly":true},
-  {"slug":"admin-manage-players","titleKey":"wiki.articles.adminManagePlayers","file":"admin-manage-players.md","adminOnly":true},
+  {"slug":"admin-manage-players","titleKey":"wiki.articles.adminManageWrestlers","file":"admin-manage-players.md","adminOnly":true},
   {"slug":"admin-seasons","titleKey":"wiki.articles.adminSeasons","file":"admin-seasons.md","adminOnly":true},
   {"slug":"admin-championships","titleKey":"wiki.articles.adminChampionships","file":"admin-championships.md","adminOnly":true},
   {"slug":"admin-events","titleKey":"wiki.articles.adminEvents","file":"admin-events.md","adminOnly":true},

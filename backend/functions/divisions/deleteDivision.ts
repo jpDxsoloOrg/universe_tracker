@@ -16,9 +16,9 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       return divisionResult.notFoundResponse;
     }
 
-    // Check if any players are assigned to this division
-    const playersResult = await dynamoDb.scan({
-      TableName: TableNames.PLAYERS,
+    // Check if any wrestlers are assigned to this division
+    const wrestlersResult = await dynamoDb.scan({
+      TableName: TableNames.WRESTLERS,
       FilterExpression: '#divisionId = :divisionId',
       ExpressionAttributeNames: {
         '#divisionId': 'divisionId',
@@ -28,9 +28,9 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       },
     });
 
-    if (playersResult.Items && playersResult.Items.length > 0) {
+    if (wrestlersResult.Items && wrestlersResult.Items.length > 0) {
       return conflict(
-        `Cannot delete division. ${playersResult.Items.length} player(s) are still assigned to this division.`
+        `Cannot delete division. ${wrestlersResult.Items.length} wrestler(s) are still assigned to this division.`
       );
     }
 

@@ -6,8 +6,8 @@ Die Seite **Herausforderer-Konfig** ermöglicht die Einrichtung der automatische
 
 - Die Ranglisten werden automatisch anhand der letzten Match-Ergebnisse berechnet
 - Jede Meisterschaft hat ihre eigene Herausforderer-Rangliste
-- Ranglisten können auf eine bestimmte Division beschränkt werden (z. B. nur Spieler der Schwergewichts-Division für die Schwergewichts-Meisterschaft)
-- Spieler müssen eine Mindestanzahl an Matches absolviert haben, um zu qualifizieren
+- Ranglisten können auf eine bestimmte Division beschränkt werden (z. B. nur Wrestler der Schwergewichts-Division für die Schwergewichts-Meisterschaft)
+- Wrestler müssen eine Mindestanzahl an Matches absolviert haben, um zu qualifizieren
 
 ## Ranglisten konfigurieren
 
@@ -15,10 +15,10 @@ Die Seite **Herausforderer-Konfig** ermöglicht die Einrichtung der automatische
 2. Wähle eine Meisterschaft zur Konfiguration
 3. Passe die Einstellungen an:
    - **Ranglistenzeitraum (Tage)** — Wie weit Match-Daten zurückreichen (7–365 Tage)
-   - **Mindestanzahl Matches** — Wie viele Matches ein Spieler braucht, um in den Ranglisten zu erscheinen
+   - **Mindestanzahl Matches** — Wie viele Matches ein Wrestler braucht, um in den Ranglisten zu erscheinen
    - **Max. Herausforderer** — Wie viele platzierte Herausforderer angezeigt werden
    - **Unentschieden einbeziehen** — Ob Unentschieden teilweise in die Ranglisten-Punkte zählen
-   - **Division beschränkt** — Nur Spieler derselben Division wie die Meisterschaft können antreten
+   - **Division beschränkt** — Nur Wrestler derselben Division wie die Meisterschaft können antreten
 4. Klicke auf **Konfiguration speichern**, um zu übernehmen
 
 ## Ranglisten neu berechnen

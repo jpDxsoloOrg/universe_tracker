@@ -83,7 +83,6 @@ const mockContenderData = {
   divisionId: 'div1',
   currentChampion: {
     wrestlerId: 'p1',
-    wrestlerName: 'John Cena',
     wrestlerName: 'The Champ',
     imageUrl: undefined,
   },
@@ -91,7 +90,6 @@ const mockContenderData = {
     {
       championshipId: 'ch1',
       wrestlerId: 'p2',
-      wrestlerName: 'The Rock',
       wrestlerName: 'The Great One',
       rank: 1,
       rankingScore: 85.5,
@@ -112,7 +110,6 @@ const mockContenderData = {
     {
       championshipId: 'ch1',
       wrestlerId: 'p3',
-      wrestlerName: 'Undertaker',
       wrestlerName: 'The Deadman',
       rank: 2,
       rankingScore: 75.2,
@@ -171,11 +168,10 @@ describe('ContenderRankings', () => {
       expect(screen.getByText('Current Champion')).toBeInTheDocument();
     });
 
-    // Champion card shows wrestler and wrestler name
+    // Champion card shows wrestler name
     const championCard = document.querySelector('.champion-card');
     expect(championCard).toBeTruthy();
     expect(championCard).toHaveTextContent('The Champ');
-    expect(championCard).toHaveTextContent('John Cena');
 
     // Missing imageUrl should use default wrestler image
     const championImage = championCard!.querySelector('img');
@@ -194,9 +190,9 @@ describe('ContenderRankings', () => {
       expect(screen.getByText('Rankings')).toBeInTheDocument();
     });
 
-    // Contender names
-    expect(screen.getByText('The Great One')).toBeInTheDocument();
-    expect(screen.getByText('The Deadman')).toBeInTheDocument();
+    // Contender names (rendered in both wrestler-name heading and paragraph)
+    expect(screen.getAllByText('The Great One').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('The Deadman').length).toBeGreaterThanOrEqual(1);
 
     // Movement indicators -- use CSS class selectors for specificity
     const upBadge = document.querySelector('.movement-badge.up');

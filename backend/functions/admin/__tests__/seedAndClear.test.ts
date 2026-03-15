@@ -16,7 +16,7 @@ vi.mock('../../../lib/dynamodb', () => ({
     update: mockUpdate, delete: mockDelete, scanAll: mockScanAll, queryAll: vi.fn(),
   },
   TableNames: {
-    SITE_CONFIG: 'SiteConfig', PLAYERS: 'Players', DIVISIONS: 'Divisions',
+    SITE_CONFIG: 'SiteConfig', WRESTLERS: 'Wrestlers', DIVISIONS: 'Divisions',
     CHAMPIONSHIPS: 'Championships', CHAMPIONSHIP_HISTORY: 'ChampionshipHistory',
     SEASON_STANDINGS: 'SeasonStandings', SEASONS: 'Seasons', MATCHES: 'Matches',
     TOURNAMENTS: 'Tournaments', EVENTS: 'Events', CONTENDER_RANKINGS: 'ContenderRankings',
@@ -89,7 +89,7 @@ describe('seedData', () => {
 
     // Verify all expected categories have counts
     expect(body.createdCounts.divisions).toBe(3);
-    expect(body.createdCounts.players).toBe(12);
+    expect(body.createdCounts.wrestlers).toBe(12);
     expect(body.createdCounts.seasons).toBe(1);
     expect(body.createdCounts.seasonStandings).toBe(12);
     expect(body.createdCounts.championships).toBe(4);
@@ -128,7 +128,7 @@ describe('seedData', () => {
     expect(result!.statusCode).toBe(200);
     const body = JSON.parse(result!.body);
     expect(body.createdCounts.divisions).toBe(3);
-    expect(body.createdCounts.players).toBe(12);
+    expect(body.createdCounts.wrestlers).toBe(12);
   });
 
   it('runs full seed when body is empty or modules array is empty', async () => {
@@ -137,7 +137,7 @@ describe('seedData', () => {
 
     const resultEmptyBody = await seedData(makeEvent({ body: '{}' }), ctx, cb);
     expect(resultEmptyBody!.statusCode).toBe(200);
-    expect(JSON.parse(resultEmptyBody!.body).createdCounts.players).toBe(12);
+    expect(JSON.parse(resultEmptyBody!.body).createdCounts.wrestlers).toBe(12);
 
     const resultEmptyModules = await seedData(
       makeEvent({ body: '{"modules":[]}' }),
@@ -145,7 +145,7 @@ describe('seedData', () => {
       cb
     );
     expect(resultEmptyModules!.statusCode).toBe(200);
-    expect(JSON.parse(resultEmptyModules!.body).createdCounts.players).toBe(12);
+    expect(JSON.parse(resultEmptyModules!.body).createdCounts.wrestlers).toBe(12);
   });
 
   it('returns 400 when body has only invalid module IDs', async () => {
@@ -191,7 +191,7 @@ describe('clearAll', () => {
   });
 
   it('clears all tables and returns deleted counts when Admin', async () => {
-    mockScanAll.mockResolvedValue([{ playerId: 'p1' }, { playerId: 'p2' }]);
+    mockScanAll.mockResolvedValue([{ wrestlerId: 'p1' }, { wrestlerId: 'p2' }]);
     mockDelete.mockResolvedValue({});
     const event = withAuth(makeEvent(), 'Admin');
 
@@ -202,7 +202,7 @@ describe('clearAll', () => {
     expect(body.message).toBe('All data cleared successfully');
     expect(mockDelete).toHaveBeenCalledTimes(22); // 11 tables * 2 items
 
-    const labels = ['players', 'matches', 'championships', 'championshipHistory',
+    const labels = ['wrestlers', 'matches', 'championships', 'championshipHistory',
       'tournaments', 'seasons', 'seasonStandings', 'divisions', 'events',
       'contenderRankings', 'rankingHistory'];
     for (const label of labels) {
@@ -220,13 +220,13 @@ describe('clearAll', () => {
     expect(result!.statusCode).toBe(200);
     const body = JSON.parse(result!.body);
     expect(body.message).toBe('All data cleared successfully');
-    expect(body.deletedCounts.players).toBe(0);
+    expect(body.deletedCounts.wrestlers).toBe(0);
     expect(body.deletedCounts.matches).toBe(0);
     expect(mockDelete).not.toHaveBeenCalled();
   });
 
   it('reports error counts when individual deletes fail', async () => {
-    mockScanAll.mockResolvedValue([{ playerId: 'p1' }, { playerId: 'p2' }, { playerId: 'p3' }]);
+    mockScanAll.mockResolvedValue([{ wrestlerId: 'p1' }, { wrestlerId: 'p2' }, { wrestlerId: 'p3' }]);
     let callIndex = 0;
     mockDelete.mockImplementation(() => {
       callIndex++;

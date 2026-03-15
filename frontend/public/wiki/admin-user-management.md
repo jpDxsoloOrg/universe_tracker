@@ -7,7 +7,7 @@ The **User Management** page allows you to manage user accounts and assign roles
 | Role | Description |
 |------|-------------|
 | **Admin** | Full access to all management features, including the Danger Zone, public pages, and authenticated features |
-| **Moderator** | Access to all management features except the Danger Zone (no Generate Sample Data or Clear All Data). Can manage players, matches, championships, challenges, promos, and other day-to-day admin tasks. Assignable only by a Super Admin. |
+| **Moderator** | Access to all management features except the Danger Zone (no Generate Sample Data or Clear All Data). Can manage wrestlers, matches, championships, challenges, promos, and other day-to-day admin tasks. Assignable only by a Super Admin. |
 | **Wrestler** | Access to personal profile page with stats, contender status, challenges, and promos |
 | **Fantasy** | Access to the fantasy league: making picks, viewing leaderboards, and tracking wrestler costs |
 

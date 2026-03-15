@@ -68,7 +68,6 @@ describe('MatchTypeLeaderboards', () => {
         {
           wrestlerId: 'p1',
           wrestlerName: 'John Cena',
-          wrestlerName: 'The Champ',
           wins: 5,
           losses: 1,
           draws: 0,
@@ -84,7 +83,7 @@ describe('MatchTypeLeaderboards', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Match Type Leaderboards')).toBeInTheDocument();
-      expect(screen.getByText('John Cena')).toBeInTheDocument();
+      expect(screen.getAllByText('John Cena').length).toBeGreaterThanOrEqual(1);
       expect(screen.getByText('83.3%')).toBeInTheDocument();
     });
 
@@ -102,7 +101,6 @@ describe('MatchTypeLeaderboards', () => {
           {
             wrestlerId: 'p1',
             wrestlerName: 'John Cena',
-            wrestlerName: 'The Champ',
             wins: 5,
             losses: 1,
             draws: 0,

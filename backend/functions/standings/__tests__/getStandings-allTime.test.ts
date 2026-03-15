@@ -26,7 +26,7 @@ vi.mock('../../../lib/dynamodb', () => ({
     queryAll: mockQueryAll,
   },
   TableNames: {
-    PLAYERS: 'Players',
+    WRESTLERS: 'Wrestlers',
     SEASON_STANDINGS: 'SeasonStandings',
     MATCHES: 'Matches',
   },
@@ -62,13 +62,13 @@ function makeEvent(overrides: Partial<APIGatewayProxyEvent> = {}): APIGatewayPro
 describe('getStandings — all-time (no seasonId)', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('returns all players sorted by wins descending', async () => {
+  it('returns all wrestlers sorted by wins descending', async () => {
     mockScanAll
       .mockResolvedValueOnce([]) // completed matches
       .mockResolvedValueOnce([
-        { playerId: 'p1', name: 'Alice', currentWrestler: 'Wrestler A', wins: 10, losses: 2, draws: 1 },
-        { playerId: 'p2', name: 'Bob', currentWrestler: 'Wrestler B', wins: 15, losses: 5, draws: 0 },
-        { playerId: 'p3', name: 'Carol', currentWrestler: 'Wrestler C', wins: 8, losses: 3, draws: 2 },
+        { wrestlerId: 'p1', name: 'Alice', wins: 10, losses: 2, draws: 1 },
+        { wrestlerId: 'p2', name: 'Bob', wins: 15, losses: 5, draws: 0 },
+        { wrestlerId: 'p3', name: 'Carol', wins: 8, losses: 3, draws: 2 },
       ]);
 
     const result = await getStandings(makeEvent(), ctx, cb);
@@ -76,20 +76,20 @@ describe('getStandings — all-time (no seasonId)', () => {
     expect(result!.statusCode).toBe(200);
     const body = JSON.parse(result!.body);
     expect(body.sortedByWins).toBe(true);
-    expect(body.players).toHaveLength(3);
+    expect(body.wrestlers).toHaveLength(3);
     // Sorted: Bob (15), Alice (10), Carol (8)
-    expect(body.players[0].name).toBe('Bob');
-    expect(body.players[1].name).toBe('Alice');
-    expect(body.players[2].name).toBe('Carol');
+    expect(body.wrestlers[0].name).toBe('Bob');
+    expect(body.wrestlers[1].name).toBe('Alice');
+    expect(body.wrestlers[2].name).toBe('Carol');
   });
 
   it('breaks ties by losses ascending (fewer losses ranks higher)', async () => {
     mockScanAll
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([
-        { playerId: 'p1', name: 'Alice', currentWrestler: 'Wrestler A', wins: 10, losses: 5, draws: 0 },
-        { playerId: 'p2', name: 'Bob', currentWrestler: 'Wrestler B', wins: 10, losses: 2, draws: 0 },
-        { playerId: 'p3', name: 'Carol', currentWrestler: 'Wrestler C', wins: 10, losses: 8, draws: 0 },
+        { wrestlerId: 'p1', name: 'Alice', wins: 10, losses: 5, draws: 0 },
+        { wrestlerId: 'p2', name: 'Bob', wins: 10, losses: 2, draws: 0 },
+        { wrestlerId: 'p3', name: 'Carol', wins: 10, losses: 8, draws: 0 },
       ]);
 
     const result = await getStandings(makeEvent(), ctx, cb);
@@ -97,17 +97,17 @@ describe('getStandings — all-time (no seasonId)', () => {
     expect(result!.statusCode).toBe(200);
     const body = JSON.parse(result!.body);
     // Same wins (10), sorted by losses ascending: Bob(2), Alice(5), Carol(8)
-    expect(body.players[0].name).toBe('Bob');
-    expect(body.players[1].name).toBe('Alice');
-    expect(body.players[2].name).toBe('Carol');
+    expect(body.wrestlers[0].name).toBe('Bob');
+    expect(body.wrestlers[1].name).toBe('Alice');
+    expect(body.wrestlers[2].name).toBe('Carol');
   });
 
   it('defaults missing wins/losses to 0 for sorting', async () => {
     mockScanAll
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([
-        { playerId: 'p1', name: 'NoStats', currentWrestler: 'Wrestler A' },
-        { playerId: 'p2', name: 'HasWins', currentWrestler: 'Wrestler B', wins: 3, losses: 1 },
+        { wrestlerId: 'p1', name: 'NoStats' },
+        { wrestlerId: 'p2', name: 'HasWins', wins: 3, losses: 1 },
       ]);
 
     const result = await getStandings(makeEvent(), ctx, cb);
@@ -115,18 +115,18 @@ describe('getStandings — all-time (no seasonId)', () => {
     expect(result!.statusCode).toBe(200);
     const body = JSON.parse(result!.body);
     // HasWins (3) > NoStats (0)
-    expect(body.players[0].name).toBe('HasWins');
-    expect(body.players[1].name).toBe('NoStats');
+    expect(body.wrestlers[0].name).toBe('HasWins');
+    expect(body.wrestlers[1].name).toBe('NoStats');
   });
 
-  it('returns empty array when no players exist', async () => {
+  it('returns empty array when no wrestlers exist', async () => {
     mockScanAll.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
 
     const result = await getStandings(makeEvent(), ctx, cb);
 
     expect(result!.statusCode).toBe(200);
     const body = JSON.parse(result!.body);
-    expect(body.players).toEqual([]);
+    expect(body.wrestlers).toEqual([]);
     expect(body.sortedByWins).toBe(true);
   });
 
@@ -139,7 +139,7 @@ describe('getStandings — all-time (no seasonId)', () => {
     expect(body.seasonId).toBeUndefined();
   });
 
-  it('calls scanAll for Matches then Players', async () => {
+  it('calls scanAll for Matches then Wrestlers', async () => {
     mockScanAll.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
 
     await getStandings(makeEvent(), ctx, cb);
@@ -152,11 +152,11 @@ describe('getStandings — all-time (no seasonId)', () => {
       ExpressionAttributeValues: { ':completed': 'completed' },
     });
     expect(mockScanAll).toHaveBeenNthCalledWith(2, {
-      TableName: 'Players',
+      TableName: 'Wrestlers',
     });
   });
 
-  it('includes recentForm and currentStreak on each player (ordered by updatedAt desc)', async () => {
+  it('includes recentForm and currentStreak on each wrestler (ordered by updatedAt desc)', async () => {
     const completedMatches = [
       { date: '2024-01-05', updatedAt: '2024-01-05T12:00:00Z', participants: ['p1', 'p2'], winners: ['p1'], losers: ['p2'], status: 'completed' },
       { date: '2024-01-04', updatedAt: '2024-01-04T12:00:00Z', participants: ['p1', 'p3'], winners: ['p1'], losers: ['p3'], status: 'completed' },
@@ -165,18 +165,18 @@ describe('getStandings — all-time (no seasonId)', () => {
     mockScanAll
       .mockResolvedValueOnce(completedMatches)
       .mockResolvedValueOnce([
-        { playerId: 'p1', name: 'Alice', currentWrestler: 'Wrestler A', wins: 10, losses: 2, draws: 1 },
-        { playerId: 'p2', name: 'Bob', currentWrestler: 'Wrestler B', wins: 8, losses: 5, draws: 0 },
+        { wrestlerId: 'p1', name: 'Alice', wins: 10, losses: 2, draws: 1 },
+        { wrestlerId: 'p2', name: 'Bob', wins: 8, losses: 5, draws: 0 },
       ]);
 
     const result = await getStandings(makeEvent(), ctx, cb);
 
     expect(result!.statusCode).toBe(200);
     const body = JSON.parse(result!.body);
-    const alice = body.players.find((p: { playerId: string }) => p.playerId === 'p1');
+    const alice = body.wrestlers.find((p: { wrestlerId: string }) => p.wrestlerId === 'p1');
     expect(alice.recentForm).toEqual(['W', 'W', 'L']); // newest first by updatedAt: 05 W, 04 W, 03 L
     expect(alice.currentStreak).toEqual({ type: 'W', count: 2 });
-    const bob = body.players.find((p: { playerId: string }) => p.playerId === 'p2');
+    const bob = body.wrestlers.find((p: { wrestlerId: string }) => p.wrestlerId === 'p2');
     expect(bob.recentForm).toEqual(['L', 'W']); // 05 L (vs p1), 03 W (vs p1)
     expect(bob.currentStreak).toEqual({ type: 'L', count: 1 });
   });
@@ -189,15 +189,15 @@ describe('getStandings — all-time (no seasonId)', () => {
     mockScanAll
       .mockResolvedValueOnce(completedMatches)
       .mockResolvedValueOnce([
-        { playerId: 'p1', name: 'Alice', currentWrestler: 'Wrestler A', wins: 1, losses: 1, draws: 0 },
-        { playerId: 'p2', name: 'Bob', currentWrestler: 'Wrestler B', wins: 1, losses: 1, draws: 0 },
+        { wrestlerId: 'p1', name: 'Alice', wins: 1, losses: 1, draws: 0 },
+        { wrestlerId: 'p2', name: 'Bob', wins: 1, losses: 1, draws: 0 },
       ]);
 
     const result = await getStandings(makeEvent(), ctx, cb);
 
     expect(result!.statusCode).toBe(200);
     const body = JSON.parse(result!.body);
-    const alice = body.players.find((p: { playerId: string }) => p.playerId === 'p1');
+    const alice = body.wrestlers.find((p: { wrestlerId: string }) => p.wrestlerId === 'p1');
     // Only the match with updatedAt (p1 won on 01-06) counts
     expect(alice.recentForm).toEqual(['W']);
     expect(alice.currentStreak).toEqual({ type: 'W', count: 1 });
@@ -206,14 +206,14 @@ describe('getStandings — all-time (no seasonId)', () => {
   it('returns empty recentForm and zero streak when no completed matches', async () => {
     mockScanAll
       .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([{ playerId: 'p1', name: 'Alice', currentWrestler: 'Wrestler A', wins: 0, losses: 0, draws: 0 }]);
+      .mockResolvedValueOnce([{ wrestlerId: 'p1', name: 'Alice', wins: 0, losses: 0, draws: 0 }]);
 
     const result = await getStandings(makeEvent(), ctx, cb);
 
     expect(result!.statusCode).toBe(200);
     const body = JSON.parse(result!.body);
-    expect(body.players[0].recentForm).toEqual([]);
-    expect(body.players[0].currentStreak).toEqual({ type: 'W', count: 0 });
+    expect(body.wrestlers[0].recentForm).toEqual([]);
+    expect(body.wrestlers[0].currentStreak).toEqual({ type: 'W', count: 0 });
   });
 });
 

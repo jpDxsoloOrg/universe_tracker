@@ -117,7 +117,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     const overlap = body.winners.filter((w: string) => body.losers.includes(w));
     if (overlap.length > 0) {
-      return badRequest('A player cannot be both a winner and loser in the same match');
+      return badRequest('A wrestler cannot be both a winner and loser in the same match');
     }
 
     if (body.starRating != null) {
@@ -183,12 +183,12 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       },
     });
 
-    // 2. Update player standings (all-time) for winners
-    for (const playerId of body.winners) {
+    // 2. Update wrestler standings (all-time) for winners
+    for (const wrestlerId of body.winners) {
       transactItems.push({
         Update: {
-          TableName: TableNames.PLAYERS,
-          Key: { playerId },
+          TableName: TableNames.WRESTLERS,
+          Key: { wrestlerId },
           UpdateExpression: isDraw
             ? 'SET draws = if_not_exists(draws, :zero) + :one, updatedAt = :timestamp'
             : 'SET wins = if_not_exists(wins, :zero) + :one, updatedAt = :timestamp',
@@ -201,13 +201,13 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       });
     }
 
-    // 3. Update player standings (all-time) for losers (if not a draw)
+    // 3. Update wrestler standings (all-time) for losers (if not a draw)
     if (!isDraw) {
-      for (const playerId of body.losers) {
+      for (const wrestlerId of body.losers) {
         transactItems.push({
           Update: {
-            TableName: TableNames.PLAYERS,
-            Key: { playerId },
+            TableName: TableNames.WRESTLERS,
+            Key: { wrestlerId },
             UpdateExpression: 'SET losses = if_not_exists(losses, :zero) + :one, updatedAt = :timestamp',
             ExpressionAttributeValues: {
               ':one': 1,
@@ -221,11 +221,11 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     // 4. Update season standings if match belongs to a season
     if (match.seasonId) {
-      for (const playerId of body.winners) {
+      for (const wrestlerId of body.winners) {
         transactItems.push({
           Update: {
             TableName: TableNames.SEASON_STANDINGS,
-            Key: { seasonId: match.seasonId, playerId },
+            Key: { seasonId: match.seasonId, wrestlerId },
             UpdateExpression: isDraw
               ? 'SET draws = if_not_exists(draws, :zero) + :one, wins = if_not_exists(wins, :zero), losses = if_not_exists(losses, :zero), updatedAt = :timestamp'
               : 'SET wins = if_not_exists(wins, :zero) + :one, losses = if_not_exists(losses, :zero), draws = if_not_exists(draws, :zero), updatedAt = :timestamp',
@@ -239,11 +239,11 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       }
 
       if (!isDraw) {
-        for (const playerId of body.losers) {
+        for (const wrestlerId of body.losers) {
           transactItems.push({
             Update: {
               TableName: TableNames.SEASON_STANDINGS,
-              Key: { seasonId: match.seasonId, playerId },
+              Key: { seasonId: match.seasonId, wrestlerId },
               UpdateExpression: 'SET losses = if_not_exists(losses, :zero) + :one, wins = if_not_exists(wins, :zero), draws = if_not_exists(draws, :zero), updatedAt = :timestamp',
               ExpressionAttributeValues: {
                 ':one': 1,
@@ -256,7 +256,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       }
     }
 
-    // Execute the core transaction (match + player standings + season standings)
+    // Execute the core transaction (match + wrestler standings + season standings)
     // DynamoDB transactions are limited to 100 items, so we execute the core updates first
     if (transactItems.length > 100) {
       return serverError(`Transaction too large: ${transactItems.length} items exceeds DynamoDB limit of 100`);
@@ -429,24 +429,24 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           // Update round-robin standings
           const standings = tournament.Item.standings || {};
 
-          for (const playerId of allParticipants) {
-            if (!standings[playerId]) {
-              standings[playerId] = { wins: 0, losses: 0, draws: 0, points: 0 };
+          for (const wrestlerId of allParticipants) {
+            if (!standings[wrestlerId]) {
+              standings[wrestlerId] = { wins: 0, losses: 0, draws: 0, points: 0 };
             }
           }
 
           if (isDraw) {
-            for (const playerId of body.winners) {
-              standings[playerId].draws += 1;
-              standings[playerId].points += 1;
+            for (const wrestlerId of body.winners) {
+              standings[wrestlerId].draws += 1;
+              standings[wrestlerId].points += 1;
             }
           } else {
-            for (const playerId of body.winners) {
-              standings[playerId].wins += 1;
-              standings[playerId].points += 2;
+            for (const wrestlerId of body.winners) {
+              standings[wrestlerId].wins += 1;
+              standings[wrestlerId].points += 2;
             }
-            for (const playerId of body.losers) {
-              standings[playerId].losses += 1;
+            for (const wrestlerId of body.losers) {
+              standings[wrestlerId].losses += 1;
             }
           }
 
@@ -455,9 +455,9 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           const expectedTotalMatches = (numParticipants * (numParticipants - 1)) / 2;
 
           let totalMatchesPlayed = 0;
-          for (const playerId of Object.keys(standings)) {
-            totalMatchesPlayed += standings[playerId].wins;
-            totalMatchesPlayed += standings[playerId].draws;
+          for (const wrestlerId of Object.keys(standings)) {
+            totalMatchesPlayed += standings[wrestlerId].wins;
+            totalMatchesPlayed += standings[wrestlerId].draws;
           }
           totalMatchesPlayed = totalMatchesPlayed / 2;
 
@@ -466,10 +466,10 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           if (isComplete) {
             let winner = '';
             let maxPoints = -1;
-            for (const [playerId, stats] of Object.entries(standings) as [string, { points: number }][]) {
+            for (const [wrestlerId, stats] of Object.entries(standings) as [string, { points: number }][]) {
               if (stats.points > maxPoints) {
                 maxPoints = stats.points;
-                winner = playerId;
+                winner = wrestlerId;
               }
             }
 

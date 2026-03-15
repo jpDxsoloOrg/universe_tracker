@@ -1,69 +1,69 @@
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../pages/LoginPage';
-import { ManagePlayersPage } from '../../pages/admin/ManagePlayersPage';
+import { ManageWrestlersPage } from '../../pages/admin/ManagePlayersPage';
 import { adminCredentials } from '../../config/credentials';
 
-test.describe('Player CRUD Operations', () => {
+test.describe('Wrestler CRUD Operations', () => {
   let loginPage: LoginPage;
-  let playersPage: ManagePlayersPage;
+  let wrestlersPage: ManageWrestlersPage;
   const timestamp = Date.now();
-  const testPlayerName = `E2E Test Player ${timestamp}`;
+  const testWrestlerName = `E2E Test Wrestler ${timestamp}`;
 
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
-    playersPage = new ManagePlayersPage(page);
+    wrestlersPage = new ManageWrestlersPage(page);
 
     // Login before each test
     await loginPage.navigateToAdmin();
     await loginPage.login(adminCredentials.username, adminCredentials.password);
-    await playersPage.selectTab();
+    await wrestlersPage.selectTab();
   });
 
-  test('should display players list', async () => {
-    const count = await playersPage.getPlayerCount();
+  test('should display wrestlers list', async () => {
+    const count = await wrestlersPage.getWrestlerCount();
     expect(count).toBeGreaterThanOrEqual(0);
   });
 
-  test('should create a new player', async () => {
-    await playersPage.createPlayer({
-      name: testPlayerName,
+  test('should create a new wrestler', async () => {
+    await wrestlersPage.createWrestler({
+      name: testWrestlerName,
       wrestler: 'Stone Cold Steve Austin',
     });
 
-    expect(await playersPage.playerExists(testPlayerName)).toBe(true);
+    expect(await wrestlersPage.wrestlerExists(testWrestlerName)).toBe(true);
   });
 
-  test('should delete a player', async ({ page }) => {
-    // First create a player to delete
-    const deleteTestPlayer = `Delete Test ${timestamp}`;
-    await playersPage.createPlayer({
-      name: deleteTestPlayer,
+  test('should delete a wrestler', async ({ page }) => {
+    // First create a wrestler to delete
+    const deleteTestWrestler = `Delete Test ${timestamp}`;
+    await wrestlersPage.createWrestler({
+      name: deleteTestWrestler,
       wrestler: 'The Undertaker',
     });
 
-    expect(await playersPage.playerExists(deleteTestPlayer)).toBe(true);
+    expect(await wrestlersPage.wrestlerExists(deleteTestWrestler)).toBe(true);
 
     // Now delete it
-    await playersPage.deletePlayer(deleteTestPlayer);
+    await wrestlersPage.deleteWrestler(deleteTestWrestler);
 
     // Refresh and verify deletion
     await page.reload();
-    await playersPage.selectTab();
-    expect(await playersPage.playerExists(deleteTestPlayer)).toBe(false);
+    await wrestlersPage.selectTab();
+    expect(await wrestlersPage.wrestlerExists(deleteTestWrestler)).toBe(false);
   });
 
   test.afterAll(async ({ browser }) => {
-    // Cleanup: delete test player if it exists
+    // Cleanup: delete test wrestler if it exists
     const page = await browser.newPage();
-    const cleanup = new ManagePlayersPage(page);
+    const cleanup = new ManageWrestlersPage(page);
     const login = new LoginPage(page);
 
     await login.navigateToAdmin();
     await login.login(adminCredentials.username, adminCredentials.password);
     await cleanup.selectTab();
 
-    if (await cleanup.playerExists(testPlayerName)) {
-      await cleanup.deletePlayer(testPlayerName);
+    if (await cleanup.wrestlerExists(testWrestlerName)) {
+      await cleanup.deleteWrestler(testWrestlerName);
     }
 
     await page.close();

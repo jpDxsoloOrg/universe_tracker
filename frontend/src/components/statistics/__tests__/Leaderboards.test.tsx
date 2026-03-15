@@ -47,14 +47,14 @@ import Leaderboards from '../Leaderboards';
 // --- Test data ---
 const mockLeaderboards = {
   mostWins: [
-    { wrestlerId: 'p1', wrestlerName: 'John Cena', wrestlerName: 'The Champ', value: 25, rank: 1 },
-    { wrestlerId: 'p2', wrestlerName: 'The Rock', wrestlerName: 'The Great One', value: 20, rank: 2 },
-    { wrestlerId: 'p3', wrestlerName: 'Undertaker', wrestlerName: 'The Deadman', value: 18, rank: 3 },
-    { wrestlerId: 'p4', wrestlerName: 'Triple H', wrestlerName: 'The Game', value: 12, rank: 4 },
+    { wrestlerId: 'p1', wrestlerName: 'John Cena', value: 25, rank: 1 },
+    { wrestlerId: 'p2', wrestlerName: 'The Rock', value: 20, rank: 2 },
+    { wrestlerId: 'p3', wrestlerName: 'Undertaker', value: 18, rank: 3 },
+    { wrestlerId: 'p4', wrestlerName: 'Triple H', value: 12, rank: 4 },
   ],
   bestWinPercentage: [
-    { wrestlerId: 'p1', wrestlerName: 'John Cena', wrestlerName: 'The Champ', value: 72.5, rank: 1 },
-    { wrestlerId: 'p3', wrestlerName: 'Undertaker', wrestlerName: 'The Deadman', value: 68.2, rank: 2 },
+    { wrestlerId: 'p1', wrestlerName: 'John Cena', value: 72.5, rank: 1 },
+    { wrestlerId: 'p3', wrestlerName: 'Undertaker', value: 68.2, rank: 2 },
   ],
   longestStreak: [],
   mostChampionships: [],
@@ -86,10 +86,10 @@ describe('Leaderboards', () => {
       expect(screen.getByText('Leaderboards')).toBeInTheDocument();
     });
 
-    // Default active tab is "Most Wins"
-    expect(screen.getByText('John Cena')).toBeInTheDocument();
-    expect(screen.getByText('The Rock')).toBeInTheDocument();
-    expect(screen.getByText('Undertaker')).toBeInTheDocument();
+    // Default active tab is "Most Wins" (names appear in both link and span)
+    expect(screen.getAllByText('John Cena').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('The Rock').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Undertaker').length).toBeGreaterThanOrEqual(1);
 
     // Medal badges for top 3
     expect(screen.getByText('1st')).toBeInTheDocument();

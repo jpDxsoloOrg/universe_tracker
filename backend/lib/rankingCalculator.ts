@@ -15,7 +15,7 @@ export interface RankingCalculationParams {
 }
 
 export interface RankingResult {
-  playerId: string;
+  wrestlerId: string;
   rank: number;
   rankingScore: number;
   winPercentage: number;
@@ -37,8 +37,8 @@ interface MatchRecord {
   seasonId?: string;
 }
 
-/** Aggregate win/loss totals for a single player within the ranking period. */
-interface PlayerStats {
+/** Aggregate win/loss totals for a single wrestler within the ranking period. */
+interface WrestlerStats {
   wins: number;
   losses: number;
   total: number;
@@ -51,14 +51,14 @@ interface PlayerStats {
 /**
  * Calculate contender rankings for a given championship.
  *
- * The algorithm evaluates every player who has completed matches within the
+ * The algorithm evaluates every wrestler who has completed matches within the
  * ranking period by combining four weighted scoring components:
  *   - Base win percentage   (40%)
  *   - Current streak bonus  (20%)
  *   - Quality of wins       (25%)
  *   - Recency weighting     (15%)
  *
- * The current champion and players below the minimum-match threshold are
+ * The current champion and wrestlers below the minimum-match threshold are
  * excluded from the results.
  */
 export async function calculateRankingsForChampionship(
@@ -73,17 +73,17 @@ export async function calculateRankingsForChampionship(
   } = params;
 
   // ------------------------------------------------------------------
-  // 1a. If championship is division-locked, fetch eligible player IDs
+  // 1a. If championship is division-locked, fetch eligible wrestler IDs
   // ------------------------------------------------------------------
-  let divisionPlayerIds: Set<string> | null = null;
+  let divisionWrestlerIds: Set<string> | null = null;
   if (divisionId) {
-    const allPlayers = await dynamoDb.scanAll({
-      TableName: TableNames.PLAYERS,
+    const allWrestlers = await dynamoDb.scanAll({
+      TableName: TableNames.WRESTLERS,
       FilterExpression: 'divisionId = :divisionId',
       ExpressionAttributeValues: { ':divisionId': divisionId },
     });
-    divisionPlayerIds = new Set(
-      allPlayers.map((p) => p.playerId as string),
+    divisionWrestlerIds = new Set(
+      allWrestlers.map((w) => w.wrestlerId as string),
     );
   }
 
@@ -114,38 +114,38 @@ export async function calculateRankingsForChampionship(
   }
 
   // ------------------------------------------------------------------
-  // 2. Build per-player match lists and aggregate stats
+  // 2. Build per-wrestler match lists and aggregate stats
   // ------------------------------------------------------------------
-  const playerMatchMap = new Map<string, MatchRecord[]>();
-  const playerStats = new Map<string, PlayerStats>();
+  const wrestlerMatchMap = new Map<string, MatchRecord[]>();
+  const wrestlerStats = new Map<string, WrestlerStats>();
 
   for (const match of matches) {
-    const involvedPlayers = [...(match.participants || [])];
+    const involvedWrestlers = [...(match.participants || [])];
 
-    for (const playerId of involvedPlayers) {
+    for (const wrestlerId of involvedWrestlers) {
       // Accumulate match list
-      if (!playerMatchMap.has(playerId)) {
-        playerMatchMap.set(playerId, []);
+      if (!wrestlerMatchMap.has(wrestlerId)) {
+        wrestlerMatchMap.set(wrestlerId, []);
       }
-      playerMatchMap.get(playerId)!.push(match);
+      wrestlerMatchMap.get(wrestlerId)!.push(match);
 
       // Accumulate aggregate stats used for quality-of-wins scoring
-      if (!playerStats.has(playerId)) {
-        playerStats.set(playerId, { wins: 0, losses: 0, total: 0 });
+      if (!wrestlerStats.has(wrestlerId)) {
+        wrestlerStats.set(wrestlerId, { wins: 0, losses: 0, total: 0 });
       }
-      const stats = playerStats.get(playerId)!;
+      const stats = wrestlerStats.get(wrestlerId)!;
       stats.total += 1;
 
-      if (match.winners.includes(playerId)) {
+      if (match.winners.includes(wrestlerId)) {
         stats.wins += 1;
-      } else if (match.losers.includes(playerId)) {
+      } else if (match.losers.includes(wrestlerId)) {
         stats.losses += 1;
       }
     }
   }
 
   // ------------------------------------------------------------------
-  // 3. Determine which player IDs belong to the current champion so
+  // 3. Determine which wrestler IDs belong to the current champion so
   //    they can be excluded from the contender list.
   // ------------------------------------------------------------------
   const championIds = new Set<string>();
@@ -158,36 +158,36 @@ export async function calculateRankingsForChampionship(
   }
 
   // ------------------------------------------------------------------
-  // 4. Score each eligible player
+  // 4. Score each eligible wrestler
   // ------------------------------------------------------------------
-  const scoredPlayers: RankingResult[] = [];
+  const scoredWrestlers: RankingResult[] = [];
 
-  for (const [playerId, playerMatches] of playerMatchMap.entries()) {
+  for (const [wrestlerId, wrestlerMatches] of wrestlerMatchMap.entries()) {
     // Exclude the current champion
-    if (championIds.has(playerId)) {
+    if (championIds.has(wrestlerId)) {
       continue;
     }
 
-    // Exclude players not in the championship's division
-    if (divisionPlayerIds && !divisionPlayerIds.has(playerId)) {
+    // Exclude wrestlers not in the championship's division
+    if (divisionWrestlerIds && !divisionWrestlerIds.has(wrestlerId)) {
       continue;
     }
 
-    // Exclude players who have not met the minimum-match threshold
-    if (playerMatches.length < minimumMatches) {
+    // Exclude wrestlers who have not met the minimum-match threshold
+    if (wrestlerMatches.length < minimumMatches) {
       continue;
     }
 
-    const score = calculatePlayerScore(playerId, playerMatches, playerStats, periodDays);
-    scoredPlayers.push(score);
+    const score = calculateWrestlerScore(wrestlerId, wrestlerMatches, wrestlerStats, periodDays);
+    scoredWrestlers.push(score);
   }
 
   // ------------------------------------------------------------------
   // 5. Rank by score descending and return the top N contenders
   // ------------------------------------------------------------------
-  scoredPlayers.sort((a, b) => b.rankingScore - a.rankingScore);
+  scoredWrestlers.sort((a, b) => b.rankingScore - a.rankingScore);
 
-  const topContenders = scoredPlayers.slice(0, maxContenders);
+  const topContenders = scoredWrestlers.slice(0, maxContenders);
 
   // Assign final rank positions (1-indexed)
   for (let i = 0; i < topContenders.length; i++) {
@@ -202,7 +202,7 @@ export async function calculateRankingsForChampionship(
 // ---------------------------------------------------------------------------
 
 /**
- * Calculate the composite ranking score for a single player.
+ * Calculate the composite ranking score for a single wrestler.
  *
  * Scoring breakdown (each component normalized to 0-100, then weighted):
  *   winPercentage  * 0.40  -- raw win rate over the period
@@ -210,20 +210,20 @@ export async function calculateRankingsForChampionship(
  *   qualityScore   * 0.25  -- average win-rate of defeated opponents
  *   recencyScore   * 0.15  -- exponentially-decayed weighting of recent results
  */
-export function calculatePlayerScore(
-  playerId: string,
-  playerMatches: MatchRecord[],
-  allPlayers: Map<string, PlayerStats>,
+export function calculateWrestlerScore(
+  wrestlerId: string,
+  wrestlerMatches: MatchRecord[],
+  allWrestlers: Map<string, WrestlerStats>,
   periodDays: number,
 ): RankingResult {
-  const wins = playerMatches.filter((m) => m.winners.includes(playerId));
-  const totalMatches = playerMatches.length;
+  const wins = wrestlerMatches.filter((m) => m.winners.includes(wrestlerId));
+  const totalMatches = wrestlerMatches.length;
 
   // ----- Win Percentage (0-100) -----
   const winPercentage = Math.min((wins.length / totalMatches) * 100, 100);
 
   // ----- Streak Bonus (0-100) -----
-  const streak = calculateCurrentStreak(playerMatches, playerId);
+  const streak = calculateCurrentStreak(wrestlerMatches, wrestlerId);
   let streakBonus: number;
   if (streak > 0) {
     // Win streak: 10 points per consecutive win, capped at 100
@@ -234,7 +234,7 @@ export function calculatePlayerScore(
   }
 
   // ----- Quality of Wins (0-100) -----
-  // Average win percentage of all defeated opponents. If the player has no
+  // Average win percentage of all defeated opponents. If the wrestler has no
   // wins in the period the quality score is 0.
   let qualityScore = 0;
   if (wins.length > 0) {
@@ -243,7 +243,7 @@ export function calculatePlayerScore(
 
     for (const match of wins) {
       for (const loserId of match.losers) {
-        const opponentStats = allPlayers.get(loserId);
+        const opponentStats = allWrestlers.get(loserId);
         if (opponentStats && opponentStats.total > 0) {
           totalOpponentWinPct += opponentStats.wins / opponentStats.total;
           opponentCount += 1;
@@ -265,7 +265,7 @@ export function calculatePlayerScore(
   let weightedWinSum = 0;
   let weightSum = 0;
 
-  for (const match of playerMatches) {
+  for (const match of wrestlerMatches) {
     const matchDate = new Date(match.date);
     const daysSinceMatch = Math.max(
       (now.getTime() - matchDate.getTime()) / (1000 * 60 * 60 * 24),
@@ -273,7 +273,7 @@ export function calculatePlayerScore(
     );
     const weight = Math.exp(-daysSinceMatch / periodDays);
 
-    const isWin = match.winners.includes(playerId) ? 1 : 0;
+    const isWin = match.winners.includes(wrestlerId) ? 1 : 0;
     weightedWinSum += isWin * weight;
     weightSum += weight;
   }
@@ -291,7 +291,7 @@ export function calculatePlayerScore(
   );
 
   return {
-    playerId,
+    wrestlerId,
     rank: 0, // assigned after sorting
     rankingScore,
     winPercentage: parseFloat(winPercentage.toFixed(2)),
@@ -308,7 +308,7 @@ export function calculatePlayerScore(
 // ---------------------------------------------------------------------------
 
 /**
- * Determine the current win or loss streak for a player.
+ * Determine the current win or loss streak for a wrestler.
  *
  * Matches are sorted by date descending (most recent first) and we count
  * consecutive wins or losses from the top.
@@ -319,7 +319,7 @@ export function calculatePlayerScore(
  */
 export function calculateCurrentStreak(
   matches: MatchRecord[],
-  playerId: string,
+  wrestlerId: string,
 ): number {
   // Sort descending by date so the most recent match is first
   const sorted = [...matches].sort(
@@ -331,11 +331,11 @@ export function calculateCurrentStreak(
   }
 
   // Determine direction from the most recent match
-  const firstIsWin = sorted[0].winners.includes(playerId);
+  const firstIsWin = sorted[0].winners.includes(wrestlerId);
   let streak = 0;
 
   for (const match of sorted) {
-    const isWin = match.winners.includes(playerId);
+    const isWin = match.winners.includes(wrestlerId);
     if (isWin === firstIsWin) {
       streak += 1;
     } else {

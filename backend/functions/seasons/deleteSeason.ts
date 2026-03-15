@@ -40,7 +40,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
           TableName: TableNames.SEASON_STANDINGS,
           Key: {
             seasonId: seasonId,
-            playerId: (standing as any).playerId,
+            wrestlerId: (standing as Record<string, string>).wrestlerId,
           },
         });
       }

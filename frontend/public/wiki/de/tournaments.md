@@ -17,7 +17,7 @@ Die Liga unterstützt zwei Turnierformate:
 
 - Jeder Teilnehmer spielt gegen jeden anderen
 - Punkte: Sieg = 2, Unentschieden = 1, Niederlage = 0
-- Der Spieler mit den meisten Punkten am Ende gewinnt
+- Der Wrestler mit den meisten Punkten am Ende gewinnt
 
 ## Turnier-Informationen
 

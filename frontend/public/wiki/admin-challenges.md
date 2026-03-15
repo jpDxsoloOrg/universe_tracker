@@ -1,6 +1,6 @@
 # Admin: Challenges
 
-The **Challenges** tab (Admin → Challenges) lets you view and manage match challenges between players.
+The **Challenges** tab (Admin → Challenges) lets you view and manage match challenges between wrestlers.
 
 ## Viewing and filtering
 

@@ -30,7 +30,7 @@ A serverless web application for managing a WWE 2K league with standings, champi
 
 | Feature | Description |
 |---------|-------------|
-| **Standings** | View all-time or per-season player rankings with win/loss/draw records |
+| **Standings** | View all-time or per-season wrestler rankings with win/loss/draw records |
 | **Championships** | Browse active titles with current champions and full reign history |
 | **Events** | Browse PPV events and weekly shows with scheduled and completed matches |
 | **Tournaments** | Follow single-elimination brackets and round-robin (G1 Climax style) standings |
@@ -54,12 +54,12 @@ A serverless web application for managing a WWE 2K league with standings, champi
 
 | Feature | Description |
 |---------|-------------|
-| **Player Management** | Create, update, and delete players; upload wrestler images; assign divisions |
+| **Wrestler Management** | Create, update, and delete wrestlers; upload wrestler images; assign divisions |
 | **Match Management** | Schedule matches with stipulations; record results (auto-updates standings, contender rankings, and championship history) |
 | **Championship Management** | Create singles and tag team titles with image upload; track full history; vacate titles |
 | **Tournament Management** | Single-elimination brackets with auto-advancement; round-robin with point system (G1 Climax style) |
 | **Season Management** | Create seasons, track per-season standings, end seasons |
-| **Division Management** | Create divisions (Raw, SmackDown, NXT, etc.) and assign players |
+| **Division Management** | Create divisions (Raw, SmackDown, NXT, etc.) and assign wrestlers |
 | **Event Management** | Create PPV events and weekly shows, organize matches into event cards |
 | **Fantasy League Admin** | Configure point systems, set wrestler costs, score completed events, view leaderboards |
 | **User Management** | Manage user roles (Admin, Moderator, Wrestler, Fantasy); create, enable, and disable users |
@@ -108,7 +108,7 @@ A serverless web application for managing a WWE 2K league with standings, champi
 | **AWS Lambda** | Serverless compute for 55+ API handlers across 17 function domains |
 | **API Gateway** | REST API with CORS support and custom JWT authorizer |
 | **DynamoDB** | NoSQL database with on-demand billing (17 tables) |
-| **Amazon S3** | Object storage for frontend static files and player/championship images with presigned URLs |
+| **Amazon S3** | Object storage for frontend static files and wrestler/championship images with presigned URLs |
 | **CloudFront** | CDN for global content delivery with HTTPS enforcement and SPA routing support |
 | **AWS Cognito** | User pool with email-based sign-in, role groups, and JWT tokens |
 | **AWS Certificate Manager** | SSL/TLS certificate management for HTTPS on custom domains |
@@ -162,7 +162,7 @@ league_szn/
 │   │   ├── fantasy/             # Fantasy league operations
 │   │   ├── images/              # S3 presigned upload URLs
 │   │   ├── matches/             # Match scheduling and results
-│   │   ├── players/             # Player CRUD + wrestler profiles
+│   │   ├── wrestlers/            # Wrestler CRUD + profiles
 │   │   ├── promos/              # Promo creation and reactions
 │   │   ├── seasons/             # Season management
 │   │   ├── standings/           # Standing calculations
@@ -199,7 +199,7 @@ Fantasy (lowest) --> Wrestler --> Moderator --> Admin (highest)
 |------|-------------|
 | **Fantasy** | Make fantasy picks, view leaderboards, access public data |
 | **Wrestler** | All Fantasy permissions + issue/respond to challenges, create promos, manage own profile |
-| **Moderator** | All Wrestler permissions + manage players, matches, championships, tournaments, seasons, divisions, events, fantasy config |
+| **Moderator** | All Wrestler permissions + manage wrestlers, matches, championships, tournaments, seasons, divisions, events, fantasy config |
 | **Admin** | All Moderator permissions + manage users/roles, clear all data, manage admin-level roles |
 
 ### Technical Details
@@ -235,10 +235,10 @@ When you add or change HTTP endpoints in `serverless.yml` or handler request/res
 <details>
 <summary><strong>Public Endpoints (17)</strong></summary>
 
-#### Players
+#### Wrestlers
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/players` | Get all players |
+| GET | `/wrestlers` | Get all wrestlers |
 
 #### Matches
 | Method | Path | Description |
@@ -281,7 +281,7 @@ When you add or change HTTP endpoints in `serverless.yml` or handler request/res
 #### Statistics
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/statistics` | Get statistics (sections: `player-stats`, `head-to-head`, `leaderboards`, `records`, `achievements`) |
+| GET | `/statistics` | Get statistics (sections: `wrestler-stats`, `head-to-head`, `leaderboards`, `records`, `achievements`) |
 
 #### Site Config
 | Method | Path | Description |
@@ -291,13 +291,13 @@ When you add or change HTTP endpoints in `serverless.yml` or handler request/res
 #### Promos
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/promos` | Get all promos (filter by `?playerId=`, `?promoType=`) |
+| GET | `/promos` | Get all promos (filter by `?wrestlerId=`, `?promoType=`) |
 | GET | `/promos/{promoId}` | Get single promo with responses |
 
 #### Challenges
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/challenges` | Get all challenges (filter by `?status=`, `?playerId=`) |
+| GET | `/challenges` | Get all challenges (filter by `?status=`, `?wrestlerId=`) |
 | GET | `/challenges/{challengeId}` | Get single challenge |
 
 #### Fantasy (Public)
@@ -316,11 +316,11 @@ When you add or change HTTP endpoints in `serverless.yml` or handler request/res
 |--------|------|-------------|
 | POST | `/auth/setup` | Create admin user (one-time setup) |
 
-#### Player Profile (Wrestler+)
+#### Wrestler Profile (Wrestler+)
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/players/me` | Get own wrestler profile |
-| PUT | `/players/me` | Update own profile (name, wrestler, image) |
+| GET | `/wrestlers/me` | Get own wrestler profile |
+| PUT | `/wrestlers/me` | Update own profile (name, image) |
 
 #### Promos (Wrestler+)
 | Method | Path | Description |
@@ -354,13 +354,13 @@ When you add or change HTTP endpoints in `serverless.yml` or handler request/res
 </details>
 
 <details>
-<summary><strong>Admin Endpoints -- Players (3)</strong></summary>
+<summary><strong>Admin Endpoints -- Wrestlers (3)</strong></summary>
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/players` | Create new player |
-| PUT | `/players/{playerId}` | Update player |
-| DELETE | `/players/{playerId}` | Delete player (fails if player holds a championship) |
+| POST | `/wrestlers` | Create new wrestler |
+| PUT | `/wrestlers/{wrestlerId}` | Update wrestler |
+| DELETE | `/wrestlers/{wrestlerId}` | Delete wrestler (fails if wrestler holds a championship) |
 
 </details>
 
@@ -414,7 +414,7 @@ When you add or change HTTP endpoints in `serverless.yml` or handler request/res
 |--------|------|-------------|
 | POST | `/divisions` | Create a new division |
 | PUT | `/divisions/{divisionId}` | Update division |
-| DELETE | `/divisions/{divisionId}` | Delete division (fails if players are assigned) |
+| DELETE | `/divisions/{divisionId}` | Delete division (fails if wrestlers are assigned) |
 
 </details>
 
@@ -437,7 +437,7 @@ When you add or change HTTP endpoints in `serverless.yml` or handler request/res
 | PUT | `/admin/fantasy/config` | Update fantasy point configuration |
 | POST | `/admin/fantasy/wrestlers/costs/initialize` | Initialize wrestler costs |
 | POST | `/admin/fantasy/wrestlers/costs/recalculate` | Recalculate all wrestler costs based on performance |
-| PUT | `/admin/fantasy/wrestlers/{playerId}/cost` | Manually set a wrestler's cost |
+| PUT | `/admin/fantasy/wrestlers/{wrestlerId}/cost` | Manually set a wrestler's cost |
 | GET | `/fantasy/leaderboard` | Get fantasy leaderboard (optional `?seasonId=`) |
 | POST | `/fantasy/score` | Score all completed but unscored events |
 
@@ -491,31 +491,31 @@ League SZN uses 17 DynamoDB tables with on-demand (PAY_PER_REQUEST) billing.
 
 | Table | Key | Description |
 |-------|-----|-------------|
-| **Players** | `playerId` (HASH) | Player info, current wrestler, win/loss records. GSI on `userId` for profile lookups. |
+| **Wrestlers** | `wrestlerId` (HASH) | Wrestler info, name, win/loss records. GSI on `userId` for profile lookups. |
 | **Matches** | `matchId` (HASH), `date` (RANGE) | Match details, participants, results, stipulations. GSI on `tournamentId` for tournament matches. |
 | **Championships** | `championshipId` (HASH) | Championship info, type (singles/tag), current champion. |
 | **ChampionshipHistory** | `championshipId` (HASH), `wonDate` (RANGE) | All championship reigns with dates and duration. |
 | **Tournaments** | `tournamentId` (HASH) | Tournament info, brackets (single-elimination), standings (round-robin). |
 | **Seasons** | `seasonId` (HASH) | Season name, start/end dates, active status. Only one season active at a time. |
-| **SeasonStandings** | `seasonId` (HASH), `playerId` (RANGE) | Per-player, per-season win/loss/draw records. GSI on `playerId`. |
-| **Divisions** | `divisionId` (HASH) | Division name and description. Players reference divisions via `divisionId`. |
+| **SeasonStandings** | `seasonId` (HASH), `wrestlerId` (RANGE) | Per-wrestler, per-season win/loss/draw records. GSI on `wrestlerId`. |
+| **Divisions** | `divisionId` (HASH) | Division name and description. Wrestlers reference divisions via `divisionId`. |
 | **Events** | `eventId` (HASH) | PPV events and weekly shows. GSIs on `eventType+date`, `status+date`, and `seasonId+date`. |
 
 ### Advanced Feature Tables
 
 | Table | Key | Description |
 |-------|-----|-------------|
-| **ContenderRankings** | `championshipId` (HASH), `playerId` (RANGE) | Current contender ranking per player per championship. GSI on `championshipId+rank`. |
-| **RankingHistory** | `playerId` (HASH), `weekKey` (RANGE) | Weekly ranking snapshots. GSI on `championshipId+weekKey`. |
+| **ContenderRankings** | `championshipId` (HASH), `wrestlerId` (RANGE) | Current contender ranking per wrestler per championship. GSI on `championshipId+rank`. |
+| **RankingHistory** | `wrestlerId` (HASH), `weekKey` (RANGE) | Weekly ranking snapshots. GSI on `championshipId+weekKey`. |
 | **Challenges** | `challengeId` (HASH) | Match challenges between wrestlers. GSIs on `challengerId`, `challengedId`, and `status`. |
-| **Promos** | `promoId` (HASH) | Wrestler promos with reactions. GSIs on `playerId+createdAt` and `promoType+createdAt`. |
+| **Promos** | `promoId` (HASH) | Wrestler promos with reactions. GSIs on `wrestlerId+createdAt` and `promoType+createdAt`. |
 
 ### Fantasy League Tables
 
 | Table | Key | Description |
 |-------|-----|-------------|
 | **FantasyConfig** | `configKey` (HASH) | Fantasy league point system configuration. |
-| **WrestlerCosts** | `playerId` (HASH) | Cost assigned to each wrestler for fantasy draft. |
+| **WrestlerCosts** | `wrestlerId` (HASH) | Cost assigned to each wrestler for fantasy draft. |
 | **FantasyPicks** | `eventId` (HASH), `fantasyUserId` (RANGE) | User picks per event. GSI on `fantasyUserId+eventId`. |
 
 ### Configuration Tables
@@ -610,7 +610,7 @@ Open **http://localhost:3000** in your browser to see the fully populated league
 ### What the Seed Creates
 
 - 3 divisions (Raw, SmackDown, NXT)
-- 12 players with random records
+- 12 wrestlers with random records
 - 1 active season
 - 4 championships with history
 - 12 matches (8 completed, 4 scheduled)
@@ -628,7 +628,7 @@ VITE_API_BASE_URL=/dev
 
 The Vite dev server proxies `/dev/*` requests to `http://localhost:3001` automatically. Restart Vite after changing `.env` files.
 
-**Backend** -- no `.env` needed. The `serverless-offline` plugin sets `IS_OFFLINE=true` automatically, which configures the backend to use DynamoDB Local at `localhost:8000`. DynamoDB table names use the `-offline` suffix locally (e.g., `universe-tracker-api-players-offline`). The `create-tables`, `seed`, and `clear-data` scripts default to this suffix.
+**Backend** -- no `.env` needed. The `serverless-offline` plugin sets `IS_OFFLINE=true` automatically, which configures the backend to use DynamoDB Local at `localhost:8000`. DynamoDB table names use the `-offline` suffix locally (e.g., `universe-tracker-api-wrestlers-offline`). The `create-tables`, `seed`, and `clear-data` scripts default to this suffix.
 
 ### Ports
 
@@ -677,7 +677,7 @@ npm test              # run tests
 **"Frontend can't reach backend"**
 - Check `frontend/.env` has `VITE_API_BASE_URL=/dev`
 - Restart Vite after `.env` changes
-- Verify backend is up: `curl http://localhost:3001/dev/players`
+- Verify backend is up: `curl http://localhost:3001/dev/wrestlers`
 
 **"Tables not found"**
 - Run `npm run create-tables` in the backend directory

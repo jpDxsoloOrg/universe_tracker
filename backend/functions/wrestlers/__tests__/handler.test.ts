@@ -33,7 +33,7 @@ vi.mock('../../../lib/dynamodb', () => ({
     queryAll: mockQueryAll,
   },
   TableNames: {
-    PLAYERS: 'Players',
+    WRESTLERS: 'Wrestlers',
     DIVISIONS: 'Divisions',
     CHAMPIONSHIPS: 'Championships',
     SEASON_STANDINGS: 'SeasonStandings',
@@ -66,21 +66,21 @@ function makeEvent(overrides: Partial<APIGatewayProxyEvent> = {}): APIGatewayPro
     queryStringParameters: null,
     multiValueQueryStringParameters: null,
     stageVariables: null,
-    resource: '/players',
+    resource: '/wrestlers',
     requestContext: { authorizer: {} } as any,
     ...overrides,
   };
 }
 
-describe('players router', () => {
+describe('wrestlers router', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('GET /players routes to getPlayers and returns 200', async () => {
-    mockScan.mockResolvedValue({ Items: [{ playerId: 'p1', name: 'P1', currentWrestler: 'Stone Cold' }] });
+  it('GET /wrestlers routes to getWrestlers and returns 200', async () => {
+    mockScan.mockResolvedValue({ Items: [{ wrestlerId: 'p1', name: 'P1' }] });
     const event = makeEvent({
       httpMethod: 'GET',
-      path: '/dev/players',
-      resource: '/players',
+      path: '/dev/wrestlers',
+      resource: '/wrestlers',
       pathParameters: null,
     });
     const result = await handler(event, ctx, cb);
@@ -88,44 +88,44 @@ describe('players router', () => {
     expect(JSON.parse(result!.body)).toHaveLength(1);
   });
 
-  it('POST /players routes to createPlayer and returns 201', async () => {
+  it('POST /wrestlers routes to createWrestler and returns 201', async () => {
     mockPut.mockResolvedValue({});
     const event = makeEvent({
       httpMethod: 'POST',
-      path: '/dev/players',
-      resource: '/players',
+      path: '/dev/wrestlers',
+      resource: '/wrestlers',
       pathParameters: null,
-      body: JSON.stringify({ name: 'John', currentWrestler: 'Rock' }),
+      body: JSON.stringify({ name: 'John' }),
     });
     const result = await handler(event, ctx, cb);
     expect(result!.statusCode).toBe(201);
-    expect(JSON.parse(result!.body).playerId).toBe('test-uuid-1234');
+    expect(JSON.parse(result!.body).wrestlerId).toBe('test-uuid-1234');
   });
 
-  it('PUT /players/{playerId} routes to updatePlayer', async () => {
-    mockGet.mockResolvedValue({ Item: { playerId: 'p1', name: 'Old' } });
+  it('PUT /wrestlers/{wrestlerId} routes to updateWrestler', async () => {
+    mockGet.mockResolvedValue({ Item: { wrestlerId: 'p1', name: 'Old' } });
     mockUpdate.mockResolvedValue({});
     const event = makeEvent({
       httpMethod: 'PUT',
-      path: '/dev/players/p1',
-      resource: '/players/{playerId}',
-      pathParameters: { playerId: 'p1' },
-      body: JSON.stringify({ name: 'New', currentWrestler: 'Rock' }),
+      path: '/dev/wrestlers/p1',
+      resource: '/wrestlers/{wrestlerId}',
+      pathParameters: { wrestlerId: 'p1' },
+      body: JSON.stringify({ name: 'New' }),
     });
     const result = await handler(event, ctx, cb);
     expect(result!.statusCode).toBe(200);
   });
 
-  it('DELETE /players/{playerId} routes to deletePlayer', async () => {
-    mockGet.mockResolvedValue({ Item: { playerId: 'p1' } });
+  it('DELETE /wrestlers/{wrestlerId} routes to deleteWrestler', async () => {
+    mockGet.mockResolvedValue({ Item: { wrestlerId: 'p1' } });
     mockScan.mockResolvedValue({ Items: [] });
     mockQuery.mockResolvedValue({ Items: [] });
     mockDelete.mockResolvedValue({});
     const event = makeEvent({
       httpMethod: 'DELETE',
-      path: '/dev/players/p1',
-      resource: '/players/{playerId}',
-      pathParameters: { playerId: 'p1' },
+      path: '/dev/wrestlers/p1',
+      resource: '/wrestlers/{wrestlerId}',
+      pathParameters: { wrestlerId: 'p1' },
     });
     const result = await handler(event, ctx, cb);
     expect(result!.statusCode).toBe(204);
@@ -134,8 +134,8 @@ describe('players router', () => {
   it('returns 405 for unsupported method/path', async () => {
     const event = makeEvent({
       httpMethod: 'PATCH',
-      path: '/dev/players',
-      resource: '/players',
+      path: '/dev/wrestlers',
+      resource: '/wrestlers',
       pathParameters: null,
     });
     const result = await handler(event, ctx, cb);

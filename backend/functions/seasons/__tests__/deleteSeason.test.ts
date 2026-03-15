@@ -83,9 +83,9 @@ describe('deleteSeason', () => {
     mockQuery
       .mockResolvedValueOnce({
         Items: [
-          { seasonId: 's1', playerId: 'p1' },
-          { seasonId: 's1', playerId: 'p2' },
-          { seasonId: 's1', playerId: 'p3' },
+          { seasonId: 's1', wrestlerId: 'p1' },
+          { seasonId: 's1', wrestlerId: 'p2' },
+          { seasonId: 's1', wrestlerId: 'p3' },
         ],
       })
       .mockResolvedValueOnce({
@@ -104,17 +104,17 @@ describe('deleteSeason', () => {
     // Verify standings deletes use correct composite key
     expect(mockDelete).toHaveBeenCalledWith(
       expect.objectContaining({
-        Key: { seasonId: 's1', playerId: 'p1' },
+        Key: { seasonId: 's1', wrestlerId: 'p1' },
       }),
     );
     expect(mockDelete).toHaveBeenCalledWith(
       expect.objectContaining({
-        Key: { seasonId: 's1', playerId: 'p2' },
+        Key: { seasonId: 's1', wrestlerId: 'p2' },
       }),
     );
     expect(mockDelete).toHaveBeenCalledWith(
       expect.objectContaining({
-        Key: { seasonId: 's1', playerId: 'p3' },
+        Key: { seasonId: 's1', wrestlerId: 'p3' },
       }),
     );
     // Verify award delete

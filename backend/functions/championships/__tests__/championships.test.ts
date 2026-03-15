@@ -132,14 +132,14 @@ describe('getChampionshipHistory', () => {
   it('returns history sorted by wonDate descending', async () => {
     mockQuery.mockResolvedValue({
       Items: [
-        { championshipId: 'c1', wonDate: '2024-06-01', playerId: 'p2' },
-        { championshipId: 'c1', wonDate: '2024-01-01', playerId: 'p1' },
+        { championshipId: 'c1', wonDate: '2024-06-01', wrestlerId: 'p2' },
+        { championshipId: 'c1', wonDate: '2024-01-01', wrestlerId: 'p1' },
       ],
     });
     const r = await getChampionshipHistory(ev({ pathParameters: { championshipId: 'c1' } }), ctx, cb);
     expect(r!.statusCode).toBe(200);
     expect(body(r)).toHaveLength(2);
-    expect(body(r)[0].playerId).toBe('p2');
+    expect(body(r)[0].wrestlerId).toBe('p2');
     expect(mockQuery).toHaveBeenCalledWith(expect.objectContaining({ ScanIndexForward: false }));
   });
 
@@ -313,7 +313,7 @@ describe('vacateChampionship', () => {
       .mockResolvedValueOnce({ Item: { championshipId: 'c1', currentChampion: 'p1' } })
       .mockResolvedValueOnce({ Item: { championshipId: 'c1' } });
     mockQuery.mockResolvedValue({
-      Items: [{ championshipId: 'c1', wonDate: '2024-01-01', playerId: 'p1' }],
+      Items: [{ championshipId: 'c1', wonDate: '2024-01-01', wrestlerId: 'p1' }],
     });
     mockTransactWrite.mockResolvedValue({});
     const r = await vacateChampionship(ev({ pathParameters: { championshipId: 'c1' } }), ctx, cb);

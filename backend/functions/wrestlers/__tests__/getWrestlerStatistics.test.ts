@@ -20,12 +20,12 @@ vi.mock('../../../lib/dynamodb', () => ({
     queryAll: vi.fn(),
   },
   TableNames: {
-    PLAYERS: 'Players',
+    WRESTLERS: 'Wrestlers',
     MATCHES: 'Matches',
   },
 }));
 
-import { handler } from '../getPlayerStatistics';
+import { handler } from '../getWrestlerStatistics';
 
 // ─── Helpers ─────────────────────────────────────────────────────────
 
@@ -39,8 +39,8 @@ function makeEvent(overrides: Partial<APIGatewayProxyEvent> = {}): APIGatewayPro
     multiValueHeaders: {},
     httpMethod: 'GET',
     isBase64Encoded: false,
-    path: '/players/p1/statistics',
-    pathParameters: { playerId: 'p1' },
+    path: '/wrestlers/p1/statistics',
+    pathParameters: { wrestlerId: 'p1' },
     queryStringParameters: null,
     multiValueQueryStringParameters: null,
     stageVariables: null,
@@ -66,31 +66,31 @@ function makeMatch(overrides: Record<string, unknown> = {}) {
 
 // ─── Tests ───────────────────────────────────────────────────────────
 
-describe('getPlayerStatistics', () => {
+describe('getWrestlerStatistics', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('returns 404 when playerId is missing', async () => {
+  it('returns 404 when wrestlerId is missing', async () => {
     const event = makeEvent({ pathParameters: null });
     const result = await handler(event, ctx, cb);
 
     expect(result!.statusCode).toBe(404);
   });
 
-  it('returns 404 when player does not exist', async () => {
+  it('returns 404 when wrestler does not exist', async () => {
     mockGet.mockResolvedValue({ Item: undefined });
 
     const event = makeEvent();
     const result = await handler(event, ctx, cb);
 
     expect(result!.statusCode).toBe(404);
-    expect(JSON.parse(result!.body).message).toBe('Player not found');
+    expect(JSON.parse(result!.body).message).toBe('Wrestler not found');
   });
 
-  it('returns overall and per-type stats for a player', async () => {
+  it('returns overall and per-type stats for a wrestler', async () => {
     mockGet.mockResolvedValue({
-      Item: { playerId: 'p1', name: 'Player One', currentWrestler: 'Wrestler A' },
+      Item: { wrestlerId: 'p1', name: 'Wrestler One' },
     });
 
     const matches = [
@@ -108,9 +108,8 @@ describe('getPlayerStatistics', () => {
     expect(result!.statusCode).toBe(200);
 
     const body = JSON.parse(result!.body);
-    expect(body.playerId).toBe('p1');
-    expect(body.playerName).toBe('Player One');
-    expect(body.wrestlerName).toBe('Wrestler A');
+    expect(body.wrestlerId).toBe('p1');
+    expect(body.wrestlerName).toBe('Wrestler One');
 
     // Overall: 3 wins, 2 losses
     expect(body.overall.wins).toBe(3);
@@ -138,7 +137,7 @@ describe('getPlayerStatistics', () => {
 
   it('filters by seasonId when provided', async () => {
     mockGet.mockResolvedValue({
-      Item: { playerId: 'p1', name: 'Player One', currentWrestler: 'Wrestler A' },
+      Item: { wrestlerId: 'p1', name: 'Wrestler One' },
     });
 
     const matches = [
@@ -162,9 +161,9 @@ describe('getPlayerStatistics', () => {
     expect(body.seasonId).toBe('s1');
   });
 
-  it('returns empty stats when player has no matches', async () => {
+  it('returns empty stats when wrestler has no matches', async () => {
     mockGet.mockResolvedValue({
-      Item: { playerId: 'p1', name: 'Player One', currentWrestler: 'Wrestler A' },
+      Item: { wrestlerId: 'p1', name: 'Wrestler One' },
     });
     mockScanAll.mockResolvedValue([]);
 

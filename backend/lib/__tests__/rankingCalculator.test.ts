@@ -10,13 +10,13 @@ vi.mock('../dynamodb', () => ({
     scanAll: mockScanAll,
   },
   TableNames: {
-    PLAYERS: 'Players',
+    WRESTLERS: 'Wrestlers',
     MATCHES: 'Matches',
   },
 }));
 
 import {
-  calculatePlayerScore,
+  calculateWrestlerScore,
   calculateCurrentStreak,
   calculateRankingsForChampionship,
 } from '../rankingCalculator';
@@ -101,9 +101,9 @@ describe('calculateCurrentStreak', () => {
   });
 });
 
-// ─── calculatePlayerScore ────────────────────────────────────────────
+// ─── calculateWrestlerScore ────────────────────────────────────────────
 
-describe('calculatePlayerScore', () => {
+describe('calculateWrestlerScore', () => {
   it('returns all scoring components and composite score', () => {
     const matches = [
       makeMatch({ matchId: 'm1', date: daysAgo(1), winners: ['p1'], losers: ['p2'], participants: ['p1', 'p2'] }),
@@ -111,15 +111,15 @@ describe('calculatePlayerScore', () => {
       makeMatch({ matchId: 'm3', date: daysAgo(3), winners: ['p2'], losers: ['p1'], participants: ['p1', 'p2'] }),
     ];
 
-    const allPlayers = new Map([
+    const allWrestlers = new Map([
       ['p1', { wins: 2, losses: 1, total: 3 }],
       ['p2', { wins: 1, losses: 2, total: 3 }],
       ['p3', { wins: 0, losses: 1, total: 1 }],
     ]);
 
-    const result = calculatePlayerScore('p1', matches, allPlayers, 30);
+    const result = calculateWrestlerScore('p1', matches, allWrestlers, 30);
 
-    expect(result.playerId).toBe('p1');
+    expect(result.wrestlerId).toBe('p1');
     expect(result.matchesInPeriod).toBe(3);
     expect(result.winsInPeriod).toBe(2);
     expect(result.winPercentage).toBeCloseTo(66.67, 1);
@@ -133,12 +133,12 @@ describe('calculatePlayerScore', () => {
     const matches = [
       makeMatch({ matchId: 'm1', date: daysAgo(0), winners: ['p1'], losers: ['p2'], participants: ['p1', 'p2'] }),
     ];
-    const allPlayers = new Map([
+    const allWrestlers = new Map([
       ['p1', { wins: 1, losses: 0, total: 1 }],
       ['p2', { wins: 0, losses: 1, total: 1 }],
     ]);
 
-    const result = calculatePlayerScore('p1', matches, allPlayers, 30);
+    const result = calculateWrestlerScore('p1', matches, allWrestlers, 30);
 
     // winPercentage = 100, contributes 100 * 0.4 = 40 to the score
     expect(result.winPercentage).toBe(100);
@@ -158,12 +158,12 @@ describe('calculatePlayerScore', () => {
       }),
     );
 
-    const allPlayers = new Map([
+    const allWrestlers = new Map([
       ['p1', { wins: 12, losses: 0, total: 12 }],
       ['p2', { wins: 0, losses: 12, total: 12 }],
     ]);
 
-    const result = calculatePlayerScore('p1', matches, allPlayers, 30);
+    const result = calculateWrestlerScore('p1', matches, allWrestlers, 30);
 
     expect(result.currentStreak).toBe(12);
     // Streak bonus capped at 100, contributing 100 * 0.2 = 20 max
@@ -177,12 +177,12 @@ describe('calculatePlayerScore', () => {
       makeMatch({ matchId: 'm1', date: daysAgo(1), winners: ['p1'], losers: ['strong'], participants: ['p1', 'strong'] }),
     ];
 
-    const allPlayers = new Map([
+    const allWrestlers = new Map([
       ['p1', { wins: 1, losses: 0, total: 1 }],
       ['strong', { wins: 8, losses: 2, total: 10 }],
     ]);
 
-    const result = calculatePlayerScore('p1', matches, allPlayers, 30);
+    const result = calculateWrestlerScore('p1', matches, allWrestlers, 30);
 
     // Quality = avg opponent win rate * 100 = 80
     expect(result.qualityScore).toBeCloseTo(80, 0);
@@ -194,13 +194,13 @@ describe('calculatePlayerScore', () => {
       makeMatch({ matchId: 'm2', date: daysAgo(1), winners: ['p3'], losers: ['p1'], participants: ['p1', 'p3'] }),
     ];
 
-    const allPlayers = new Map([
+    const allWrestlers = new Map([
       ['p1', { wins: 0, losses: 2, total: 2 }],
       ['p2', { wins: 1, losses: 0, total: 1 }],
       ['p3', { wins: 1, losses: 0, total: 1 }],
     ]);
 
-    const result = calculatePlayerScore('p1', matches, allPlayers, 30);
+    const result = calculateWrestlerScore('p1', matches, allWrestlers, 30);
 
     expect(result.currentStreak).toBe(-2);
     // 0% win rate, 0 streak bonus, 0 quality (no wins), low recency
@@ -208,14 +208,14 @@ describe('calculatePlayerScore', () => {
   });
 
   it('recency favors recent matches via exponential decay', () => {
-    // Both players: 1 win + 1 loss, but at different times
-    // "recent" player won recently and lost long ago
-    // "old" player lost recently and won long ago
-    const recentPlayer = [
+    // Both wrestlers: 1 win + 1 loss, but at different times
+    // "recent" wrestler won recently and lost long ago
+    // "old" wrestler lost recently and won long ago
+    const recentWrestler = [
       makeMatch({ matchId: 'm1', date: daysAgo(1), winners: ['r'], losers: ['x'], participants: ['r', 'x'] }),
       makeMatch({ matchId: 'm2', date: daysAgo(25), winners: ['x'], losers: ['r'], participants: ['r', 'x'] }),
     ];
-    const oldPlayer = [
+    const oldWrestler = [
       makeMatch({ matchId: 'm1', date: daysAgo(1), winners: ['x'], losers: ['o'], participants: ['o', 'x'] }),
       makeMatch({ matchId: 'm2', date: daysAgo(25), winners: ['o'], losers: ['x'], participants: ['o', 'x'] }),
     ];
@@ -226,8 +226,8 @@ describe('calculatePlayerScore', () => {
       ['x', { wins: 2, losses: 2, total: 4 }],
     ]);
 
-    const recent = calculatePlayerScore('r', recentPlayer, stats, 30);
-    const old = calculatePlayerScore('o', oldPlayer, stats, 30);
+    const recent = calculateWrestlerScore('r', recentWrestler, stats, 30);
+    const old = calculateWrestlerScore('o', oldWrestler, stats, 30);
 
     // Recent win is weighted more heavily than old win
     expect(recent.recencyScore).toBeGreaterThan(old.recencyScore);
@@ -290,7 +290,7 @@ describe('calculateRankingsForChampionship', () => {
       maxContenders: 10,
     });
 
-    const ids = results.map((r) => r.playerId);
+    const ids = results.map((r) => r.wrestlerId);
     expect(ids).not.toContain('champ');
   });
 
@@ -310,12 +310,12 @@ describe('calculateRankingsForChampionship', () => {
       maxContenders: 10,
     });
 
-    const ids = results.map((r) => r.playerId);
+    const ids = results.map((r) => r.wrestlerId);
     expect(ids).not.toContain('t1a');
     expect(ids).not.toContain('t1b');
   });
 
-  it('excludes players below minimum match threshold', async () => {
+  it('excludes wrestlers below minimum match threshold', async () => {
     mockScanAll.mockResolvedValueOnce([
       // p1 has 3 matches (meets min), p2 has 2 matches (below min of 3)
       makeMatch({ matchId: 'm1', date: daysAgo(1), winners: ['p1'], losers: ['p2'], participants: ['p1', 'p2'] }),
@@ -332,16 +332,16 @@ describe('calculateRankingsForChampionship', () => {
       maxContenders: 10,
     });
 
-    const ids = results.map((r) => r.playerId);
+    const ids = results.map((r) => r.wrestlerId);
     expect(ids).toContain('p1');
     expect(ids).not.toContain('p2'); // only 2 matches
     expect(ids).not.toContain('p3'); // only 1 match
   });
 
   it('respects division lock when divisionId is set', async () => {
-    // First call: scanAll for players in division
+    // First call: scanAll for wrestlers in division
     mockScanAll.mockResolvedValueOnce([
-      { playerId: 'p1', divisionId: 'div-1' },
+      { wrestlerId: 'p1', divisionId: 'div-1' },
       // p2 is NOT in this division
     ]);
     // Second call: scanAll for matches
@@ -362,13 +362,13 @@ describe('calculateRankingsForChampionship', () => {
       maxContenders: 10,
     });
 
-    const ids = results.map((r) => r.playerId);
+    const ids = results.map((r) => r.wrestlerId);
     expect(ids).toContain('p1');
     expect(ids).not.toContain('p2'); // not in division
   });
 
   it('limits results to maxContenders', async () => {
-    // Generate enough matches for 5 players with 3+ matches each
+    // Generate enough matches for 5 wrestlers with 3+ matches each
     const matches: any[] = [];
     for (let p = 1; p <= 5; p++) {
       for (let m = 0; m < 3; m++) {

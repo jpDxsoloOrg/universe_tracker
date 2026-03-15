@@ -18,7 +18,7 @@ vi.mock('../../../lib/dynamodb', () => ({
     queryAll: vi.fn(),
   },
   TableNames: {
-    PLAYERS: 'Players',
+    WRESTLERS: 'Wrestlers',
     MATCHES: 'Matches',
     CHAMPIONSHIPS: 'Championships',
     CHAMPIONSHIP_HISTORY: 'ChampionshipHistory',
@@ -56,7 +56,7 @@ describe('getActivity', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockScanAll.mockResolvedValue([]);
-    mockGet.mockResolvedValue({ Item: { name: 'Test Player', currentWrestler: 'Wrestler' } });
+    mockGet.mockResolvedValue({ Item: { name: 'Test Wrestler' } });
   });
 
   it('returns empty items and null nextCursor when no data', async () => {
@@ -96,7 +96,7 @@ describe('getActivity', () => {
     expect(body.items[0].type).toBe('match_result');
     expect(body.items[0].timestamp).toBe('2024-02-01T14:00:00.000Z');
     expect(body.items[0].id).toBe('match-m1');
-    expect(body.items[0].summary).toBe('Test Player def. Test Player');
+    expect(body.items[0].summary).toBe('Test Wrestler def. Test Wrestler');
     expect(body.nextCursor).toBeNull();
   });
 

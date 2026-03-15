@@ -4,16 +4,16 @@ import { success, serverError } from '../../lib/response';
 
 type FormResult = 'W' | 'L' | 'D';
 
-function getResultForPlayer(
-  playerId: string,
+function getResultForWrestler(
+  wrestlerId: string,
   match: { participants?: string[]; winners?: string[]; losers?: string[] }
 ): FormResult {
   const participants = (match.participants || []) as string[];
   const winners = (match.winners || []) as string[];
   const losers = (match.losers || []) as string[];
-  if (!participants.includes(playerId)) return 'D';
-  if (winners.includes(playerId)) return 'W';
-  if (losers.includes(playerId)) return 'L';
+  if (!participants.includes(wrestlerId)) return 'D';
+  if (winners.includes(wrestlerId)) return 'W';
+  if (losers.includes(wrestlerId)) return 'L';
   return 'D';
 }
 
@@ -26,18 +26,18 @@ type CompletedMatchForForm = {
 };
 
 function computeRecentFormAndStreak(
-  playerId: string,
+  wrestlerId: string,
   completedMatches: CompletedMatchForForm[]
 ): { recentForm: FormResult[]; currentStreak: { type: FormResult; count: number } } {
-  const playerMatches = completedMatches
-    .filter((m) => ((m.participants || []) as string[]).includes(playerId))
+  const wrestlerMatches = completedMatches
+    .filter((m) => ((m.participants || []) as string[]).includes(wrestlerId))
     .sort((a, b) => {
       const aTime = new Date((a.updatedAt ?? 0) as string | number).getTime();
       const bTime = new Date((b.updatedAt ?? 0) as string | number).getTime();
       return bTime - aTime;
     })
     .slice(0, 5);
-  const recentForm: FormResult[] = playerMatches.map((m) => getResultForPlayer(playerId, m));
+  const recentForm: FormResult[] = wrestlerMatches.map((m) => getResultForWrestler(wrestlerId, m));
   if (recentForm.length === 0) {
     return { recentForm: [], currentStreak: { type: 'W', count: 0 } };
   }
@@ -72,28 +72,25 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         ExpressionAttributeValues: { ':seasonId': seasonId },
       });
 
-      // Get all player details with pagination support
-      const allPlayers = await dynamoDb.scanAll({
-        TableName: TableNames.PLAYERS,
+      // Get all wrestler details with pagination support
+      const allWrestlers = await dynamoDb.scanAll({
+        TableName: TableNames.WRESTLERS,
       });
 
-      // Only include players who have a wrestler assigned
-      const players = allPlayers.filter((p) => p.currentWrestler);
-
-      // Build a map of season standings by playerId
+      // Build a map of season standings by wrestlerId
       const standingsMap = new Map(
-        seasonStandings.map((s) => [s.playerId as string, s])
+        seasonStandings.map((s) => [s.wrestlerId as string, s])
       );
 
-      // Show ALL players - those with standings get season W-L-D, others get 0-0-0
-      const standings = players.map((player) => {
-        const standing = standingsMap.get(player.playerId as string);
+      // Show ALL wrestlers - those with standings get season W-L-D, others get 0-0-0
+      const standings = allWrestlers.map((wrestler) => {
+        const standing = standingsMap.get(wrestler.wrestlerId as string);
         const { recentForm, currentStreak } = computeRecentFormAndStreak(
-          player.playerId as string,
+          wrestler.wrestlerId as string,
           completedMatches
         );
         return {
-          ...player,
+          ...wrestler,
           wins: standing ? ((standing.wins as number) || 0) : 0,
           losses: standing ? ((standing.losses as number) || 0) : 0,
           draws: standing ? ((standing.draws as number) || 0) : 0,
@@ -111,22 +108,19 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       });
 
       return success({
-        players: standings,
+        wrestlers: standings,
         seasonId,
         sortedByWins: true,
       });
     }
 
-    // Default: get all-time standings from Players table with pagination support
-    const allPlayers = await dynamoDb.scanAll({
-      TableName: TableNames.PLAYERS,
+    // Default: get all-time standings from Wrestlers table with pagination support
+    const allWrestlers = await dynamoDb.scanAll({
+      TableName: TableNames.WRESTLERS,
     });
 
-    // Only include players who have a wrestler assigned
-    const wrestlers = allPlayers.filter((p) => p.currentWrestler);
-
-    // Sort players by wins descending, then by losses ascending
-    const players = wrestlers.sort((a, b) => {
+    // Sort wrestlers by wins descending, then by losses ascending
+    const wrestlers = allWrestlers.sort((a, b) => {
       const aWins = (a.wins as number) || 0;
       const bWins = (b.wins as number) || 0;
       const aLosses = (a.losses as number) || 0;
@@ -138,16 +132,16 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       return aLosses - bLosses;
     });
 
-    const playersWithForm = players.map((player) => {
+    const wrestlersWithForm = wrestlers.map((wrestler) => {
       const { recentForm, currentStreak } = computeRecentFormAndStreak(
-        player.playerId as string,
+        wrestler.wrestlerId as string,
         completedMatches
       );
-      return { ...player, recentForm, currentStreak };
+      return { ...wrestler, recentForm, currentStreak };
     });
 
     return success({
-      players: playersWithForm,
+      wrestlers: wrestlersWithForm,
       sortedByWins: true,
     });
   } catch (err) {

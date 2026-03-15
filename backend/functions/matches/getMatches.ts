@@ -39,10 +39,10 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       attrValues[':status'] = params.status;
     }
 
-    if (params.playerId) {
-      filters.push('contains(#participants, :playerId)');
+    if (params.wrestlerId) {
+      filters.push('contains(#participants, :wrestlerId)');
       attrNames['#participants'] = 'participants';
-      attrValues[':playerId'] = params.playerId;
+      attrValues[':wrestlerId'] = params.wrestlerId;
     }
 
     if (params.stipulationId) {

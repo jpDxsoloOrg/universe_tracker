@@ -104,7 +104,7 @@ describe('championships router', () => {
     mockGet
       .mockResolvedValueOnce({ Item: { championshipId: 'c1', currentChampionId: 'p1', currentChampion: 'p1' } })
       .mockResolvedValueOnce({ Item: { championshipId: 'c1', currentChampionId: null, currentChampion: null } });
-    mockQuery.mockResolvedValue({ Items: [{ championshipId: 'c1', wonDate: '2025-01-01', playerId: 'p1' }] });
+    mockQuery.mockResolvedValue({ Items: [{ championshipId: 'c1', wonDate: '2025-01-01', wrestlerId: 'p1' }] });
     mockTransactWrite.mockResolvedValue({});
     const event = makeEvent({
       httpMethod: 'POST',

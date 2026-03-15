@@ -8,7 +8,7 @@ The **Tournaments** page allows you to create and manage tournaments.
 2. Fill in the tournament details:
    - **Tournament Name** — e.g., "King of the Ring 2025"
    - **Type** — Single Elimination or Round Robin
-   - **Participants** — Select the players competing
+   - **Participants** — Select the wrestlers competing
 3. Click **Create Tournament** to save
 
 ## Tournament Types

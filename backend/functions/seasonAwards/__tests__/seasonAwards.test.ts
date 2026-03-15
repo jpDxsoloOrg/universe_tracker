@@ -22,7 +22,7 @@ vi.mock('../../../lib/dynamodb', () => ({
   TableNames: {
     SEASON_AWARDS: 'SeasonAwards',
     SEASONS: 'Seasons',
-    PLAYERS: 'Players',
+    WRESTLERS: 'Wrestlers',
     MATCHES: 'Matches',
     CHAMPIONSHIP_HISTORY: 'ChampionshipHistory',
   },
@@ -67,7 +67,7 @@ describe('getSeasonAwards', () => {
 
   it('returns auto and custom awards for a season', async () => {
     mockQuery.mockResolvedValue({
-      Items: [{ awardId: 'custom-1', seasonId: 's1', name: 'Best Promo', awardType: 'custom', playerId: 'p1' }],
+      Items: [{ awardId: 'custom-1', seasonId: 's1', name: 'Best Promo', awardType: 'custom', wrestlerId: 'p1' }],
     });
     mockScan
       .mockResolvedValueOnce({
@@ -79,8 +79,8 @@ describe('getSeasonAwards', () => {
       })
       .mockResolvedValueOnce({
         Items: [
-          { playerId: 'p1', name: 'Player One' },
-          { playerId: 'p2', name: 'Player Two' },
+          { wrestlerId: 'p1', name: 'Wrestler One' },
+          { wrestlerId: 'p2', name: 'Wrestler Two' },
         ],
       })
       .mockResolvedValueOnce({ Items: [] });
@@ -97,7 +97,7 @@ describe('getSeasonAwards', () => {
     // MVP should be p1 with 3 wins
     const mvp = body.autoAwards.find((a: Record<string, string>) => a.awardType === 'mvp');
     expect(mvp).toBeDefined();
-    expect(mvp.playerId).toBe('p1');
+    expect(mvp.wrestlerId).toBe('p1');
     expect(mvp.value).toBe('3 wins');
   });
 
@@ -127,12 +127,12 @@ describe('createSeasonAward', () => {
   it('creates a custom award and returns 201', async () => {
     mockGet
       .mockResolvedValueOnce({ Item: { seasonId: 's1', name: 'Season 1' } })
-      .mockResolvedValueOnce({ Item: { playerId: 'p1', name: 'Player One' } });
+      .mockResolvedValueOnce({ Item: { wrestlerId: 'p1', name: 'Wrestler One' } });
     mockPut.mockResolvedValue({});
 
     const event = makeEvent({
       pathParameters: { seasonId: 's1' },
-      body: JSON.stringify({ name: 'Best Promo', playerId: 'p1', description: 'Great mic work' }),
+      body: JSON.stringify({ name: 'Best Promo', wrestlerId: 'p1', description: 'Great mic work' }),
     });
 
     const result = await createSeasonAward(event, ctx, cb);
@@ -141,8 +141,8 @@ describe('createSeasonAward', () => {
     const body = JSON.parse(result!.body);
     expect(body.awardId).toBe('test-award-uuid');
     expect(body.name).toBe('Best Promo');
-    expect(body.playerId).toBe('p1');
-    expect(body.playerName).toBe('Player One');
+    expect(body.wrestlerId).toBe('p1');
+    expect(body.wrestlerName).toBe('Wrestler One');
     expect(body.awardType).toBe('custom');
     expect(body.description).toBe('Great mic work');
     expect(mockPut).toHaveBeenCalledOnce();
@@ -151,7 +151,7 @@ describe('createSeasonAward', () => {
   it('returns 400 when name is missing', async () => {
     const event = makeEvent({
       pathParameters: { seasonId: 's1' },
-      body: JSON.stringify({ playerId: 'p1' }),
+      body: JSON.stringify({ wrestlerId: 'p1' }),
     });
 
     const result = await createSeasonAward(event, ctx, cb);
@@ -160,7 +160,7 @@ describe('createSeasonAward', () => {
     expect(JSON.parse(result!.body).message).toBe('name is required');
   });
 
-  it('returns 400 when playerId is missing', async () => {
+  it('returns 400 when wrestlerId is missing', async () => {
     const event = makeEvent({
       pathParameters: { seasonId: 's1' },
       body: JSON.stringify({ name: 'MVP' }),
@@ -169,7 +169,7 @@ describe('createSeasonAward', () => {
     const result = await createSeasonAward(event, ctx, cb);
 
     expect(result!.statusCode).toBe(400);
-    expect(JSON.parse(result!.body).message).toBe('playerId is required');
+    expect(JSON.parse(result!.body).message).toBe('wrestlerId is required');
   });
 
   it('returns 404 when season not found', async () => {
@@ -177,7 +177,7 @@ describe('createSeasonAward', () => {
 
     const event = makeEvent({
       pathParameters: { seasonId: 's999' },
-      body: JSON.stringify({ name: 'MVP', playerId: 'p1' }),
+      body: JSON.stringify({ name: 'MVP', wrestlerId: 'p1' }),
     });
 
     const result = await createSeasonAward(event, ctx, cb);
@@ -186,20 +186,20 @@ describe('createSeasonAward', () => {
     expect(JSON.parse(result!.body).message).toBe('Season not found');
   });
 
-  it('returns 404 when player not found', async () => {
+  it('returns 404 when wrestler not found', async () => {
     mockGet
       .mockResolvedValueOnce({ Item: { seasonId: 's1' } })
       .mockResolvedValueOnce({ Item: undefined });
 
     const event = makeEvent({
       pathParameters: { seasonId: 's1' },
-      body: JSON.stringify({ name: 'MVP', playerId: 'p999' }),
+      body: JSON.stringify({ name: 'MVP', wrestlerId: 'p999' }),
     });
 
     const result = await createSeasonAward(event, ctx, cb);
 
     expect(result!.statusCode).toBe(404);
-    expect(JSON.parse(result!.body).message).toBe('Player not found');
+    expect(JSON.parse(result!.body).message).toBe('Wrestler not found');
   });
 
   it('returns 400 when body is null', async () => {

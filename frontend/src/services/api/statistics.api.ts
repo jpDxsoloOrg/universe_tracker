@@ -112,14 +112,14 @@ export interface WrestlerMatchStatsResponse {
 
 export const statisticsApi = {
   getWrestlerStats: async (wrestlerId?: string, seasonId?: string, signal?: AbortSignal): Promise<WrestlerStatsResponse> => {
-    const params = new URLSearchParams({ section: 'player-stats' });
-    if (wrestlerId) params.set('playerId', wrestlerId);
+    const params = new URLSearchParams({ section: 'wrestler-stats' });
+    if (wrestlerId) params.set('wrestlerId', wrestlerId);
     if (seasonId) params.set('seasonId', seasonId);
     return fetchWithAuth(`${API_BASE_URL}/statistics?${params}`, {}, signal);
   },
 
   getHeadToHead: async (wrestler1Id: string, wrestler2Id: string, seasonId?: string, signal?: AbortSignal): Promise<HeadToHeadResponse> => {
-    const params = new URLSearchParams({ section: 'head-to-head', player1Id: wrestler1Id, player2Id: wrestler2Id });
+    const params = new URLSearchParams({ section: 'head-to-head', wrestler1Id: wrestler1Id, wrestler2Id: wrestler2Id });
     if (seasonId) params.set('seasonId', seasonId);
     return fetchWithAuth(`${API_BASE_URL}/statistics?${params}`, {}, signal);
   },
@@ -142,7 +142,7 @@ export const statisticsApi = {
 
   getAchievements: async (wrestlerId?: string, signal?: AbortSignal): Promise<AchievementsResponse> => {
     const params = new URLSearchParams({ section: 'achievements' });
-    if (wrestlerId) params.set('playerId', wrestlerId);
+    if (wrestlerId) params.set('wrestlerId', wrestlerId);
     return fetchWithAuth(`${API_BASE_URL}/statistics?${params}`, {}, signal);
   },
 

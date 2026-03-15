@@ -15,7 +15,7 @@ vi.mock('../../../lib/dynamodb', () => ({
   },
   TableNames: {
     CHAMPIONSHIPS: 'Championships',
-    PLAYERS: 'Players',
+    WRESTLERS: 'Wrestlers',
     SEASONS: 'Seasons',
     MATCHES: 'Matches',
     STIPULATIONS: 'Stipulations',
@@ -34,7 +34,7 @@ describe('getDashboard', () => {
     vi.clearAllMocks();
     mockScanAll
       .mockResolvedValueOnce([]) // championships
-      .mockResolvedValueOnce([]) // players
+      .mockResolvedValueOnce([]) // wrestlers
       .mockResolvedValueOnce([]) // seasons
       .mockResolvedValueOnce([]) // matches
       .mockResolvedValueOnce([]); // stipulations
@@ -56,7 +56,7 @@ describe('getDashboard', () => {
     expect(Array.isArray(body.upcomingEvents)).toBe(true);
     expect(Array.isArray(body.recentResults)).toBe(true);
     expect(body.quickStats).toMatchObject({
-      totalPlayers: 0,
+      totalWrestlers: 0,
       totalMatches: 0,
       activeChampionships: 0,
     });
@@ -82,7 +82,7 @@ describe('getDashboard', () => {
         { championshipId: 'c3', name: 'Midcard', isActive: true },
       ])
       .mockResolvedValueOnce([
-        { playerId: 'p1', name: 'Alice', currentWrestler: 'Stone Cold' },
+        { wrestlerId: 'p1', name: 'Alice' },
       ])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([])
@@ -96,7 +96,7 @@ describe('getDashboard', () => {
     const body = JSON.parse(result!.body);
     expect(body.currentChampions).toHaveLength(1);
     expect(body.currentChampions[0].championshipName).toBe('World Title');
-    expect(body.currentChampions[0].championName).toBe('Stone Cold');
+    expect(body.currentChampions[0].championName).toBe('Alice');
   });
 
   it('limits upcoming events to 3', async () => {
@@ -137,7 +137,7 @@ describe('getDashboard', () => {
     mockScanAll
       .mockReset()
       .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([{ playerId: 'p1', currentWrestler: 'A' }, { playerId: 'p2', currentWrestler: 'B' }])
+      .mockResolvedValueOnce([{ wrestlerId: 'p1', name: 'A' }, { wrestlerId: 'p2', name: 'B' }])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce(completedNoUpdatedAt)
       .mockResolvedValueOnce([]);
@@ -164,7 +164,7 @@ describe('getDashboard', () => {
     mockScanAll
       .mockReset()
       .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([{ playerId: 'p1', currentWrestler: 'A' }, { playerId: 'p2', currentWrestler: 'B' }])
+      .mockResolvedValueOnce([{ wrestlerId: 'p1', name: 'A' }, { wrestlerId: 'p2', name: 'B' }])
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce(manyMatches)
       .mockResolvedValueOnce([]); // stipulations

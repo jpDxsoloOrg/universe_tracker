@@ -7,7 +7,7 @@ interface DashboardChampion {
   championshipName: string;
   championName: string;
   championImageUrl?: string;
-  playerId: string;
+  wrestlerId: string;
   wonDate?: string;
   defenses?: number;
 }
@@ -48,10 +48,10 @@ interface DashboardSeason {
 }
 
 interface DashboardQuickStats {
-  totalPlayers: number;
+  totalWrestlers: number;
   totalMatches: number;
   activeChampionships: number;
-  mostWinsPlayer?: { name: string; wins: number };
+  mostWinsWrestler?: { name: string; wins: number };
 }
 
 interface DashboardResponse {
@@ -64,11 +64,11 @@ interface DashboardResponse {
 
 export const handler: APIGatewayProxyHandler = async () => {
   try {
-    // Fetch data: championships, players, seasons, matches, stipulations; events via query
-    const [championships, players, seasons, matches, stipulations, upcomingEventsResult] =
+    // Fetch data: championships, wrestlers, seasons, matches, stipulations; events via query
+    const [championships, wrestlers, seasons, matches, stipulations, upcomingEventsResult] =
       await Promise.all([
         dynamoDb.scanAll({ TableName: TableNames.CHAMPIONSHIPS }),
-        dynamoDb.scanAll({ TableName: TableNames.PLAYERS }),
+        dynamoDb.scanAll({ TableName: TableNames.WRESTLERS }),
         dynamoDb.scanAll({ TableName: TableNames.SEASONS }),
         dynamoDb.scanAll({ TableName: TableNames.MATCHES }),
         dynamoDb.scanAll({ TableName: TableNames.STIPULATIONS }),
@@ -83,13 +83,10 @@ export const handler: APIGatewayProxyHandler = async () => {
         }),
       ]);
 
-    // Only include players who have a wrestler assigned
-    const wrestlerPlayers = (players as Record<string, unknown>[]).filter((p) => p.currentWrestler);
-
-    const playerMap = new Map<string, Record<string, unknown>>();
-    for (const p of wrestlerPlayers) {
-      const id = p.playerId as string;
-      if (id) playerMap.set(id, p);
+    const wrestlerMap = new Map<string, Record<string, unknown>>();
+    for (const w of wrestlers as Record<string, unknown>[]) {
+      const id = w.wrestlerId as string;
+      if (id) wrestlerMap.set(id, w);
     }
 
     const championshipMap = new Map<string, Record<string, unknown>>();
@@ -110,14 +107,14 @@ export const handler: APIGatewayProxyHandler = async () => {
       if (c.isActive === false) continue;
       const champ = c.currentChampion;
       if (!champ) continue;
-      const playerIds = Array.isArray(champ) ? champ : [champ];
+      const wrestlerIds = Array.isArray(champ) ? champ : [champ];
       const names: string[] = [];
       let imageUrl: string | undefined;
-      for (const pid of playerIds) {
-        const player = playerMap.get(pid as string);
-        if (player) {
-          names.push((player.currentWrestler as string) || (player.name as string));
-          if (player.imageUrl) imageUrl = player.imageUrl as string;
+      for (const wid of wrestlerIds) {
+        const wrestler = wrestlerMap.get(wid as string);
+        if (wrestler) {
+          names.push((wrestler.name as string));
+          if (wrestler.imageUrl) imageUrl = wrestler.imageUrl as string;
         }
       }
       if (names.length > 0) {
@@ -126,7 +123,7 @@ export const handler: APIGatewayProxyHandler = async () => {
           championshipName: c.name as string,
           championName: names.join(' & '),
           championImageUrl: imageUrl,
-          playerId: (playerIds[0] as string) ?? '',
+          wrestlerId: (wrestlerIds[0] as string) ?? '',
           wonDate: c.updatedAt as string,
           defenses: c.defenses as number | undefined,
         });
@@ -170,16 +167,16 @@ export const handler: APIGatewayProxyHandler = async () => {
       const loserIds = m.losers as string[];
       const winnerName = (winnerIds || [])
         .map((id) => {
-          const p = playerMap.get(id);
-          return p ? (p.currentWrestler as string) || (p.name as string) : '';
+          const p = wrestlerMap.get(id);
+          return p ? (p.name as string) : '';
         })
         .filter(Boolean)
         .join(' & ');
       // Use " vs " for losers so triple threat / fatal four way read as "A vs B vs C" not "A vs B & C"
       const loserName = (loserIds || [])
         .map((id) => {
-          const p = playerMap.get(id);
-          return p ? (p.currentWrestler as string) || (p.name as string) : '';
+          const p = wrestlerMap.get(id);
+          return p ? (p.name as string) : '';
         })
         .filter(Boolean)
         .join(' vs ');
@@ -203,11 +200,11 @@ export const handler: APIGatewayProxyHandler = async () => {
         matchOfTheNight: Boolean(m.matchOfTheNight),
         winnerName: winnerName || '—',
         winnerImageUrl: firstWinner
-          ? (playerMap.get(firstWinner)?.imageUrl as string | undefined)
+          ? (wrestlerMap.get(firstWinner)?.imageUrl as string | undefined)
           : undefined,
         loserName: loserName || '—',
         loserImageUrl: firstLoser
-          ? (playerMap.get(firstLoser)?.imageUrl as string | undefined)
+          ? (wrestlerMap.get(firstLoser)?.imageUrl as string | undefined)
           : undefined,
         eventId: m.eventId as string | undefined,
       };
@@ -236,7 +233,7 @@ export const handler: APIGatewayProxyHandler = async () => {
     const totalMatches = (matches as Record<string, unknown>[]).filter(
       (m) => m.status === 'completed'
     ).length;
-    let mostWinsPlayer: { name: string; wins: number } | undefined;
+    let mostWinsWrestler: { name: string; wins: number } | undefined;
     if (activeSeason) {
       const seasonStandings = await dynamoDb.queryAll({
         TableName: TableNames.SEASON_STANDINGS,
@@ -245,37 +242,37 @@ export const handler: APIGatewayProxyHandler = async () => {
       });
       let maxWins = 0;
       for (const s of seasonStandings as Record<string, unknown>[]) {
-        const w = (s.wins as number) ?? 0;
-        if (w > maxWins) {
-          maxWins = w;
-          const p = playerMap.get(s.playerId as string);
-          mostWinsPlayer = {
-            name: (p?.currentWrestler as string) || (p?.name as string) || '—',
-            wins: w,
+        const winCount = (s.wins as number) ?? 0;
+        if (winCount > maxWins) {
+          maxWins = winCount;
+          const wr = wrestlerMap.get(s.wrestlerId as string);
+          mostWinsWrestler = {
+            name: (wr?.name as string) || '—',
+            wins: winCount,
           };
         }
       }
     } else {
       let maxWins = 0;
-      for (const p of wrestlerPlayers) {
-        const w = (p.wins as number) ?? 0;
-        if (w > maxWins) {
-          maxWins = w;
-          mostWinsPlayer = {
-            name: (p.currentWrestler as string) || (p.name as string) || '—',
-            wins: w,
+      for (const wr of wrestlers as Record<string, unknown>[]) {
+        const wn = (wr.wins as number) ?? 0;
+        if (wn > maxWins) {
+          maxWins = wn;
+          mostWinsWrestler = {
+            name: (wr.name as string) || '—',
+            wins: wn,
           };
         }
       }
     }
 
     const quickStats: DashboardQuickStats = {
-      totalPlayers: wrestlerPlayers.length,
+      totalWrestlers: (wrestlers as Record<string, unknown>[]).length,
       totalMatches,
       activeChampionships: (championships as Record<string, unknown>[]).filter(
         (c) => c.isActive !== false
       ).length,
-      mostWinsPlayer,
+      mostWinsWrestler,
     };
 
     const response: DashboardResponse = {

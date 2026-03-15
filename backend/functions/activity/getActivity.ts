@@ -39,15 +39,15 @@ function parseQuery(event: { queryStringParameters?: Record<string, string | und
   return { limit, cursor, typeFilter };
 }
 
-async function fetchPlayerNames(playerIds: Set<string>): Promise<Record<string, string>> {
+async function fetchWrestlerNames(wrestlerIds: Set<string>): Promise<Record<string, string>> {
   const names: Record<string, string> = {};
-  for (const playerId of playerIds) {
+  for (const wrestlerId of wrestlerIds) {
     const result = await dynamoDb.get({
-      TableName: TableNames.PLAYERS,
-      Key: { playerId },
+      TableName: TableNames.WRESTLERS,
+      Key: { wrestlerId },
     });
     if (result.Item) {
-      names[playerId] = (result.Item.name as string) || (result.Item.currentWrestler as string) || playerId;
+      names[wrestlerId] = (result.Item.name as string) || wrestlerId;
     }
   }
   return names;
@@ -76,7 +76,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const includeSeason = !typeFilter || typeFilter === 'season';
     const includeTournament = !typeFilter || typeFilter === 'tournament';
     const rawItems: { type: ActivityItemType; timestamp: string; id: string; summary: string; metadata: Record<string, unknown> }[] = [];
-    const playerIds = new Set<string>();
+    const wrestlerIds = new Set<string>();
     const championshipIds = new Set<string>();
 
     if (includeMatch) {
@@ -93,7 +93,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         const participants = (m.participants as string[]) || [];
         const winners = (m.winners as string[]) || [];
         const losers = (m.losers as string[]) || [];
-        participants.forEach((p: string) => playerIds.add(p));
+        participants.forEach((p: string) => wrestlerIds.add(p));
         rawItems.push({
           type: 'match_result',
           timestamp: updatedAt,
@@ -126,8 +126,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         const wonDate = h.wonDate as string;
         championshipIds.add(h.championshipId as string);
         const champion = h.champion;
-        if (typeof champion === 'string') playerIds.add(champion);
-        else if (Array.isArray(champion)) champion.forEach((c: string) => playerIds.add(c));
+        if (typeof champion === 'string') wrestlerIds.add(champion);
+        else if (Array.isArray(champion)) champion.forEach((c: string) => wrestlerIds.add(c));
         rawItems.push({
           type: 'championship_change',
           timestamp: updatedAt,
@@ -196,7 +196,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         if (!updatedAt) continue; // only show tournaments with updatedAt or createdAt
         const status = t.status as string;
         const winner = t.winner as string | undefined;
-        if (winner) playerIds.add(winner);
+        if (winner) wrestlerIds.add(winner);
         rawItems.push({
           type: 'tournament_result',
           timestamp: updatedAt,
@@ -214,7 +214,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       }
     }
 
-    const playerNames = await fetchPlayerNames(playerIds);
+    const wrestlerNames = await fetchWrestlerNames(wrestlerIds);
     const championshipNames = await fetchChampionshipNames(championshipIds);
 
     for (const item of rawItems) {
@@ -222,8 +222,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         const meta = item.metadata;
         const winners = (meta.winners as string[]) || [];
         const losers = (meta.losers as string[]) || [];
-        const winnerNames = winners.map((id: string) => playerNames[id] || id);
-        const loserNames = losers.map((id: string) => playerNames[id] || id);
+        const winnerNames = winners.map((id: string) => wrestlerNames[id] || id);
+        const loserNames = losers.map((id: string) => wrestlerNames[id] || id);
         meta.winnerNames = winnerNames;
         meta.loserNames = loserNames;
         item.summary = winnerNames.length && loserNames.length
@@ -233,8 +233,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         const meta = item.metadata;
         const champ = meta.champion;
         const champNames = Array.isArray(champ)
-          ? (champ as string[]).map((id: string) => playerNames[id] || id)
-          : [playerNames[champ as string] || (champ as string)];
+          ? (champ as string[]).map((id: string) => wrestlerNames[id] || id)
+          : [wrestlerNames[champ as string] || (champ as string)];
         meta.championNames = champNames;
         meta.championshipName = championshipNames[meta.championshipId as string] || meta.championshipId;
         item.summary = `${meta.championshipName}: ${champNames.join(' & ')} crowned`;
@@ -246,7 +246,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         const meta = item.metadata;
         const name = meta.name as string;
         const winner = meta.winner as string | undefined;
-        meta.winnerName = winner ? playerNames[winner] || winner : undefined;
+        meta.winnerName = winner ? wrestlerNames[winner] || winner : undefined;
         item.summary = winner
           ? `Tournament "${name}" completed — ${meta.winnerName || winner} won`
           : `Tournament "${name}"`;

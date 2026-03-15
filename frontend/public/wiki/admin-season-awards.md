@@ -13,7 +13,7 @@ Use **Season Awards** to review auto-generated awards and add your own custom aw
 
 1. Pick a season.
 2. Click **Create Award**.
-3. Enter award name, player, and optional description.
+3. Enter award name, wrestler, and optional description.
 4. Save and verify it appears in the custom awards list.
 
 ## Delete a custom award

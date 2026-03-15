@@ -8,9 +8,9 @@ Quickly populate the league with realistic sample data for testing or demonstrat
 
 **What Gets Created:**
 
-- **12 Players** — With random win/loss records and assigned wrestlers
+- **12 Wrestlers** — With random win/loss records
 - **3 Divisions** — e.g., Heavyweight, Cruiserweight, Mid-Card
-- **1 Active Season** — With standings for all players
+- **1 Active Season** — With standings for all wrestlers
 - **4 Championships** — World, Intercontinental, Tag Team, and US titles
 - **12 Matches** — Mix of completed and scheduled matches
 - **2 Tournaments** — Single elimination and round robin
@@ -34,7 +34,7 @@ Quickly populate the league with realistic sample data for testing or demonstrat
 
 ## What Gets Deleted
 
-- All players (wrestlers) and their match records
+- All wrestlers and their match records
 - All matches and results
 - All championships and their complete history
 - All tournaments and brackets

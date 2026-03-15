@@ -56,22 +56,21 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
         const match = matchQuery.Items[0] as Record<string, any>;
 
-        // Fetch participant player data
-        const participants: { playerId: string; playerName: string; wrestlerName: string }[] = [];
+        // Fetch participant wrestler data
+        const participants: { wrestlerId: string; wrestlerName: string }[] = [];
         if (match.participants && match.participants.length > 0) {
-          const playerPromises = match.participants.map(async (playerId: string) => {
-            const playerResult = await dynamoDb.get({
-              TableName: TableNames.PLAYERS,
-              Key: { playerId },
+          const wrestlerPromises = match.participants.map(async (wrestlerId: string) => {
+            const wrestlerResult = await dynamoDb.get({
+              TableName: TableNames.WRESTLERS,
+              Key: { wrestlerId },
             });
-            const player = playerResult.Item as Record<string, any> | undefined;
+            const wrestler = wrestlerResult.Item as Record<string, unknown> | undefined;
             return {
-              playerId,
-              playerName: player?.name || 'Unknown Player',
-              wrestlerName: player?.currentWrestler || 'Unknown Wrestler',
+              wrestlerId,
+              wrestlerName: (wrestler?.name as string) || 'Unknown Wrestler',
             };
           });
-          participants.push(...(await Promise.all(playerPromises)));
+          participants.push(...(await Promise.all(wrestlerPromises)));
         }
 
         // Fetch championship name if applicable

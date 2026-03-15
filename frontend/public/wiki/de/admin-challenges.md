@@ -1,6 +1,6 @@
 # Admin: Herausforderungen
 
-Der Tab **Herausforderungen** (Admin → Herausforderungen) ermöglicht das Anzeigen und Verwalten von Match-Herausforderungen zwischen Spielern.
+Der Tab **Herausforderungen** (Admin → Herausforderungen) ermöglicht das Anzeigen und Verwalten von Match-Herausforderungen zwischen Wrestlern.
 
 ## Anzeigen und Filtern
 

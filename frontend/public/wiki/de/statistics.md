@@ -4,7 +4,7 @@ Der Bereich Statistiken bietet tiefere Einblicke in die Liga-Leistung: Leaderboa
 
 ## Leaderboards
 
-Leaderboards ordnen Spieler nach verschiedenen Statistiken (z. B. Siege, Siegesserien, Meisterschafts-Regentschaften). So sehen Sie, wer in jeder Kategorie führt und wie Sie im Vergleich dastehen. Filter (z. B. nach Division oder Saison) können je nach Liga-Setup verfügbar sein.
+Leaderboards ordnen Wrestler nach verschiedenen Statistiken (z. B. Siege, Siegesserien, Meisterschafts-Regentschaften). So sehen Sie, wer in jeder Kategorie führt und wie Sie im Vergleich dastehen. Filter (z. B. nach Division oder Saison) können je nach Liga-Setup verfügbar sein.
 
 ## Rekorde
 
@@ -12,15 +12,15 @@ Rekorde heben bemerkenswerte Leistungen hervor: längste Siegesserien, meisten S
 
 ## Rivalitäten
 
-Rivalitäten zeigen die Direktvergleiche zwischen zwei Spielern: Siege, Niederlagen und Unentschieden gegeneinander. So sehen Sie, wie zwei Wrestler in direkten Duelle abgeschnitten haben und können laufende Fehden verfolgen.
+Rivalitäten zeigen die Direktvergleiche zwischen zwei Wrestlern: Siege, Niederlagen und Unentschieden gegeneinander. So sehen Sie, wie zwei Wrestler in direkten Duelle abgeschnitten haben und können laufende Fehden verfolgen.
 
 ## Tale of the Tape
 
-Tale of the Tape vergleicht zwei Wrestler direkt: Rekorde, Serien, Meisterschaften und andere Statistiken. Wählen Sie zwei Spieler für einen direkten Vergleich und sehen Sie, wer auf dem Papier die Nase vorn hat.
+Tale of the Tape vergleicht zwei Wrestler direkt: Rekorde, Serien, Meisterschaften und andere Statistiken. Wählen Sie zwei Wrestler für einen direkten Vergleich und sehen Sie, wer auf dem Papier die Nase vorn hat.
 
 ## Achievements
 
-Achievements erfassen Abzeichen oder Meilensteine, die Spieler freigeschaltet haben (z. B. erster Titel, 10 Siege, ungeschlagene Serie). Diese Seite listet verfügbare Achievements und wer sie freigeschaltet hat.
+Achievements erfassen Abzeichen oder Meilensteine, die Wrestler freigeschaltet haben (z. B. erster Titel, 10 Siege, ungeschlagene Serie). Diese Seite listet verfügbare Achievements und wer sie freigeschaltet hat.
 
 ## Beste Matches
 

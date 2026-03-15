@@ -1,7 +1,7 @@
 # WWE 2K League - Project Documentation for Claude
 
 ## Project Overview
-A serverless web application for managing a WWE 2K league with player standings, championships, matches, and tournaments.
+A serverless web application for managing a WWE 2K league with wrestler standings, championships, matches, and tournaments.
 
 ## Tech Stack
 
@@ -17,7 +17,7 @@ A serverless web application for managing a WWE 2K league with player standings,
 | **react-i18next** | 16.5.4 | React hooks (`useTranslation`) for i18next integration |
 | **AWS Amplify** | 6.16.0 | Configures and initializes AWS services (Cognito auth) |
 | **amazon-cognito-identity-js** | 6.3.7 | Handles admin login/logout with Cognito User Pool |
-| **@aws-sdk/client-s3** | 3.981.0 | Browser-side S3 uploads for player/championship images |
+| **@aws-sdk/client-s3** | 3.981.0 | Browser-side S3 uploads for wrestler/championship images |
 | **@aws-sdk/lib-storage** | 3.981.0 | Multi-part upload support for larger images |
 | **ESLint** | 9.x | Code quality with React Hooks and TypeScript rules (flat config) |
 
@@ -33,7 +33,7 @@ A serverless web application for managing a WWE 2K league with player standings,
 | **@aws-sdk/s3-request-presigner** | 3.450.0 | Creates time-limited signed URLs for S3 |
 | **@aws-sdk/client-cognito-identity-provider** | 3.982.0 | Admin operations on Cognito users |
 | **aws-jwt-verify** | 5.1.1 | Validates Cognito JWT tokens in Lambda authorizer (`functions/auth/authorizer.ts`) |
-| **uuid** | 9.0.1 | Generates unique IDs for players, matches, championships, etc. |
+| **uuid** | 9.0.1 | Generates unique IDs for wrestlers, matches, championships, etc. |
 | **ts-node** | 10.9.2 | Runs TypeScript scripts directly (`seed-data.ts`, `clear-data.ts`) |
 | **Serverless Framework** | 3.38.0 | Deploys all infrastructure defined in `serverless.yml` |
 | **serverless-plugin-typescript** | 2.1.5 | Auto-compiles TypeScript during serverless deploy |
@@ -43,10 +43,10 @@ A serverless web application for managing a WWE 2K league with player standings,
 
 | Service | How It's Used |
 |---------|---------------|
-| **AWS Lambda** | Serverless functions for all API endpoints - organized by feature: `auth/`, `players/`, `matches/`, `championships/`, `tournaments/`, `standings/`, `seasons/`, `divisions/`, `images/`, `admin/` |
+| **AWS Lambda** | Serverless functions for all API endpoints - organized by feature: `auth/`, `wrestlers/`, `matches/`, `championships/`, `tournaments/`, `standings/`, `seasons/`, `divisions/`, `images/`, `admin/` |
 | **API Gateway** | REST API exposing Lambda functions via HTTP; CORS configured for browser access; custom authorizer validates JWT tokens for admin routes |
-| **DynamoDB** | NoSQL database with 8 tables: Players, Matches (with TournamentIndex GSI), Championships, ChampionshipHistory, Tournaments, Seasons, SeasonStandings (with PlayerIndex GSI), Divisions - all use on-demand (PAY_PER_REQUEST) billing |
-| **Amazon S3** | Two purposes: (1) hosts frontend static files, (2) stores player/championship images with public read access and presigned URL uploads |
+| **DynamoDB** | NoSQL database with 8 tables: Wrestlers, Matches (with TournamentIndex GSI), Championships, ChampionshipHistory, Tournaments, Seasons, SeasonStandings (with WrestlerIndex GSI), Divisions - all use on-demand (PAY_PER_REQUEST) billing |
+| **Amazon S3** | Two purposes: (1) hosts frontend static files, (2) stores wrestler/championship images with public read access and presigned URL uploads |
 | **CloudFront** | CDN in front of S3; custom error responses redirect 403/404 to /index.html for SPA routing; HTTPS enforced |
 | **AWS Cognito** | User Pool for admin authentication - username-based login (not email), 24hr access tokens, 30-day refresh tokens. **Shared from the league_szn devtest Cognito pool -- do NOT recreate it.** |
 | **ACM** | SSL/TLS certificates for CloudFront HTTPS |
@@ -78,7 +78,7 @@ wwe-2k-league/
 │   │   │   └── admin/           # Admin-only components
 │   │   │       ├── AdminPanel.tsx
 │   │   │       ├── AdminLogin.tsx
-│   │   │       ├── ManagePlayers.tsx
+│   │   │       ├── ManageWrestlers.tsx
 │   │   │       ├── ScheduleMatch.tsx
 │   │   │       ├── RecordResult.tsx
 │   │   │       ├── ManageChampionships.tsx
@@ -92,7 +92,7 @@ wwe-2k-league/
 ├── backend/
 │   ├── functions/               # Lambda functions
 │   │   ├── auth/                # Authentication & JWT authorization
-│   │   ├── players/             # GET, POST, PUT, DELETE players
+│   │   ├── wrestlers/            # GET, POST, PUT, DELETE wrestlers
 │   │   ├── matches/             # GET, POST matches, PUT results
 │   │   ├── championships/       # GET, POST, PUT, DELETE championships, GET history
 │   │   ├── tournaments/         # GET, POST, PUT tournaments
@@ -123,9 +123,9 @@ wwe-2k-league/
 
 ## Data Model
 
-### Players Table
-- **PK**: `playerId`
-- Attributes: name, currentWrestler, wins, losses, draws, imageUrl, divisionId, createdAt, updatedAt
+### Wrestlers Table
+- **PK**: `wrestlerId`
+- Attributes: name, wins, losses, draws, imageUrl, divisionId, createdAt, updatedAt
 
 ### Matches Table
 - **PK**: `matchId`
@@ -153,14 +153,14 @@ wwe-2k-league/
 
 ### Season Standings Table
 - **PK**: `seasonId`
-- **SK**: `playerId`
+- **SK**: `wrestlerId`
 - Attributes: wins, losses, draws, updatedAt
-- **GSI**: PlayerIndex (playerId, seasonId) - For querying all seasons a player participated in
+- **GSI**: WrestlerIndex (wrestlerId, seasonId) - For querying all seasons a wrestler participated in
 
 ## Key Features
 
 ### Public Features (No Auth Required)
-1. **Standings** - View all players ranked by wins (all-time or per-season)
+1. **Standings** - View all wrestlers ranked by wins (all-time or per-season)
 2. **Championships** - View all titles with current champions and full history
 3. **Matches** - View scheduled and completed matches with filters
 4. **Tournaments** - View tournament brackets and round-robin standings
@@ -168,13 +168,13 @@ wwe-2k-league/
 ### Admin Features (Requires Login)
 Credentials: **admin / FireGreen48!**
 
-1. **Manage Players** - Add new players, edit wrestlers, upload images, delete players
+1. **Manage Wrestlers** - Add new wrestlers, edit details, upload images, delete wrestlers
 2. **Schedule Match** - Create matches with participants, stipulations, championships (assign to season)
 3. **Record Results** - Select winners from scheduled matches
 4. **Manage Championships** - Create new championships (singles/tag team), upload images, delete championships
 5. **Create Tournament** - Single elimination or round-robin with automatic bracket/standings generation
 6. **Manage Seasons** - Create new seasons, end active seasons, view historical season standings, delete seasons
-7. **Manage Divisions** - Create divisions, assign players to divisions, delete divisions
+7. **Manage Divisions** - Create divisions, assign wrestlers to divisions, delete divisions
 8. **Image Management** - Upload wrestler and championship images via presigned S3 URLs
 
 ## Important Implementation Details
@@ -182,7 +182,7 @@ Credentials: **admin / FireGreen48!**
 ### Match Result Recording
 When a match result is recorded (`recordResult.ts`):
 1. Updates match status to 'completed'
-2. Updates player win/loss/draw records (all-time standings)
+2. Updates wrestler win/loss/draw records (all-time standings)
 3. If match has seasonId: updates season-specific standings in SeasonStandings table
 4. If championship match: updates current champion and creates history entry
 5. If tournament match: updates tournament brackets/standings
@@ -200,7 +200,7 @@ When a match result is recorded (`recordResult.ts`):
 - All admin endpoints protected with custom authorizer in API Gateway
 
 ### Standings and dashboard data sources (no mock data)
-- **Standings "Last 5" (form)**: The form column comes from the standings API response (`recentForm` and `currentStreak`). The backend (`functions/standings/getStandings.ts`) computes these from the last 5 completed matches per player (DynamoDB Matches with `status = 'completed'`). The frontend displays only what the API returns; there is no client-side mock or fallback data.
+- **Standings "Last 5" (form)**: The form column comes from the standings API response (`recentForm` and `currentStreak`). The backend (`functions/standings/getStandings.ts`) computes these from the last 5 completed matches per wrestler (DynamoDB Matches with `status = 'completed'`). The frontend displays only what the API returns; there is no client-side mock or fallback data.
 - **Dashboard "Recent Results"**: The matches listed on the dashboard come from the dashboard API response (`recentResults`). The backend (`functions/dashboard/getDashboard.ts`) builds this from DynamoDB Matches (completed only, sorted by date descending, latest 5). The frontend renders only `data.recentResults`; there is no hardcoded or mock match list.
 
 ## Local Development
@@ -220,7 +220,7 @@ npm run offline  # Starts at http://localhost:3001/dev
 ### Seed Test Data
 ```bash
 cd backend
-npm run seed      # Creates 12 players, 4 championships, 12 matches, 2 tournaments, 3 divisions, 1 season
+npm run seed      # Creates 12 wrestlers, 4 championships, 12 matches, 2 tournaments, 3 divisions, 1 season
 npm run clear-data  # Clears all data
 ```
 
@@ -234,7 +234,7 @@ npm run dev  # Starts at http://localhost:3000
 ## API Endpoints
 
 ### Public (No Auth)
-- `GET /players` - All players with standings
+- `GET /wrestlers` - All wrestlers with standings
 - `GET /matches` - All matches (filterable by status)
 - `GET /championships` - All championships
 - `GET /championships/{id}/history` - Championship history
@@ -247,9 +247,9 @@ npm run dev  # Starts at http://localhost:3000
 All admin endpoints require a valid JWT token from Cognito in the `Authorization` header.
 
 - `POST /auth/setup` - Create admin user (one-time setup)
-- `POST /players` - Create player
-- `PUT /players/{id}` - Update player
-- `DELETE /players/{id}` - Delete player (fails if holds championship)
+- `POST /wrestlers` - Create wrestler
+- `PUT /wrestlers/{id}` - Update wrestler
+- `DELETE /wrestlers/{id}` - Delete wrestler (fails if holds championship)
 - `POST /matches` - Schedule match (optional `seasonId` to assign to season)
 - `PUT /matches/{id}/result` - Record match result
 - `POST /championships` - Create championship
@@ -262,16 +262,15 @@ All admin endpoints require a valid JWT token from Cognito in the `Authorization
 - `DELETE /seasons/{id}` - Delete season (cascade delete season standings)
 - `POST /divisions` - Create division
 - `PUT /divisions/{id}` - Update division
-- `DELETE /divisions/{id}` - Delete division (fails if players assigned)
+- `DELETE /divisions/{id}` - Delete division (fails if wrestlers assigned)
 - `POST /images/upload-url` - Generate presigned URL for image upload
 
 ## Common Tasks
 
-### Adding a New Player
+### Adding a New Wrestler
 ```typescript
-await playersApi.create({
-  name: "John Doe",
-  currentWrestler: "Stone Cold Steve Austin",
+await wrestlersApi.create({
+  name: "Stone Cold Steve Austin",
   wins: 0,
   losses: 0,
   draws: 0
@@ -284,7 +283,7 @@ await matchesApi.schedule({
   date: new Date().toISOString(),
   matchType: "singles",
   stipulation: "Ladder Match",
-  participants: [playerId1, playerId2],
+  participants: [wrestlerId1, wrestlerId2],
   isChampionship: false,
   status: "scheduled"
 });
@@ -293,8 +292,8 @@ await matchesApi.schedule({
 ### Recording a Match Result
 ```typescript
 await matchesApi.recordResult(matchId, {
-  winners: [playerId1],
-  losers: [playerId2]
+  winners: [wrestlerId1],
+  losers: [wrestlerId2]
 });
 ```
 
@@ -352,7 +351,7 @@ aws configure set region us-east-1 --profile league-szn
 This deploys:
 - Lambda functions for all API endpoints
 - API Gateway
-- DynamoDB tables (Players, Matches, Championships, ChampionshipHistory, Tournaments, Seasons, SeasonStandings)
+- DynamoDB tables (Wrestlers, Matches, Championships, ChampionshipHistory, Tournaments, Seasons, SeasonStandings)
 ### Deploy
 
 Deploy backend and frontend:
@@ -394,7 +393,7 @@ aws cloudformation describe-stacks --stack-name universe-tracker-api-dev \
 2. ~~**Lambda Authorizer**: Admin endpoints protected.~~ **DONE** - Custom authorizer validates JWT tokens
 3. **Tag Team Matches**: Frontend doesn't have special handling for tag teams yet.
 4. **Tournament Progression**: Single-elimination bracket progression needs manual updates.
-5. **Match Statistics**: Not yet tracking which player is best at which match type.
+5. **Match Statistics**: Not yet tracking which wrestler is best at which match type.
 6. ~~**Image Uploads**: No profile pictures or championship images.~~ **DONE** - Images supported for wrestlers and championships
 7. **Real-time Updates**: No WebSocket support for live updates.
 8. ~~**Seasons Support**: Track standings per season, season resets.~~ **DONE** - Full season management implemented
@@ -415,7 +414,7 @@ aws cloudformation describe-stacks --stack-name universe-tracker-api-dev \
 
 ### Match results not updating
 - Check that match status is 'scheduled' before recording
-- Verify all participant IDs exist in players table
+- Verify all participant IDs exist in wrestlers table
 - Check browser console for API errors
 
 ## Code Style

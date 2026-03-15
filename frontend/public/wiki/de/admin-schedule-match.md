@@ -9,7 +9,7 @@ Die Seite **Match planen** ermöglicht das Anlegen von anstehenden Matches.
    - **Datum & Uhrzeit** — Wann das Match stattfindet
    - **Match-Typ** — Wähle aus den konfigurierten Typen (siehe Match-Konfig). z. B. Singles, Tag Team, Triple Threat, Fatal 4-Way, Battle Royal
    - **Stipulation** (optional) — Wähle aus den konfigurierten Stipulations oder lasse „Standard“. z. B. Ladder, Steel Cage, Hell in a Cell, Last Man Standing
-   - **Teilnehmer** — Wähle 2 oder mehr Spieler
+   - **Teilnehmer** — Wähle 2 oder mehr Wrestler
 3. Optional: **Titelmatch** aktivieren und den auf dem Spiel stehenden Titel wählen
 4. Optional: Match einem **Turnier** zuordnen
 5. Optional: Match einer **Saison** zuordnen

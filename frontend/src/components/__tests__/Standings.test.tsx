@@ -76,7 +76,6 @@ const mockWrestlers = [
   {
     wrestlerId: 'p1',
     name: 'John Cena',
-,
     wins: 25,
     losses: 10,
     draws: 3,
@@ -87,7 +86,6 @@ const mockWrestlers = [
   {
     wrestlerId: 'p2',
     name: 'The Rock',
-,
     wins: 20,
     losses: 12,
     draws: 1,
@@ -98,7 +96,6 @@ const mockWrestlers = [
   {
     wrestlerId: 'p3',
     name: 'Undertaker',
-,
     wins: 18,
     losses: 5,
     draws: 0,
@@ -153,7 +150,6 @@ describe('Standings', () => {
     // Table headers
     expect(screen.getByText('Rank')).toBeInTheDocument();
     expect(screen.getByText('Wrestler')).toBeInTheDocument();
-    expect(screen.getByText('Wrestler')).toBeInTheDocument();
     expect(screen.getByText('W')).toBeInTheDocument();
     expect(screen.getByText('L')).toBeInTheDocument();
     expect(screen.getByText('D')).toBeInTheDocument();
@@ -161,9 +157,7 @@ describe('Standings', () => {
 
     // Wrestler data
     expect(screen.getByText('John Cena')).toBeInTheDocument();
-    expect(screen.getByText('The Champ')).toBeInTheDocument();
     expect(screen.getByText('The Rock')).toBeInTheDocument();
-    expect(screen.getByText('The Great One')).toBeInTheDocument();
 
     // Win percentages
     // 25/(25+10+3) = 65.8%

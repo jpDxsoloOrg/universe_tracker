@@ -8,9 +8,9 @@ Fülle die Liga schnell mit realistischen Beispieldaten für Tests oder Vorführ
 
 **Was erstellt wird:**
 
-- **12 Spieler** — Mit zufälligen Sieg-/Niederlagen-Bilanzen und zugewiesenen Wrestlern
+- **12 Wrestler** — Mit zufälligen Sieg-/Niederlagen-Bilanzen
 - **3 Divisionen** — z. B. Schwergewicht, Cruiserweight, Mid-Card
-- **1 aktive Saison** — Mit Tabellenständen für alle Spieler
+- **1 aktive Saison** — Mit Tabellenständen für alle Wrestler
 - **4 Meisterschaften** — World, Intercontinental, Tag Team und US-Titel
 - **12 Matches** — Mix aus abgeschlossenen und geplanten Matches
 - **2 Turniere** — K.-o.-System und Rundensystem
@@ -34,7 +34,7 @@ Fülle die Liga schnell mit realistischen Beispieldaten für Tests oder Vorführ
 
 ## Was gelöscht wird
 
-- Alle Spieler (Wrestler) und ihre Match-Daten
+- Alle Wrestler und ihre Match-Daten
 - Alle Matches und Ergebnisse
 - Alle Meisterschaften und ihre komplette Historie
 - Alle Turniere und Brackets

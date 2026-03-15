@@ -172,15 +172,11 @@ describe('ScheduleMatch', () => {
     expect(screen.getByText('Ladder Match')).toBeInTheDocument();
     expect(screen.getByText('Steel Cage')).toBeInTheDocument();
 
-    // Wrestler cards are rendered in participants grid (use participant-name class)
-    expect(screen.getByText('John Cena')).toBeInTheDocument();
-    expect(screen.getByText('Dwayne Johnson')).toBeInTheDocument();
-    expect(screen.getByText('Mark Calaway')).toBeInTheDocument();
-    expect(screen.getByText('Paul Levesque')).toBeInTheDocument();
-
-    // Wrestler names are also shown
-    expect(screen.getByText('The Champ')).toBeInTheDocument();
-    expect(screen.getByText('The Rock')).toBeInTheDocument();
+    // Wrestler cards are rendered in participants grid (name appears in both participant-name and participant-wrestler divs)
+    expect(screen.getAllByText('John Cena').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Dwayne Johnson').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Mark Calaway').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Paul Levesque').length).toBeGreaterThanOrEqual(1);
 
     // Submit button
     expect(screen.getByRole('button', { name: 'Schedule Match' })).toBeInTheDocument();
@@ -239,15 +235,15 @@ describe('ScheduleMatch', () => {
     renderScheduleMatch();
 
     await waitFor(() => {
-      expect(screen.getByText('John Cena')).toBeInTheDocument();
+      expect(screen.getAllByText('John Cena').length).toBeGreaterThanOrEqual(1);
     });
 
     // Select match format (no longer defaults to singles)
     await user.selectOptions(screen.getByLabelText('Match Format'), 'Singles');
 
     // Click participant cards to select two wrestlers
-    await user.click(screen.getByText('John Cena').closest('.participant-card')!);
-    await user.click(screen.getByText('Dwayne Johnson').closest('.participant-card')!);
+    await user.click(screen.getAllByText('John Cena')[0].closest('.participant-card')!);
+    await user.click(screen.getAllByText('Dwayne Johnson')[0].closest('.participant-card')!);
 
     // Verify selected count
     expect(screen.getByText('Selected: 2')).toBeInTheDocument();
@@ -273,14 +269,14 @@ describe('ScheduleMatch', () => {
     renderScheduleMatch();
 
     await waitFor(() => {
-      expect(screen.getByText('John Cena')).toBeInTheDocument();
+      expect(screen.getAllByText('John Cena').length).toBeGreaterThanOrEqual(1);
     });
 
     // Select match format first (no longer defaults to singles)
     await user.selectOptions(screen.getByLabelText('Match Format'), 'Singles');
 
     // Select only one participant
-    await user.click(screen.getByText('John Cena').closest('.participant-card')!);
+    await user.click(screen.getAllByText('John Cena')[0].closest('.participant-card')!);
 
     // Submit
     await user.click(screen.getByRole('button', { name: 'Schedule Match' }));

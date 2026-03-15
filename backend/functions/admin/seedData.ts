@@ -243,7 +243,7 @@ function isSeedModuleId(moduleId: string): moduleId is SeedModuleId {
   return (SEED_MODULE_IDS as readonly string[]).includes(moduleId);
 }
 
-const wrestlers = [
+const wrestlerNames = [
   'Stone Cold Steve Austin',
   'The Rock',
   'The Undertaker',
@@ -256,21 +256,6 @@ const wrestlers = [
   'CM Punk',
   'Roman Reigns',
   'Seth Rollins',
-];
-
-const playerNames = [
-  'John Stone',
-  'Mike Rock',
-  'Jake Undertaker',
-  'Chris Helmsley',
-  'Alex Michaels',
-  'Sam Hart',
-  'Dave Cena',
-  'Randy Legend',
-  'Adam Copeland',
-  'Phil Brooks',
-  'Joe Anoa\'i',
-  'Colby Lopez',
 ];
 
 const stipulations = ['Standard', 'No DQ', 'Steel Cage', 'Ladder Match', 'Hell in a Cell', 'Tables Match'];
@@ -381,12 +366,11 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     }
     createdCounts.divisions = divisions.length;
 
-    // ── Players ────────────────────────────────────────────────
-    console.log('Creating players...');
-    const players = playerNames.map((name, index) => ({
-      playerId: uuidv4(),
+    // ── Wrestlers ────────────────────────────────────────────────
+    console.log('Creating wrestlers...');
+    const seedWrestlers = wrestlerNames.map((name, index) => ({
+      wrestlerId: uuidv4(),
       name,
-      currentWrestler: wrestlers[index],
       wins: Math.floor(Math.random() * 15) + 3,
       losses: Math.floor(Math.random() * 12) + 2,
       draws: Math.floor(Math.random() * 3),
@@ -395,10 +379,10 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
       updatedAt: now,
     }));
 
-    for (const player of players) {
-      await dynamoDb.put({ TableName: TableNames.PLAYERS, Item: player });
+    for (const wrestler of seedWrestlers) {
+      await dynamoDb.put({ TableName: TableNames.WRESTLERS, Item: wrestler });
     }
-    createdCounts.players = players.length;
+    createdCounts.wrestlers = seedWrestlers.length;
 
     // ── Seasons ────────────────────────────────────────────────
     console.log('Creating seasons...');
@@ -417,10 +401,10 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     // ── Season Standings ───────────────────────────────────────
     console.log('Creating season standings...');
     let standingsCount = 0;
-    for (const player of players) {
+    for (const wrestler of seedWrestlers) {
       const standing = {
         seasonId: season.seasonId,
-        playerId: player.playerId,
+        wrestlerId: wrestler.wrestlerId,
         wins: Math.floor(Math.random() * 8) + 1,
         losses: Math.floor(Math.random() * 6) + 1,
         draws: Math.floor(Math.random() * 2),
@@ -438,7 +422,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         championshipId: uuidv4(),
         name: 'World Heavyweight Championship',
         type: 'singles',
-        currentChampion: players[0].playerId,
+        currentChampion: seedWrestlers[0].wrestlerId,
         divisionId: divisions[0].divisionId,
         isActive: true,
         createdAt: now,
@@ -449,7 +433,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         championshipId: uuidv4(),
         name: 'Intercontinental Championship',
         type: 'singles',
-        currentChampion: players[1].playerId,
+        currentChampion: seedWrestlers[1].wrestlerId,
         isActive: true,
         createdAt: now,
         updatedAt: now,
@@ -459,7 +443,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         championshipId: uuidv4(),
         name: 'Tag Team Championship',
         type: 'tag',
-        currentChampion: [players[2].playerId, players[3].playerId],
+        currentChampion: [seedWrestlers[2].wrestlerId, seedWrestlers[3].wrestlerId],
         isActive: true,
         createdAt: now,
         updatedAt: now,
@@ -469,7 +453,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         championshipId: uuidv4(),
         name: 'United States Championship',
         type: 'singles',
-        currentChampion: players[4].playerId,
+        currentChampion: seedWrestlers[4].wrestlerId,
         divisionId: divisions[1].divisionId,
         isActive: true,
         createdAt: now,
@@ -511,10 +495,10 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
       const ago = Math.floor(Math.random() * 25) + 5;
       const matchDate = daysAgo(ago);
 
-      const p1 = players[Math.floor(Math.random() * players.length)];
-      let p2 = players[Math.floor(Math.random() * players.length)];
-      while (p2.playerId === p1.playerId) {
-        p2 = players[Math.floor(Math.random() * players.length)];
+      const p1 = seedWrestlers[Math.floor(Math.random() * seedWrestlers.length)];
+      let p2 = seedWrestlers[Math.floor(Math.random() * seedWrestlers.length)];
+      while (p2.wrestlerId === p1.wrestlerId) {
+        p2 = seedWrestlers[Math.floor(Math.random() * seedWrestlers.length)];
       }
 
       const winner = Math.random() > 0.5 ? p1 : p2;
@@ -525,9 +509,9 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         date: matchDate.toISOString(),
         matchFormat: 'singles',
         stipulation: stipulations[Math.floor(Math.random() * stipulations.length)],
-        participants: [p1.playerId, p2.playerId],
-        winners: [winner.playerId],
-        losers: [loser.playerId],
+        participants: [p1.wrestlerId, p2.wrestlerId],
+        winners: [winner.wrestlerId],
+        losers: [loser.wrestlerId],
         isChampionship: false,
         seasonId: season.seasonId,
         status: 'completed',
@@ -541,10 +525,10 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
       const ahead = Math.floor(Math.random() * 14) + 1;
       const matchDate = daysFromNow(ahead);
 
-      const p1 = players[Math.floor(Math.random() * players.length)];
-      let p2 = players[Math.floor(Math.random() * players.length)];
-      while (p2.playerId === p1.playerId) {
-        p2 = players[Math.floor(Math.random() * players.length)];
+      const p1 = seedWrestlers[Math.floor(Math.random() * seedWrestlers.length)];
+      let p2 = seedWrestlers[Math.floor(Math.random() * seedWrestlers.length)];
+      while (p2.wrestlerId === p1.wrestlerId) {
+        p2 = seedWrestlers[Math.floor(Math.random() * seedWrestlers.length)];
       }
 
       const match: Record<string, unknown> = {
@@ -552,7 +536,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         date: matchDate.toISOString(),
         matchFormat: i % 2 === 0 ? 'singles' : 'tag',
         stipulation: stipulations[Math.floor(Math.random() * stipulations.length)],
-        participants: [p1.playerId, p2.playerId],
+        participants: [p1.wrestlerId, p2.wrestlerId],
         isChampionship: i === 0,
         seasonId: season.seasonId,
         status: 'scheduled',
@@ -580,21 +564,21 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         name: 'King of the Ring 2024',
         type: 'single-elimination',
         status: 'in-progress',
-        participants: [players[0].playerId, players[1].playerId, players[2].playerId, players[3].playerId],
+        participants: [seedWrestlers[0].wrestlerId, seedWrestlers[1].wrestlerId, seedWrestlers[2].wrestlerId, seedWrestlers[3].wrestlerId],
         brackets: {
           rounds: [
             {
               roundNumber: 1,
               matches: [
                 {
-                  participant1: players[0].playerId,
-                  participant2: players[1].playerId,
-                  winner: players[0].playerId,
+                  participant1: seedWrestlers[0].wrestlerId,
+                  participant2: seedWrestlers[1].wrestlerId,
+                  winner: seedWrestlers[0].wrestlerId,
                 },
                 {
-                  participant1: players[2].playerId,
-                  participant2: players[3].playerId,
-                  winner: players[2].playerId,
+                  participant1: seedWrestlers[2].wrestlerId,
+                  participant2: seedWrestlers[3].wrestlerId,
+                  winner: seedWrestlers[2].wrestlerId,
                 },
               ],
             },
@@ -602,8 +586,8 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
               roundNumber: 2,
               matches: [
                 {
-                  participant1: players[0].playerId,
-                  participant2: players[2].playerId,
+                  participant1: seedWrestlers[0].wrestlerId,
+                  participant2: seedWrestlers[2].wrestlerId,
                 },
               ],
             },
@@ -617,12 +601,12 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         name: 'G1 Climax 2024',
         type: 'round-robin',
         status: 'in-progress',
-        participants: [players[4].playerId, players[5].playerId, players[6].playerId, players[7].playerId],
+        participants: [seedWrestlers[4].wrestlerId, seedWrestlers[5].wrestlerId, seedWrestlers[6].wrestlerId, seedWrestlers[7].wrestlerId],
         standings: {
-          [players[4].playerId]: { wins: 2, losses: 1, draws: 0, points: 4 },
-          [players[5].playerId]: { wins: 2, losses: 1, draws: 0, points: 4 },
-          [players[6].playerId]: { wins: 1, losses: 2, draws: 0, points: 2 },
-          [players[7].playerId]: { wins: 1, losses: 2, draws: 0, points: 2 },
+          [seedWrestlers[4].wrestlerId]: { wins: 2, losses: 1, draws: 0, points: 4 },
+          [seedWrestlers[5].wrestlerId]: { wins: 2, losses: 1, draws: 0, points: 4 },
+          [seedWrestlers[6].wrestlerId]: { wins: 1, losses: 2, draws: 0, points: 2 },
+          [seedWrestlers[7].wrestlerId]: { wins: 1, losses: 2, draws: 0, points: 2 },
         },
         createdAt: now,
         version: 1,
@@ -720,17 +704,17 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     let rankingsCount = 0;
 
     // WHC rankings (division-locked to Raw)
-    const rawPlayers = players.filter(p => p.divisionId === divisions[0].divisionId);
+    const rawWrestlers = seedWrestlers.filter(w => w.divisionId === divisions[0].divisionId);
     const whcChampionId = championships[0].currentChampion as string;
-    const whcContenders = rawPlayers
-      .filter(p => p.playerId !== whcChampionId)
+    const whcContenders = rawWrestlers
+      .filter(p => p.wrestlerId !== whcChampionId)
       .slice(0, 3);
 
     for (let i = 0; i < whcContenders.length; i++) {
       const contender = whcContenders[i];
       const ranking: Record<string, unknown> = {
         championshipId: championships[0].championshipId,
-        playerId: contender.playerId,
+        wrestlerId: contender.wrestlerId,
         rank: i + 1,
         rankingScore: 80 - i * 15,
         winPercentage: 0.6 - i * 0.1,
@@ -753,15 +737,15 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
 
     // IC rankings (open, no division lock)
     const icChampionId = championships[1].currentChampion as string;
-    const icContenders = players
-      .filter(p => p.playerId !== icChampionId)
+    const icContenders = seedWrestlers
+      .filter(p => p.wrestlerId !== icChampionId)
       .slice(0, 5);
 
     for (let i = 0; i < icContenders.length; i++) {
       const contender = icContenders[i];
       const ranking: Record<string, unknown> = {
         championshipId: championships[1].championshipId,
-        playerId: contender.playerId,
+        wrestlerId: contender.wrestlerId,
         rank: i + 1,
         rankingScore: 90 - i * 12,
         winPercentage: 0.7 - i * 0.08,
@@ -794,7 +778,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         await dynamoDb.put({
           TableName: TableNames.RANKING_HISTORY,
           Item: {
-            playerId: contender.playerId,
+            wrestlerId: contender.wrestlerId,
             weekKey,
             championshipId: championships[1].championshipId,
             rank: i + 1 + (weekOffset === 2 ? 1 : 0),

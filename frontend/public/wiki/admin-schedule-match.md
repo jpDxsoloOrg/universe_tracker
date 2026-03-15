@@ -9,7 +9,7 @@ The **Schedule Match** page allows you to create upcoming matches.
    - **Date & Time** — When the match will take place
    - **Match Type** — Choose from the types you've configured (see Match Config). Examples: Singles, Tag Team, Triple Threat, Fatal 4-Way, Battle Royal.
    - **Stipulation** (optional) — Choose from the stipulations you've configured, or leave as standard. Examples: Ladder, Steel Cage, Hell in a Cell, Last Man Standing.
-   - **Participants** — Select 2 or more players
+   - **Participants** — Select 2 or more wrestlers
 3. Optionally enable **Championship Match** and select the title on the line
 4. Optionally associate the match with a **Tournament**
 5. Optionally associate the match with a **Season**

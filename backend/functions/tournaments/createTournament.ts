@@ -67,8 +67,8 @@ const generateSingleEliminationBracket = (participants: string[]): { rounds: Bra
 const initializeRoundRobinStandings = (participants: string[]): Record<string, any> => {
   const standings: Record<string, any> = {};
 
-  for (const playerId of participants) {
-    standings[playerId] = {
+  for (const wrestlerId of participants) {
+    standings[wrestlerId] = {
       wins: 0,
       losses: 0,
       draws: 0,

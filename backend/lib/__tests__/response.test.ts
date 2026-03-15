@@ -64,10 +64,10 @@ describe('response helpers', () => {
 
   describe('notFound', () => {
     it('returns 404 with custom message', () => {
-      const result = notFound('Player not found');
+      const result = notFound('Wrestler not found');
 
       expect(result.statusCode).toBe(404);
-      expect(JSON.parse(result.body)).toEqual({ message: 'Player not found' });
+      expect(JSON.parse(result.body)).toEqual({ message: 'Wrestler not found' });
     });
 
     it('returns 404 with default message when none provided', () => {

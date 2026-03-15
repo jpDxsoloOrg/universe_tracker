@@ -73,21 +73,21 @@ Tests use the Page Object Model pattern:
 ```typescript
 import { test, expect } from '@playwright/test';
 import { LoginPage } from '../../pages/LoginPage';
-import { ManagePlayersPage } from '../../pages/admin/ManagePlayersPage';
+import { ManageWrestlersPage } from '../../pages/admin/ManagePlayersPage';
 
-test('should create a player', async ({ page }) => {
+test('should create a wrestler', async ({ page }) => {
   const loginPage = new LoginPage(page);
-  const playersPage = new ManagePlayersPage(page);
+  const wrestlersPage = new ManageWrestlersPage(page);
 
   await loginPage.navigateToAdmin();
   await loginPage.login();
-  await playersPage.selectTab();
-  await playersPage.createPlayer({
-    name: 'Test Player',
+  await wrestlersPage.selectTab();
+  await wrestlersPage.createWrestler({
+    name: 'Test Wrestler',
     wrestler: 'Stone Cold',
   });
 
-  expect(await playersPage.playerExists('Test Player')).toBe(true);
+  expect(await wrestlersPage.wrestlerExists('Test Wrestler')).toBe(true);
 });
 ```
 

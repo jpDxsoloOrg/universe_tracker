@@ -2,7 +2,7 @@
 
 *This feature is for wrestlers. It may be enabled or disabled by your league.*
 
-As a wrestler you can issue, accept, decline, or counter challenges to set up matches with other players.
+As a wrestler you can issue, accept, decline, or counter challenges to set up matches with other wrestlers.
 
 ## Challenge Board
 

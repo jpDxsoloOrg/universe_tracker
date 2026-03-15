@@ -8,7 +8,7 @@ Die Seite **Turniere** ermöglicht das Anlegen und Verwalten von Turnieren.
 2. Fülle die Angaben aus:
    - **Turniername** — z. B. „King of the Ring 2025“
    - **Typ** — K.-o.-System oder Rundensystem
-   - **Teilnehmer** — Wähle die teilnehmenden Spieler
+   - **Teilnehmer** — Wähle die teilnehmenden Wrestler
 3. Klicke auf **Turnier anlegen**, um zu speichern
 
 ## Turnier-Typen

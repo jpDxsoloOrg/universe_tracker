@@ -70,14 +70,9 @@ describe('ManageWrestlers', () => {
     });
 
     expect(screen.getByText('John')).toBeInTheDocument();
-    expect(screen.getByText('The Rock')).toBeInTheDocument();
     expect(screen.getByText('Jane')).toBeInTheDocument();
-    expect(screen.getByText('Becky Lynch')).toBeInTheDocument();
     expect(screen.getByText('10W - 3L - 1D')).toBeInTheDocument();
     expect(screen.getByText('Raw')).toBeInTheDocument();
-    // "Linked" appears as both a table header and badge; target the badge by CSS class
-    expect(screen.getByText('Linked', { selector: '.linked-badge' })).toBeInTheDocument();
-    expect(screen.getByText('Manual')).toBeInTheDocument();
   });
 
   it('shows error state on API failure', async () => {
@@ -113,7 +108,6 @@ describe('ManageWrestlers', () => {
 
     expect(screen.getByText('Edit Wrestler')).toBeInTheDocument();
     expect(screen.getByDisplayValue('John')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('The Rock')).toBeInTheDocument();
   });
 
   it('edits existing wrestler and saves changes via API', async () => {
@@ -130,21 +124,16 @@ describe('ManageWrestlers', () => {
 
     // Verify pre-populated and modify
     const nameInput = screen.getByLabelText('Wrestler Name');
-    const wrestlerInput = screen.getByLabelText('Wrestler');
     expect(nameInput).toHaveValue('John');
-    expect(wrestlerInput).toHaveValue('The Rock');
 
     await user.clear(nameInput);
     await user.type(nameInput, 'John Updated');
-    await user.clear(wrestlerInput);
-    await user.type(wrestlerInput, 'The Boulder');
 
     await user.click(screen.getByRole('button', { name: 'Update Wrestler' }));
 
     await waitFor(() => {
       expect(mockWrestlersApi.update).toHaveBeenCalledWith('p1', expect.objectContaining({
         name: 'John Updated',
-,
       }));
     });
     await waitFor(() => {

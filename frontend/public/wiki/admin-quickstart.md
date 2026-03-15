@@ -6,9 +6,9 @@ New admin? Follow these steps to set up your league from scratch.
 
 1. **Manage Users** — Go to **User Management** and assign roles to your league members. Give wrestlers the **Wrestler** role so they get profile pages, and optionally assign the **Fantasy** role to those participating in the fantasy league.
 
-2. **Create Divisions** — Go to **Divisions** and create divisions (e.g., Heavyweight, Cruiserweight, or Main Event, Jobbers). Divisions organize players by weight class or tier and can lock contender rankings to that division.
+2. **Create Divisions** — Go to **Divisions** and create divisions (e.g., Heavyweight, Cruiserweight, or Main Event, Jobbers). Divisions organize wrestlers by weight class or tier and can lock contender rankings to that division.
 
-3. **Manage Players** — Go to **Manage Players** to edit wrestler details, upload images, assign divisions, and remove players. This screen is for editing and deleting; admins do not add wrestlers here.
+3. **Manage Wrestlers** — Go to **Manage Wrestlers** to edit wrestler details, upload images, assign divisions, and remove wrestlers. This screen is for editing and deleting; admins do not add wrestlers here.
 
 4. **Create a Season** — Go to **Seasons** and create your first season. Only one season can be active at a time. Seasons track separate standings for each competitive period.
 
@@ -30,4 +30,4 @@ New admin? Follow these steps to set up your league from scratch.
 
 ## Quick Demo Mode
 
-Want to try things out first? Go to the **Danger Zone** tab and click **Generate Sample Data** to populate the league with 12 players, 3 divisions, 4 championships, 12 matches, 2 tournaments, and a full season of standings.
+Want to try things out first? Go to the **Danger Zone** tab and click **Generate Sample Data** to populate the league with 12 wrestlers, 3 divisions, 4 championships, 12 matches, 2 tournaments, and a full season of standings.

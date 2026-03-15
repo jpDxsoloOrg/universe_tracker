@@ -15,10 +15,9 @@ interface MatchRecord {
   seasonId?: string;
 }
 
-interface PlayerRecord {
-  playerId: string;
+interface WrestlerRecord {
+  wrestlerId: string;
   name: string;
-  currentWrestler: string;
 }
 
 function getMatchCategory(match: MatchRecord): string {
@@ -34,7 +33,7 @@ function getMatchCategory(match: MatchRecord): string {
 
 function computeStatsForType(
   matches: MatchRecord[],
-  playerId: string,
+  wrestlerId: string,
 ): {
   wins: number;
   losses: number;
@@ -47,9 +46,9 @@ function computeStatsForType(
   let draws = 0;
 
   for (const match of matches) {
-    if (match.winners?.includes(playerId)) {
+    if (match.winners?.includes(wrestlerId)) {
       wins++;
-    } else if (match.losers?.includes(playerId)) {
+    } else if (match.losers?.includes(wrestlerId)) {
       losses++;
     } else {
       draws++;
@@ -64,24 +63,24 @@ function computeStatsForType(
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
-    const playerId = event.pathParameters?.playerId;
-    if (!playerId) {
-      return notFound('Player ID is required');
+    const wrestlerId = event.pathParameters?.wrestlerId;
+    if (!wrestlerId) {
+      return notFound('Wrestler ID is required');
     }
 
     const seasonId = event.queryStringParameters?.seasonId;
 
-    // Verify player exists
-    const playerResult = await dynamoDb.get({
-      TableName: TableNames.PLAYERS,
-      Key: { playerId },
+    // Verify wrestler exists
+    const wrestlerResult = await dynamoDb.get({
+      TableName: TableNames.WRESTLERS,
+      Key: { wrestlerId },
     });
 
-    if (!playerResult.Item) {
-      return notFound('Player not found');
+    if (!wrestlerResult.Item) {
+      return notFound('Wrestler not found');
     }
 
-    const player = playerResult.Item as unknown as PlayerRecord;
+    const wrestler = wrestlerResult.Item as unknown as WrestlerRecord;
 
     // Get all completed matches
     const allMatches = await dynamoDb.scanAll({
@@ -91,39 +90,38 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       ExpressionAttributeValues: { ':completed': 'completed' },
     }) as unknown as MatchRecord[];
 
-    // Filter to player's matches and optionally by season
-    let playerMatches = allMatches.filter((m) => m.participants.includes(playerId));
+    // Filter to wrestler's matches and optionally by season
+    let wrestlerMatches = allMatches.filter((m) => m.participants.includes(wrestlerId));
     if (seasonId) {
-      playerMatches = playerMatches.filter((m) => m.seasonId === seasonId);
+      wrestlerMatches = wrestlerMatches.filter((m) => m.seasonId === seasonId);
     }
 
     // Group matches by type
     const matchesByType: Record<string, MatchRecord[]> = {};
-    for (const match of playerMatches) {
+    for (const match of wrestlerMatches) {
       const category = getMatchCategory(match);
       if (!matchesByType[category]) matchesByType[category] = [];
       matchesByType[category].push(match);
     }
 
     // Compute overall stats
-    const overall = computeStatsForType(playerMatches, playerId);
+    const overall = computeStatsForType(wrestlerMatches, wrestlerId);
 
     // Compute per-type stats
     const byMatchType: Record<string, ReturnType<typeof computeStatsForType>> = {};
     for (const [matchType, matches] of Object.entries(matchesByType)) {
-      byMatchType[matchType] = computeStatsForType(matches, playerId);
+      byMatchType[matchType] = computeStatsForType(matches, wrestlerId);
     }
 
     return success({
-      playerId: player.playerId,
-      playerName: player.name,
-      wrestlerName: player.currentWrestler,
+      wrestlerId: wrestler.wrestlerId,
+      wrestlerName: wrestler.name,
       overall,
       byMatchType,
       ...(seasonId ? { seasonId } : {}),
     });
   } catch (err) {
-    console.error('Error fetching player statistics:', err);
-    return serverError('Failed to fetch player statistics');
+    console.error('Error fetching wrestler statistics:', err);
+    return serverError('Failed to fetch wrestler statistics');
   }
 };

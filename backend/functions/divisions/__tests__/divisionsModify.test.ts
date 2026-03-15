@@ -27,7 +27,7 @@ vi.mock('../../../lib/dynamodb', () => ({
   },
   TableNames: {
     DIVISIONS: 'Divisions',
-    PLAYERS: 'Players',
+    WRESTLERS: 'Wrestlers',
   },
 }));
 
@@ -212,12 +212,12 @@ describe('deleteDivision', () => {
     expect(JSON.parse(result!.body).message).toBe('Division not found');
   });
 
-  it('returns 409 when players are assigned to the division', async () => {
+  it('returns 409 when wrestlers are assigned to the division', async () => {
     mockGet.mockResolvedValue({ Item: { divisionId: 'div-1', name: 'Raw' } });
     mockScan.mockResolvedValue({
       Items: [
-        { playerId: 'p1', name: 'John', divisionId: 'div-1' },
-        { playerId: 'p2', name: 'Jane', divisionId: 'div-1' },
+        { wrestlerId: 'p1', name: 'John', divisionId: 'div-1' },
+        { wrestlerId: 'p2', name: 'Jane', divisionId: 'div-1' },
       ],
     });
 
@@ -226,15 +226,15 @@ describe('deleteDivision', () => {
     const result = await deleteDivision(event, ctx, cb);
 
     expect(result!.statusCode).toBe(409);
-    expect(JSON.parse(result!.body).message).toContain('2 player(s)');
+    expect(JSON.parse(result!.body).message).toContain('2 wrestler(s)');
     expect(JSON.parse(result!.body).message).toContain('Cannot delete division');
     expect(mockDelete).not.toHaveBeenCalled();
   });
 
-  it('returns 409 with correct count for single player', async () => {
+  it('returns 409 with correct count for single wrestler', async () => {
     mockGet.mockResolvedValue({ Item: { divisionId: 'div-1', name: 'Raw' } });
     mockScan.mockResolvedValue({
-      Items: [{ playerId: 'p1', name: 'John', divisionId: 'div-1' }],
+      Items: [{ wrestlerId: 'p1', name: 'John', divisionId: 'div-1' }],
     });
 
     const event = makeEvent({ pathParameters: { divisionId: 'div-1' } });
@@ -242,10 +242,10 @@ describe('deleteDivision', () => {
     const result = await deleteDivision(event, ctx, cb);
 
     expect(result!.statusCode).toBe(409);
-    expect(JSON.parse(result!.body).message).toContain('1 player(s)');
+    expect(JSON.parse(result!.body).message).toContain('1 wrestler(s)');
   });
 
-  it('deletes when player scan returns undefined Items', async () => {
+  it('deletes when wrestler scan returns undefined Items', async () => {
     mockGet.mockResolvedValue({ Item: { divisionId: 'div-1', name: 'Raw' } });
     mockScan.mockResolvedValue({ Items: undefined });
     mockDelete.mockResolvedValue({});

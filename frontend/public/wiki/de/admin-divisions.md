@@ -1,6 +1,6 @@
 # Divisionen verwalten
 
-Die Seite **Divisionen** ermöglicht es, Spieler nach Gewichtsklasse, Kartenposition oder Rolle zu gruppieren – z. B. Schwergewicht, Cruiserweight, Main Event oder Jobber. Divisionen sind keine Show-Brands; sie legen fest, wer bei aktivierter Divisionsbeschränkung für welche Meisterschaften antreten kann.
+Die Seite **Divisionen** ermöglicht es, Wrestler nach Gewichtsklasse, Kartenposition oder Rolle zu gruppieren – z. B. Schwergewicht, Cruiserweight, Main Event oder Jobber. Divisionen sind keine Show-Brands; sie legen fest, wer bei aktivierter Divisionsbeschränkung für welche Meisterschaften antreten kann.
 
 ## Division anlegen
 
@@ -23,11 +23,11 @@ Die Seite **Divisionen** ermöglicht es, Spieler nach Gewichtsklasse, Kartenposi
 2. Klicke auf **Löschen** bei der Division
 3. Bestätige die Aktion im Dialog
 
-**Hinweis:** Eine Division, der noch Spieler zugewiesen sind, kann nicht gelöscht werden. Weise die Spieler zuerst einer anderen Division zu oder entferne die Zuweisung.
+**Hinweis:** Eine Division, der noch Wrestler zugewiesen sind, kann nicht gelöscht werden. Weise die Wrestler zuerst einer anderen Division zu oder entferne die Zuweisung.
 
-## Spieler Divisionen zuweisen
+## Wrestler Divisionen zuweisen
 
-1. Gehe zu **Spieler verwalten**
-2. Beim Bearbeiten eines Spielers nutze das **Division**-Dropdown
-3. Wähle die passende Division oder „Keine Division“
-4. Speichere den Spieler, um die Zuweisung zu übernehmen
+1. Gehe zu **Wrestler verwalten**
+2. Beim Bearbeiten eines Wrestlers nutze das **Division**-Dropdown
+3. Wähle die passende Division oder „Keine Division”
+4. Speichere den Wrestler, um die Zuweisung zu übernehmen

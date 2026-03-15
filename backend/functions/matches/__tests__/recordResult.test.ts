@@ -20,7 +20,7 @@ vi.mock('../../../lib/dynamodb', () => ({
     transactWrite: mockTransactWrite,
   },
   TableNames: {
-    MATCHES: 'Matches', PLAYERS: 'Players', CHAMPIONSHIPS: 'Championships',
+    MATCHES: 'Matches', WRESTLERS: 'Wrestlers', CHAMPIONSHIPS: 'Championships',
     CHAMPIONSHIP_HISTORY: 'ChampionshipHistory', TOURNAMENTS: 'Tournaments',
     SEASONS: 'Seasons', SEASON_STANDINGS: 'SeasonStandings',
     EVENTS: 'Events', CONTENDER_RANKINGS: 'ContenderRankings',
@@ -92,7 +92,7 @@ describe('recordResult — validation', () => {
     expect(JSON.parse(r!.body).message).toBe('Winners and losers are required');
   });
 
-  it('returns 400 when a player is both winner and loser', async () => {
+  it('returns 400 when a wrestler is both winner and loser', async () => {
     const r = await recordResult(ev({
       pathParameters: { matchId: 'm1' },
       body: JSON.stringify({ winners: ['p1'], losers: ['p1'] }),
@@ -157,7 +157,7 @@ describe('recordResult — core transaction', () => {
       body: JSON.stringify({ winners: ['p1'], losers: ['p2'] }),
     }), ctx, cb);
     const items = mockTransactWrite.mock.calls[0][0].TransactItems;
-    expect(items).toHaveLength(5); // match + 2 players + 2 season standings
+    expect(items).toHaveLength(5); // match + 2 wrestlers + 2 season standings
     const seasonItems = items.filter((i: any) => i.Update?.TableName === 'SeasonStandings');
     expect(seasonItems).toHaveLength(2);
   });

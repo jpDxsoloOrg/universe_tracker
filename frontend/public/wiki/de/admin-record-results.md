@@ -15,7 +15,7 @@ Die Seite **Ergebnisse eintragen** ermöglicht das Erfassen von Match-Ergebnisse
 
 ## Was beim Eintragen passiert
 
-- Die Sieg-/Niederlagen-/Unentschieden-Bilanz der Spieler wird automatisch aktualisiert (sowohl gesamt als auch saisonbezogen)
+- Die Sieg-/Niederlagen-/Unentschieden-Bilanz der Wrestler wird automatisch aktualisiert (sowohl gesamt als auch saisonbezogen)
 - Die Liga-Tabelle wird neu berechnet
 - Bei einem Titelmatch wechselt der Titel an den Sieger
 - Bei einem Turnier-Match werden Brackets/Standings aktualisiert

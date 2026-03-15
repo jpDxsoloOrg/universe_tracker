@@ -6,9 +6,9 @@ Neuer Admin? Folge diesen Schritten, um deine Liga von Grund auf einzurichten.
 
 1. **Benutzerverwaltung** — Gehe zu **Benutzerverwaltung** und weise deinen Liga-Mitgliedern Rollen zu. Gib Wrestlern die Rolle **Wrestler**, damit sie Profilseiten erhalten; optional die Rolle **Fantasy** für Teilnehmer der Fantasy-Liga.
 
-2. **Divisionen anlegen** — Gehe zu **Divisionen** und lege Divisionen an (z. B. Schwergewicht, Cruiserweight, Main Event, Jobber). Divisionen ordnen Spieler nach Gewichtsklasse oder Ebene zu und können die Herausforderer-Ranglisten auf eine Division beschränken.
+2. **Divisionen anlegen** — Gehe zu **Divisionen** und lege Divisionen an (z. B. Schwergewicht, Cruiserweight, Main Event, Jobber). Divisionen ordnen Wrestler nach Gewichtsklasse oder Ebene zu und können die Herausforderer-Ranglisten auf eine Division beschränken.
 
-3. **Spieler verwalten** — Gehe zu **Spieler verwalten**, um Wrestler-Daten zu bearbeiten, Bilder hochzuladen, Divisionen zuzuweisen und Spieler zu entfernen. Auf dieser Seite werden nur Bearbeitung und Löschung durchgeführt; Admins legen hier keine neuen Wrestler an.
+3. **Wrestler verwalten** — Gehe zu **Wrestler verwalten**, um Wrestler-Daten zu bearbeiten, Bilder hochzuladen, Divisionen zuzuweisen und Wrestler zu entfernen. Auf dieser Seite werden nur Bearbeitung und Löschung durchgeführt; Admins legen hier keine neuen Wrestler an.
 
 4. **Saison anlegen** — Gehe zu **Saisons** und lege deine erste Saison an. Es kann nur eine Saison gleichzeitig aktiv sein. Saisons erfassen getrennte Tabellen für jeden Wettbewerbszeitraum.
 
@@ -30,4 +30,4 @@ Neuer Admin? Folge diesen Schritten, um deine Liga von Grund auf einzurichten.
 
 ## Schnell-Demo
 
-Zuerst ausprobieren? Gehe zum Tab **Gefahrenzone** und klicke auf **Beispieldaten erzeugen**, um die Liga mit 12 Spielern, 3 Divisionen, 4 Meisterschaften, 12 Matches, 2 Turnieren und einer vollen Saison-Tabelle zu füllen.
+Zuerst ausprobieren? Gehe zum Tab **Gefahrenzone** und klicke auf **Beispieldaten erzeugen**, um die Liga mit 12 Wrestlern, 3 Divisionen, 4 Meisterschaften, 12 Matches, 2 Turnieren und einer vollen Saison-Tabelle zu füllen.

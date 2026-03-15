@@ -69,12 +69,12 @@ describe('CreateTournament', () => {
     // Participants header with count
     expect(screen.getByText('Participants (Selected: 0)')).toBeInTheDocument();
 
-    // All wrestler cards rendered (name appears in participant-name div)
-    expect(screen.getByText('John Cena')).toBeInTheDocument();
-    expect(screen.getByText('The Rock')).toBeInTheDocument();
-    expect(screen.getByText('Undertaker')).toBeInTheDocument();
-    expect(screen.getByText('Triple H')).toBeInTheDocument();
-    expect(screen.getByText('Stone Cold')).toBeInTheDocument();
+    // All wrestler cards rendered (name appears in both participant-name and participant-wrestler divs)
+    expect(screen.getAllByText('John Cena').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('The Rock').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Undertaker').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Triple H').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Stone Cold').length).toBeGreaterThanOrEqual(1);
 
     // Wrestler records displayed as compound text within participant-record divs
     const recordDivs = document.querySelectorAll('.participant-record');
@@ -99,8 +99,8 @@ describe('CreateTournament', () => {
     });
 
     // Select only 2 participants (single-elimination requires 4)
-    fireEvent.click(screen.getByText('John Cena'));
-    fireEvent.click(screen.getByText('The Rock'));
+    fireEvent.click(screen.getAllByText('John Cena')[0]);
+    fireEvent.click(screen.getAllByText('The Rock')[0]);
 
     expect(screen.getByText('Participants (Selected: 2)')).toBeInTheDocument();
     expect(screen.queryByText('Seed / Matchup Order')).not.toBeInTheDocument();
@@ -138,10 +138,10 @@ describe('CreateTournament', () => {
     });
 
     // Select 4 participants for single elimination
-    fireEvent.click(screen.getByText('John Cena'));
-    fireEvent.click(screen.getByText('The Rock'));
-    fireEvent.click(screen.getByText('Undertaker'));
-    fireEvent.click(screen.getByText('Triple H'));
+    fireEvent.click(screen.getAllByText('John Cena')[0]);
+    fireEvent.click(screen.getAllByText('The Rock')[0]);
+    fireEvent.click(screen.getAllByText('Undertaker')[0]);
+    fireEvent.click(screen.getAllByText('Triple H')[0]);
 
     expect(screen.getByText('Participants (Selected: 4)')).toBeInTheDocument();
     expect(screen.getByText('Seed / Matchup Order')).toBeInTheDocument();
@@ -182,11 +182,11 @@ describe('CreateTournament', () => {
     });
 
     // Pick 5 participants: valid minimum but invalid for power-of-two rule
-    fireEvent.click(screen.getByText('John Cena'));
-    fireEvent.click(screen.getByText('The Rock'));
-    fireEvent.click(screen.getByText('Undertaker'));
-    fireEvent.click(screen.getByText('Triple H'));
-    fireEvent.click(screen.getByText('Stone Cold'));
+    fireEvent.click(screen.getAllByText('John Cena')[0]);
+    fireEvent.click(screen.getAllByText('The Rock')[0]);
+    fireEvent.click(screen.getAllByText('Undertaker')[0]);
+    fireEvent.click(screen.getAllByText('Triple H')[0]);
+    fireEvent.click(screen.getAllByText('Stone Cold')[0]);
 
     expect(screen.queryByText('Seed / Matchup Order')).not.toBeInTheDocument();
 

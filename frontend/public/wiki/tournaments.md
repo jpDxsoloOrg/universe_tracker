@@ -17,7 +17,7 @@ The league supports two tournament formats:
 
 - Every participant faces every other participant
 - Points awarded: Win = 2 pts, Draw = 1 pt, Loss = 0 pts
-- Player with the most points at the end wins
+- Wrestler with the most points at the end wins
 
 ## Tournament Information
 

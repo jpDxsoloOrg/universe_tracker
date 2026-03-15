@@ -157,6 +157,28 @@
   transform: scale(1.4);
 }
 
+.calendar-show-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s;
+  border: 2px solid;
+  background: transparent;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.calendar-show-dot:hover:not(:disabled) {
+  transform: scale(1.4);
+}
+
+.calendar-show-dot:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
 /* ── Legend ─────────────────────────────────────────────────────────────────── */
 
 .calendar-legend {

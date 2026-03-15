@@ -1,6 +1,6 @@
 import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { wrestlersApi, imagesApi, divisionsApi } from '../../services/api';
+import { wrestlersApi, imagesApi, divisionsApi, companiesApi } from '../../services/api';
 import { sanitizeName } from '../../utils/sanitize';
 import { logger } from '../../utils/logger';
 import { FILE_UPLOAD_LIMITS, VALIDATION } from '../../constants';
@@ -9,12 +9,13 @@ import {
   applyImageFallback,
   resolveImageSrc,
 } from '../../constants/imageFallbacks';
-import type { Wrestler, Division } from '../../types';
+import type { Wrestler, Division, Company } from '../../types';
 import './ManageWrestlers.css';
 
 export default function ManageWrestlers() {
   const [wrestlers, setWrestlers] = useState<Wrestler[]>([]);
   const [divisions, setDivisions] = useState<Division[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -29,6 +30,7 @@ export default function ManageWrestlers() {
     name: '',
     imageUrl: '',
     divisionId: '',
+    companyId: '',
   });
 
   // Image upload state
@@ -42,12 +44,14 @@ export default function ManageWrestlers() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [wrestlersData, divisionsData] = await Promise.all([
+      const [wrestlersData, divisionsData, companiesData] = await Promise.all([
         wrestlersApi.getAll(),
         divisionsApi.getAll(),
+        companiesApi.getAll(),
       ]);
       setWrestlers(wrestlersData);
       setDivisions(divisionsData);
+      setCompanies(companiesData);
     } catch (_err) {
       setError('Failed to load data');
     } finally {
@@ -59,6 +63,12 @@ export default function ManageWrestlers() {
     if (!divisionId) return 'None';
     const division = divisions.find(d => d.divisionId === divisionId);
     return division?.name || 'Unknown';
+  };
+
+  const getCompanyName = (companyId?: string) => {
+    if (!companyId) return 'None';
+    const company = companies.find(c => c.companyId === companyId);
+    return company?.name || 'Unknown';
   };
 
   const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
@@ -160,19 +170,21 @@ export default function ManageWrestlers() {
           name: sanitizedName,
           imageUrl: imageUrl || undefined,
           divisionId: formData.divisionId || undefined,
+          companyId: formData.companyId || undefined,
         });
       } else {
         await wrestlersApi.create({
           name: sanitizedName,
           imageUrl: imageUrl || undefined,
           divisionId: formData.divisionId || undefined,
+          companyId: formData.companyId || undefined,
           wins: 0,
           losses: 0,
           draws: 0,
         });
       }
 
-      setFormData({ name: '', imageUrl: '', divisionId: '' });
+      setFormData({ name: '', imageUrl: '', divisionId: '', companyId: '' });
       setSelectedFile(null);
       setImagePreview(null);
       setShowAddForm(false);
@@ -192,6 +204,7 @@ export default function ManageWrestlers() {
       name: wrestler.name,
       imageUrl: wrestler.imageUrl || '',
       divisionId: wrestler.divisionId || '',
+      companyId: wrestler.companyId || '',
     });
     setImagePreview(wrestler.imageUrl || null);
     setSelectedFile(null);
@@ -199,7 +212,7 @@ export default function ManageWrestlers() {
   };
 
   const handleCancel = () => {
-    setFormData({ name: '', imageUrl: '', divisionId: '' });
+    setFormData({ name: '', imageUrl: '', divisionId: '', companyId: '' });
     setSelectedFile(null);
     setImagePreview(null);
     setShowAddForm(false);
@@ -278,6 +291,22 @@ export default function ManageWrestlers() {
             </div>
 
             <div className="form-group">
+              <label htmlFor="company">Company</label>
+              <select
+                id="company"
+                value={formData.companyId}
+                onChange={(e) => setFormData({ ...formData, companyId: e.target.value })}
+              >
+                <option value="">No Company</option>
+                {companies.map((company) => (
+                  <option key={company.companyId} value={company.companyId}>
+                    {company.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
               <label htmlFor="image">Wrestler Image</label>
               <div className="image-upload-container">
                 {imagePreview ? (
@@ -328,6 +357,7 @@ export default function ManageWrestlers() {
               <tr>
                 <th>Image</th>
                 <th>Wrestler Name</th>
+                <th>Company</th>
                 <th>Division</th>
                 <th>Record</th>
                 <th>Actions</th>
@@ -345,6 +375,7 @@ export default function ManageWrestlers() {
                     />
                   </td>
                   <td>{wrestler.name}</td>
+                  <td className="company-cell">{getCompanyName(wrestler.companyId)}</td>
                   <td className="division-cell">{getDivisionName(wrestler.divisionId)}</td>
                   <td>
                     <span className="record">

@@ -19,6 +19,9 @@ vi.mock('../../../services/api', () => ({
   seasonsApi: {
     getAll: mockGetAllSeasons,
   },
+  companiesApi: {
+    getAll: vi.fn().mockResolvedValue([]),
+  },
 }));
 
 vi.mock('react-i18next', () => ({

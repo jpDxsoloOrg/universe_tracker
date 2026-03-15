@@ -12,6 +12,7 @@ export interface Wrestler {
   draws: number;
   imageUrl?: string;
   divisionId?: string;
+  companyId?: string;
   createdAt: string;
   updatedAt: string;
   /** Last 5 match results (newest first): W win, L loss, D draw */
@@ -63,6 +64,7 @@ export interface Championship {
   type: 'singles' | 'tag';
   currentChampion?: string | string[]; // wrestlerId or array for tag teams
   divisionId?: string;
+  companyId?: string;
   imageUrl?: string;
   createdAt: string;
   isActive: boolean;
@@ -195,6 +197,27 @@ export interface Division {
   divisionId: string;
   name: string;
   description?: string;
+  companyId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Company {
+  companyId: string;
+  name: string;
+  abbreviation?: string;
+  imageUrl?: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Show {
+  showId: string;
+  name: string;
+  companyId: string;
+  description?: string;
+  schedule?: 'weekly' | 'ppv' | 'special';
   createdAt: string;
   updatedAt: string;
 }

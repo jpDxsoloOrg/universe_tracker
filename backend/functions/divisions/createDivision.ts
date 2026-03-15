@@ -6,6 +6,6 @@ export const handler = handlerFactory({
   idField: 'divisionId',
   entityName: 'division',
   requiredFields: ['name'],
-  optionalFields: ['description'],
+  optionalFields: ['description', 'companyId'],
 });
 

@@ -19,10 +19,12 @@ import './AdminPanel.css';
 
 import ManageSeasonAwards from './ManageSeasonAwards';
 import AdminContenderConfig from './AdminContenderConfig';
+import ManageCompanies from './ManageCompanies';
+import ManageShows from './ManageShows';
 
-type AdminTab = 'wrestlers' | 'divisions' | 'match-config' | 'schedule' | 'results' | 'championships' | 'tournaments' | 'seasons' | 'season-awards' | 'events' | 'contender-config' | 'danger' | 'features';
+type AdminTab = 'wrestlers' | 'divisions' | 'companies' | 'shows' | 'match-config' | 'schedule' | 'results' | 'championships' | 'tournaments' | 'seasons' | 'season-awards' | 'events' | 'contender-config' | 'danger' | 'features';
 
-const VALID_TABS: AdminTab[] = ['wrestlers', 'divisions', 'match-config', 'schedule', 'results', 'championships', 'tournaments', 'seasons', 'season-awards', 'events', 'contender-config', 'danger', 'features'];
+const VALID_TABS: AdminTab[] = ['wrestlers', 'divisions', 'companies', 'shows', 'match-config', 'schedule', 'results', 'championships', 'tournaments', 'seasons', 'season-awards', 'events', 'contender-config', 'danger', 'features'];
 
 
 export default function AdminPanel() {
@@ -62,6 +64,8 @@ export default function AdminPanel() {
     features: <ManageFeatures />,
     wrestlers: <ManageWrestlers />,
     divisions: <ManageDivisions />,
+    companies: <ManageCompanies />,
+    shows: <ManageShows />,
     'match-config': <ManageMatchConfig />,
     schedule: <ScheduleMatch />,
     results: <RecordResult />,

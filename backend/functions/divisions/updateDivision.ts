@@ -7,6 +7,7 @@ import { parseBody } from '../../lib/parseBody';
 interface UpdateDivisionBody {
   name?: string;
   description?: string;
+  companyId?: string;
 }
 
 export const handler: APIGatewayProxyHandler = async (event) => {
@@ -28,6 +29,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const updateExpr = buildUpdateExpression({
       name: body.name,
       description: body.description,
+      companyId: body.companyId,
     });
 
     if (!updateExpr.hasChanges) {

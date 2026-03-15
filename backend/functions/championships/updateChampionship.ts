@@ -31,6 +31,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       isActive: body.isActive,
       currentChampion: body.currentChampion,
       divisionId: body.divisionId,
+      companyId: body.companyId,
     });
 
     if (!updateExpr.hasChanges) {

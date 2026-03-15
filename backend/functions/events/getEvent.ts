@@ -118,9 +118,25 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       })
     );
 
+    // Enrich with company names if companyIds are present
+    let companyNames: string[] | undefined;
+    if (eventItem.companyIds && Array.isArray(eventItem.companyIds) && (eventItem.companyIds as string[]).length > 0) {
+      companyNames = await Promise.all(
+        (eventItem.companyIds as string[]).map(async (companyId: string) => {
+          const companyResult = await dynamoDb.get({
+            TableName: TableNames.COMPANIES,
+            Key: { companyId },
+          });
+          const company = companyResult.Item as Record<string, unknown> | undefined;
+          return (company?.name as string) || 'Unknown Company';
+        })
+      );
+    }
+
     return success({
       ...eventItem,
       enrichedMatches,
+      ...(companyNames && { companyNames }),
     });
   } catch (err) {
     console.error('Error fetching event:', err);

@@ -22,6 +22,7 @@ vi.mock('../../../lib/dynamodb', () => ({
     TOURNAMENTS: 'Tournaments', EVENTS: 'Events', CONTENDER_RANKINGS: 'ContenderRankings',
     RANKING_HISTORY: 'RankingHistory', MATCH_TYPES: 'MatchTypes',
     STIPULATIONS: 'Stipulations', SEASON_AWARDS: 'SeasonAwards',
+    COMPANIES: 'Companies', SHOWS: 'Shows',
   },
 }));
 
@@ -88,6 +89,8 @@ describe('seedData', () => {
     expect(body.message).toBe('Sample data seeded successfully!');
 
     // Verify all expected categories have counts
+    expect(body.createdCounts.companies).toBe(3);
+    expect(body.createdCounts.shows).toBe(3);
     expect(body.createdCounts.divisions).toBe(3);
     expect(body.createdCounts.wrestlers).toBe(12);
     expect(body.createdCounts.seasons).toBe(1);
@@ -103,7 +106,7 @@ describe('seedData', () => {
     expect(body.createdCounts.matchTypes).toBe(6);
 
     // Verify put was called many times for all entity inserts
-    expect(mockPut.mock.calls.length).toBeGreaterThan(60);
+    expect(mockPut.mock.calls.length).toBeGreaterThan(66);
   });
 
   it('returns 500 when DynamoDB throws during seeding', async () => {
@@ -200,11 +203,11 @@ describe('clearAll', () => {
     expect(result!.statusCode).toBe(200);
     const body = JSON.parse(result!.body);
     expect(body.message).toBe('All data cleared successfully');
-    expect(mockDelete).toHaveBeenCalledTimes(22); // 11 tables * 2 items
+    expect(mockDelete).toHaveBeenCalledTimes(26); // 13 tables * 2 items
 
     const labels = ['wrestlers', 'matches', 'championships', 'championshipHistory',
       'tournaments', 'seasons', 'seasonStandings', 'divisions', 'events',
-      'contenderRankings', 'rankingHistory'];
+      'contenderRankings', 'rankingHistory', 'companies', 'shows'];
     for (const label of labels) {
       expect(body.deletedCounts[label]).toBe(2);
     }
@@ -279,7 +282,7 @@ describe('clearAll', () => {
     await clearAll(event, ctx, cb);
 
     const scanCalls = mockScanAll.mock.calls;
-    expect(scanCalls.length).toBe(11);
+    expect(scanCalls.length).toBe(13);
     for (const call of scanCalls) {
       expect(call[0].ExpressionAttributeNames).toHaveProperty('#pk');
       expect(call[0].ProjectionExpression).toContain('#pk');

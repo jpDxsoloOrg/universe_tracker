@@ -31,6 +31,7 @@ vi.mock('../../../lib/dynamodb', () => ({
     CHAMPIONSHIPS: 'Championships',
     SEASON_STANDINGS: 'SeasonStandings',
     SEASONS: 'Seasons',
+    COMPANIES: 'Companies',
   },
 }));
 

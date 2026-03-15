@@ -50,6 +50,24 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       }
     }
 
+    if (body.companyId !== undefined) {
+      if (body.companyId === '' || body.companyId === null) {
+        // Remove companyId if empty string or null (unassign from company)
+        removeFields.push('companyId');
+      } else {
+        // Validate that the company exists
+        const companyResult = await getOrNotFound(
+          TableNames.COMPANIES,
+          { companyId: body.companyId },
+          `Company ${body.companyId} not found`
+        );
+        if ('notFoundResponse' in companyResult) {
+          return companyResult.notFoundResponse;
+        }
+        updateFields.companyId = body.companyId;
+      }
+    }
+
     const updateExpr = buildUpdateExpression(updateFields, {
       removeFields,
     });

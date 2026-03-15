@@ -335,6 +335,71 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     const createdCounts: Record<string, number> = {};
     const now = new Date().toISOString();
 
+    // ── Companies ─────────────────────────────────────────────
+    console.log('Creating companies...');
+    const companies = [
+      {
+        companyId: 'comp-wwf',
+        name: 'World Wrestling Federation',
+        abbreviation: 'WWF',
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        companyId: 'comp-wcw',
+        name: 'World Championship Wrestling',
+        abbreviation: 'WCW',
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        companyId: 'comp-ecw',
+        name: 'Extreme Championship Wrestling',
+        abbreviation: 'ECW',
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    for (const company of companies) {
+      await dynamoDb.put({ TableName: TableNames.COMPANIES, Item: company });
+    }
+    createdCounts.companies = companies.length;
+
+    // ── Shows ────────────────────────────────────────────────
+    console.log('Creating shows...');
+    const shows = [
+      {
+        showId: 'show-raw',
+        name: 'Monday Night Raw',
+        companyId: 'comp-wwf',
+        schedule: 'weekly',
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        showId: 'show-nitro',
+        name: 'Monday Nitro',
+        companyId: 'comp-wcw',
+        schedule: 'weekly',
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        showId: 'show-ecw-tv',
+        name: 'ECW Hardcore TV',
+        companyId: 'comp-ecw',
+        schedule: 'weekly',
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+
+    for (const show of shows) {
+      await dynamoDb.put({ TableName: TableNames.SHOWS, Item: show });
+    }
+    createdCounts.shows = shows.length;
+
     // ── Divisions ──────────────────────────────────────────────
     console.log('Creating divisions...');
     const divisions = [
@@ -375,6 +440,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
       losses: Math.floor(Math.random() * 12) + 2,
       draws: Math.floor(Math.random() * 3),
       divisionId: divisions[index % divisions.length].divisionId,
+      companyId: companies[index % companies.length].companyId,
       createdAt: now,
       updatedAt: now,
     }));
@@ -424,6 +490,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         type: 'singles',
         currentChampion: seedWrestlers[0].wrestlerId,
         divisionId: divisions[0].divisionId,
+        companyId: 'comp-wwf',
         isActive: true,
         createdAt: now,
         updatedAt: now,
@@ -434,6 +501,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         name: 'Intercontinental Championship',
         type: 'singles',
         currentChampion: seedWrestlers[1].wrestlerId,
+        companyId: 'comp-wwf',
         isActive: true,
         createdAt: now,
         updatedAt: now,
@@ -444,6 +512,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         name: 'Tag Team Championship',
         type: 'tag',
         currentChampion: [seedWrestlers[2].wrestlerId, seedWrestlers[3].wrestlerId],
+        companyId: 'comp-wcw',
         isActive: true,
         createdAt: now,
         updatedAt: now,
@@ -455,6 +524,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
         type: 'singles',
         currentChampion: seedWrestlers[4].wrestlerId,
         divisionId: divisions[1].divisionId,
+        companyId: 'comp-ecw',
         isActive: true,
         createdAt: now,
         updatedAt: now,

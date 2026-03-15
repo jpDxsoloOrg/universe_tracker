@@ -14,6 +14,9 @@ const { mockDivisionsApi } = vi.hoisted(() => ({
 
 vi.mock('../../../services/api', () => ({
   divisionsApi: mockDivisionsApi,
+  companiesApi: {
+    getAll: vi.fn().mockResolvedValue([]),
+  },
 }));
 
 vi.mock('../ManageDivisions.css', () => ({}));

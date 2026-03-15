@@ -26,6 +26,8 @@ provider:
     STIPULATIONS_TABLE: ${self:service}-stipulations-${self:provider.stage}
     MATCH_TYPES_TABLE: ${self:service}-match-types-${self:provider.stage}
     SEASON_AWARDS_TABLE: ${self:service}-season-awards-${self:provider.stage}
+    COMPANIES_TABLE: ${self:service}-companies-${self:provider.stage}
+    SHOWS_TABLE: ${self:service}-shows-${self:provider.stage}
     DYNAMODB_ENDPOINT: ${env:DYNAMODB_ENDPOINT, 'http://localhost:8000'}
     COGNITO_USER_POOL_ID: 'us-east-1_5GZ9UY8V2'
     COGNITO_CLIENT_ID: '5bn99khg7knh9v0t5dqbjpgh1d'
@@ -64,6 +66,9 @@ provider:
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.STIPULATIONS_TABLE}
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.MATCH_TYPES_TABLE}
             - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.SEASON_AWARDS_TABLE}
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.COMPANIES_TABLE}
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.SHOWS_TABLE}
+            - arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.SHOWS_TABLE}/index/*
         - Effect: Allow
           Action:
             - s3:PutObject
@@ -446,6 +451,34 @@ functions:
           cors: *corsConfig
           authorizer: adminAuthorizer
 
+  # Companies (CRUD for wrestling companies/promotions)
+  companies:
+    handler: functions/companies/handler.handler
+    events:
+      - http:
+          path: companies
+          method: any
+          cors: *corsConfig
+      - http:
+          path: companies/{companyId}
+          method: any
+          cors: *corsConfig
+          authorizer: adminAuthorizer
+
+  # Shows (CRUD for TV shows/programs)
+  shows:
+    handler: functions/shows/handler.handler
+    events:
+      - http:
+          path: shows
+          method: any
+          cors: *corsConfig
+      - http:
+          path: shows/{showId}
+          method: any
+          cors: *corsConfig
+          authorizer: adminAuthorizer
+
   # Contenders (Phase 3 consolidated: getContenders, calculateRankings)
   contenders:
     handler: functions/contenders/handler.handler
@@ -562,9 +595,18 @@ resources:
         AttributeDefinitions:
           - AttributeName: wrestlerId
             AttributeType: S
+          - AttributeName: companyId
+            AttributeType: S
         KeySchema:
           - AttributeName: wrestlerId
             KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: CompanyIndex
+            KeySchema:
+              - AttributeName: companyId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
 
     MatchesTable:
       Type: AWS::DynamoDB::Table
@@ -832,6 +874,39 @@ resources:
             KeyType: HASH
           - AttributeName: awardId
             KeyType: RANGE
+
+    CompaniesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.COMPANIES_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: companyId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: companyId
+            KeyType: HASH
+
+    ShowsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.SHOWS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: showId
+            AttributeType: S
+          - AttributeName: companyId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: showId
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: CompanyShowsIndex
+            KeySchema:
+              - AttributeName: companyId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
 
     ImagesBucket:
       Type: AWS::S3::Bucket

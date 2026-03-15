@@ -12,7 +12,7 @@ vi.mock('../../../lib/dynamodb', () => ({
     get: vi.fn(), put: mockPut, scan: vi.fn(), query: vi.fn(),
     update: vi.fn(), delete: vi.fn(), scanAll: vi.fn(), queryAll: vi.fn(),
   },
-  TableNames: { EVENTS: 'Events' },
+  TableNames: { EVENTS: 'Events', COMPANIES: 'Companies' },
 }));
 
 vi.mock('uuid', () => ({ v4: () => 'test-event-uuid' }));

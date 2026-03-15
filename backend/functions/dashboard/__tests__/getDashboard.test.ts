@@ -20,7 +20,6 @@ vi.mock('../../../lib/dynamodb', () => ({
     MATCHES: 'Matches',
     STIPULATIONS: 'Stipulations',
     EVENTS: 'Events',
-    CHALLENGES: 'Challenges',
     SEASON_STANDINGS: 'SeasonStandings',
   },
 }));
@@ -53,7 +52,6 @@ describe('getDashboard', () => {
     expect(body).toHaveProperty('recentResults');
     expect(body).toHaveProperty('seasonInfo');
     expect(body).toHaveProperty('quickStats');
-    expect(body).toHaveProperty('activeChallengesCount');
     expect(Array.isArray(body.currentChampions)).toBe(true);
     expect(Array.isArray(body.upcomingEvents)).toBe(true);
     expect(Array.isArray(body.recentResults)).toBe(true);
@@ -62,7 +60,6 @@ describe('getDashboard', () => {
       totalMatches: 0,
       activeChampionships: 0,
     });
-    expect(body.activeChallengesCount).toBe(0);
   });
 
   it('handles empty tables gracefully', async () => {

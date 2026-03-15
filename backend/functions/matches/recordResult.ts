@@ -4,7 +4,6 @@ import { dynamoDb, TableNames } from '../../lib/dynamodb';
 import { success, badRequest, notFound, serverError } from '../../lib/response';
 import { invokeAsync } from '../../lib/asyncLambda';
 import { parseBody } from '../../lib/parseBody';
-import { calculateFantasyPoints } from '../fantasy/calculateFantasyPoints';
 
 interface RecordResultBody {
   winners: string[];
@@ -80,13 +79,6 @@ async function autoCompleteEvent(matchId: string): Promise<void> {
       });
       console.log(`Event ${eventItem.eventId} auto-completed: all ${matchIds.length} matches finished`);
 
-      // Calculate fantasy points for all users who made picks for this event
-      // Must await here — if fire-and-forget, Lambda may freeze before scoring completes
-      try {
-        await calculateFantasyPoints(eventItem.eventId as string);
-      } catch (err) {
-        console.warn('Fantasy points calculation failed:', err);
-      }
     } else {
       // If at least one match is done but not all, mark as in-progress
       if (eventItem.status === 'upcoming') {
@@ -627,12 +619,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     } catch (err) {
       console.warn('Failed to invoke calculateRankings async:', err);
     }
-    try {
-      await invokeAsync('fantasy', { source: 'recordResult' });
-    } catch (err) {
-      console.warn('Failed to invoke recalculateWrestlerCosts async:', err);
-    }
-
     const returnedMatch = {
       ...match,
       winners: body.winners,

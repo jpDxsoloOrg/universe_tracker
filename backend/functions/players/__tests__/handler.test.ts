@@ -76,7 +76,7 @@ describe('players router', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('GET /players routes to getPlayers and returns 200', async () => {
-    mockScan.mockResolvedValue({ Items: [{ playerId: 'p1', name: 'P1' }] });
+    mockScan.mockResolvedValue({ Items: [{ playerId: 'p1', name: 'P1', currentWrestler: 'Stone Cold' }] });
     const event = makeEvent({
       httpMethod: 'GET',
       path: '/dev/players',
@@ -86,36 +86,6 @@ describe('players router', () => {
     const result = await handler(event, ctx, cb);
     expect(result!.statusCode).toBe(200);
     expect(JSON.parse(result!.body)).toHaveLength(1);
-  });
-
-  it('GET /players/me routes to getMyProfile', async () => {
-    mockQuery.mockResolvedValue({ Items: [{ playerId: 'p1', name: 'Me', userId: 'sub-1' }] });
-    mockScanAll.mockResolvedValue([{ seasonId: 's1', name: 'Season 1', status: 'active' }]);
-    mockQueryAll.mockResolvedValue([]);
-    const event = makeEvent({
-      httpMethod: 'GET',
-      path: '/dev/players/me',
-      resource: '/players/me',
-      pathParameters: {},
-    });
-    const result = await handler(event, ctx, cb);
-    expect(result!.statusCode).toBe(200);
-    expect(JSON.parse(result!.body).name).toBe('Me');
-  });
-
-  it('PUT /players/me routes to updateMyProfile', async () => {
-    mockQuery.mockResolvedValue({ Items: [{ playerId: 'p1', userId: 'sub-1' }] });
-    mockGet.mockResolvedValue({ Item: { playerId: 'p1' } });
-    mockUpdate.mockResolvedValue({});
-    const event = makeEvent({
-      httpMethod: 'PUT',
-      path: '/dev/players/me',
-      resource: '/players/me',
-      pathParameters: {},
-      body: JSON.stringify({ currentWrestler: 'Rock' }),
-    });
-    const result = await handler(event, ctx, cb);
-    expect(result!.statusCode).toBe(200);
   });
 
   it('POST /players routes to createPlayer and returns 201', async () => {

@@ -77,7 +77,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         TableName: TableNames.PLAYERS,
       });
 
-      // Only include players who have a wrestler assigned (exclude Fantasy-only users)
+      // Only include players who have a wrestler assigned
       const players = allPlayers.filter((p) => p.currentWrestler);
 
       // Build a map of season standings by playerId
@@ -122,7 +122,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       TableName: TableNames.PLAYERS,
     });
 
-    // Only include players who have a wrestler assigned (exclude Fantasy-only users)
+    // Only include players who have a wrestler assigned
     const wrestlers = allPlayers.filter((p) => p.currentWrestler);
 
     // Sort players by wins descending, then by losses ascending

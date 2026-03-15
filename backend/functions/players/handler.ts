@@ -2,15 +2,13 @@ import { handler as getPlayersHandler } from './getPlayers';
 import { handler as createPlayerHandler } from './createPlayer';
 import { handler as updatePlayerHandler } from './updatePlayer';
 import { handler as deletePlayerHandler } from './deletePlayer';
-import { handler as getMyProfileHandler } from './getMyProfile';
-import { handler as updateMyProfileHandler } from './updateMyProfile';
 import { createRouter, type RouteConfig } from '../../lib/router';
 import { handler as getPlayerStatisticsHandler } from './getPlayerStatistics';
 
 
 /**
  * Single Lambda for players: routes by HTTP method and path.
- * Replaces getPlayers, createPlayer, updatePlayer, deletePlayer, getMyProfile, updateMyProfile, getPlayerStatistics.
+ * Replaces getPlayers, createPlayer, updatePlayer, deletePlayer, getPlayerStatistics.
  */
 
 const routes: ReadonlyArray<RouteConfig> = [
@@ -18,16 +16,6 @@ const routes: ReadonlyArray<RouteConfig> = [
     resource: '/players',
     method: 'GET',
     handler: getPlayersHandler,
-  },
-  {
-    resource: '/players/me',
-    method: 'GET',
-    handler: getMyProfileHandler,
-  },
-  {
-    resource: '/players/me',
-    method: 'PUT',
-    handler: updateMyProfileHandler,
   },
   {
     resource: '/players',

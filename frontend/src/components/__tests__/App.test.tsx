@@ -32,14 +32,6 @@ vi.mock('../Championships', () => ({ default: () => <div data-testid="championsh
 vi.mock('../Tournaments', () => ({ default: () => <div data-testid="tournaments">Tournaments</div> }));
 vi.mock('../admin/AdminPanel', () => ({ default: () => <div data-testid="admin-panel">AdminPanel</div> }));
 vi.mock('../auth/Login', () => ({ default: () => <div data-testid="login">Login</div> }));
-vi.mock('../auth/Signup', () => ({ default: () => <div data-testid="signup">Signup</div> }));
-vi.mock('../challenges/ChallengeBoard', () => ({ default: () => <div data-testid="challenge-board">ChallengeBoard</div> }));
-vi.mock('../challenges/ChallengeDetail', () => ({ default: () => <div>ChallengeDetail</div> }));
-vi.mock('../challenges/IssueChallenge', () => ({ default: () => <div>IssueChallenge</div> }));
-vi.mock('../challenges/MyChallenges', () => ({ default: () => <div>MyChallenges</div> }));
-vi.mock('../promos/PromoFeed', () => ({ default: () => <div>PromoFeed</div> }));
-vi.mock('../promos/PromoThread', () => ({ default: () => <div>PromoThread</div> }));
-vi.mock('../promos/PromoEditor', () => ({ default: () => <div>PromoEditor</div> }));
 vi.mock('../statistics/PlayerStats', () => ({ default: () => <div data-testid="player-stats">PlayerStats</div> }));
 vi.mock('../statistics/HeadToHeadComparison', () => ({ default: () => <div>H2H</div> }));
 vi.mock('../statistics/Leaderboards', () => ({ default: () => <div>Leaderboards</div> }));
@@ -48,16 +40,9 @@ vi.mock('../statistics/TaleOfTheTape', () => ({ default: () => <div>TaleOfTape</
 vi.mock('../statistics/Achievements', () => ({ default: () => <div>Achievements</div> }));
 vi.mock('../contenders/ContenderRankings', () => ({ default: () => <div>ContenderRankings</div> }));
 vi.mock('../contenders/MyContenderStatus', () => ({ default: () => <div>MyContenderStatus</div> }));
-vi.mock('../fantasy/FantasyLanding', () => ({ default: () => <div data-testid="fantasy-landing">FantasyLanding</div> }));
-vi.mock('../fantasy/FantasyDashboard', () => ({ default: () => <div>FantasyDashboard</div> }));
-vi.mock('../fantasy/MakePicks', () => ({ default: () => <div>MakePicks</div> }));
-vi.mock('../fantasy/FantasyLeaderboard', () => ({ default: () => <div>FantasyLeaderboard</div> }));
-vi.mock('../fantasy/WrestlerCosts', () => ({ default: () => <div>WrestlerCosts</div> }));
-vi.mock('../fantasy/ShowResults', () => ({ default: () => <div>ShowResults</div> }));
 vi.mock('../events/EventsCalendar', () => ({ default: () => <div data-testid="events">Events</div> }));
 vi.mock('../events/EventDetail', () => ({ default: () => <div>EventDetail</div> }));
 vi.mock('../events/EventResults', () => ({ default: () => <div>EventResults</div> }));
-vi.mock('../profile/WrestlerProfile', () => ({ default: () => <div data-testid="profile">Profile</div> }));
 vi.mock('../ErrorBoundary', () => ({
   default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
@@ -89,9 +74,6 @@ vi.mock('react-router-dom', async () => {
 import App from '../../App';
 
 const ALL_FEATURES = {
-  fantasy: true,
-  challenges: true,
-  promos: true,
   contenders: true,
   statistics: true,
 };
@@ -103,16 +85,10 @@ function authenticatedAuth(overrides = {}) {
     isAdminOrModerator: true,
     isSuperAdmin: false,
     isModerator: false,
-    isWrestler: true,
-    isFantasy: true,
-    groups: ['Admin', 'Wrestler'],
+    groups: ['Admin'],
     email: 'test@example.com',
-    playerId: 'p1',
     signIn: vi.fn(),
-    signUp: vi.fn(),
-    confirmSignUp: vi.fn(),
     signOut: vi.fn(),
-    refreshProfile: vi.fn(),
     hasRole: () => true,
     ...overrides,
   };
@@ -123,11 +99,8 @@ function unauthenticatedAuth() {
     isAuthenticated: false,
     isAdminOrModerator: false,
     isSuperAdmin: false,
-    isWrestler: false,
-    isFantasy: false,
     groups: [],
     email: null,
-    playerId: null,
     hasRole: () => false,
   });
 }
@@ -154,16 +127,6 @@ describe('App', () => {
     render(<App />);
 
     expect(screen.getByTestId('championships')).toBeInTheDocument();
-  });
-
-  it('redirects protected routes to login when not authenticated', async () => {
-    mockUseAuth.mockReturnValue(unauthenticatedAuth());
-    testEntries = ['/profile'];
-    render(<App />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('navigate')).toHaveAttribute('data-to', '/login');
-    });
   });
 
   it('renders /matches as MatchSearch page', async () => {

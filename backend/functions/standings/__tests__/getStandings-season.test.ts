@@ -112,8 +112,8 @@ describe('getStandings — season-specific (with seasonId)', () => {
     mockScanAll
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([
-        { playerId: 'p1', name: 'Alice' },
-        { playerId: 'p2', name: 'Bob' },
+        { playerId: 'p1', name: 'Alice', currentWrestler: 'Wrestler A' },
+        { playerId: 'p2', name: 'Bob', currentWrestler: 'Wrestler B' },
       ]);
 
     const result = await getStandings(makeSeasonEvent('s1'), ctx, cb);
@@ -137,9 +137,9 @@ describe('getStandings — season-specific (with seasonId)', () => {
     mockScanAll
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([
-        { playerId: 'p1', name: 'Alice' },
-        { playerId: 'p2', name: 'Bob' },
-        { playerId: 'p3', name: 'Carol' },
+        { playerId: 'p1', name: 'Alice', currentWrestler: 'Wrestler A' },
+        { playerId: 'p2', name: 'Bob', currentWrestler: 'Wrestler B' },
+        { playerId: 'p3', name: 'Carol', currentWrestler: 'Wrestler C' },
       ]);
 
     const result = await getStandings(makeSeasonEvent('s1'), ctx, cb);
@@ -196,8 +196,8 @@ describe('getStandings — season-specific (with seasonId)', () => {
     mockScanAll
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([
-        { playerId: 'p1', name: 'Alice' },
-        { playerId: 'p2', name: 'Bob' },
+        { playerId: 'p1', name: 'Alice', currentWrestler: 'Wrestler A' },
+        { playerId: 'p2', name: 'Bob', currentWrestler: 'Wrestler B' },
       ]);
 
     const result = await getStandings(makeSeasonEvent('s1'), ctx, cb);

@@ -21,7 +21,6 @@ vi.mock('react-i18next', () => ({
         'dashboard.recentResults': 'Recent Results',
         'dashboard.seasonProgress': 'Season Progress',
         'dashboard.quickStats': 'Quick Stats',
-        'dashboard.activeChallenges': 'Active Challenges',
         'dashboard.viewAll': 'View All',
         'dashboard.noChampions': 'No active champions',
         'dashboard.noUpcomingEvents': 'No upcoming events',
@@ -56,7 +55,6 @@ const emptyDashboard = {
     totalMatches: 0,
     activeChampionships: 0,
   },
-  activeChallengesCount: 0,
 };
 
 function renderDashboard() {
@@ -118,7 +116,6 @@ describe('Dashboard', () => {
     expect(screen.getByText('World')).toBeInTheDocument();
     expect(screen.getByText('Bob')).toBeInTheDocument();
     expect(screen.getByText('Season 1')).toBeInTheDocument();
-    expect(screen.getByText('View All')).toBeInTheDocument();
   });
 
   it('renders empty states when no data', async () => {

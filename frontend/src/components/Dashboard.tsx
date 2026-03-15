@@ -309,13 +309,6 @@ export default function Dashboard() {
         </div>
       </section>
 
-      <section className="dashboard-section">
-        <h3>{t('dashboard.activeChallenges')}</h3>
-        <Link to="/challenges" className="dashboard-challenges-cta">
-          {data.activeChallengesCount > 0 && <span className="badge">{data.activeChallengesCount}</span>}
-          {t('dashboard.viewAll')}
-        </Link>
-      </section>
     </div>
   );
 }

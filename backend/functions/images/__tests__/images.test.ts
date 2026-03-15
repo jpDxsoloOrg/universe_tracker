@@ -103,7 +103,7 @@ describe('generateUploadUrl — auth & validation', () => {
     expect(result!.statusCode).toBe(403);
   });
 
-  it('allows Wrestler role to generate upload URL', async () => {
+  it('returns 403 when user only has Wrestler role', async () => {
     const event = withAuth(
       makeEvent({
         body: JSON.stringify({ fileName: 'photo.jpg', fileType: 'image/jpeg', folder: 'wrestlers' }),
@@ -113,10 +113,10 @@ describe('generateUploadUrl — auth & validation', () => {
 
     const result = await generateUploadUrl(event, ctx, cb);
 
-    expect(result!.statusCode).toBe(200);
+    expect(result!.statusCode).toBe(403);
   });
 
-  it('allows Moderator role to generate upload URL', async () => {
+  it('returns 403 when user only has Moderator role', async () => {
     const event = withAuth(
       makeEvent({
         body: JSON.stringify({ fileName: 'photo.jpg', fileType: 'image/jpeg', folder: 'wrestlers' }),
@@ -126,7 +126,7 @@ describe('generateUploadUrl — auth & validation', () => {
 
     const result = await generateUploadUrl(event, ctx, cb);
 
-    expect(result!.statusCode).toBe(200);
+    expect(result!.statusCode).toBe(403);
   });
 
   it('allows Admin role to generate upload URL', async () => {

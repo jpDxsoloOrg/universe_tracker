@@ -1,27 +1,20 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { cognitoAuth, type UserRole } from '../services/cognito';
-import { profileApi } from '../services/api';
 
 interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   groups: UserRole[];
   email: string | null;
-  playerId: string | null;
 }
 
 interface AuthContextType extends AuthState {
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, options?: { wrestlerName?: string }) => Promise<{ isConfirmed: boolean }>;
-  confirmSignUp: (email: string, code: string) => Promise<boolean>;
   signOut: () => Promise<void>;
-  refreshProfile: () => Promise<void>;
   devSignIn?: (player: { playerId: string; name: string }, roles?: UserRole[]) => void;
   isAdminOrModerator: boolean;
   isSuperAdmin: boolean;
   isModerator: boolean;
-  isWrestler: boolean;
-  isFantasy: boolean;
   hasRole: (role: UserRole) => boolean;
 }
 
@@ -33,7 +26,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading: true,
     groups: cognitoAuth.getUserGroups(),
     email: null,
-    playerId: null,
   });
 
   // Initialize auth state on mount
@@ -48,13 +40,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           try {
             const player = JSON.parse(devPlayer);
             if (!mounted) return;
-            const groups = (player.groups as UserRole[]) || ['Wrestler'];
+            const groups = (player.groups as UserRole[]) || ['Admin'];
             setState({
               isAuthenticated: true,
               isLoading: false,
               groups,
               email: `${(player.name as string).toLowerCase().replace(/\s/g, '.')}@dev.local`,
-              playerId: player.playerId,
             });
             return;
           } catch {
@@ -74,25 +65,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           const groups = session?.groups || cognitoAuth.getUserGroups();
 
-          // Fetch player profile if user is in the Wrestler group
-          let playerId: string | null = null;
-          if (groups.includes('Wrestler')) {
-            try {
-              const profile = await profileApi.getMyProfile();
-              if (!mounted) return;
-              playerId = profile.playerId;
-            } catch {
-              // Profile may not exist yet
-            }
-          }
-
           if (!mounted) return;
           setState({
             isAuthenticated: true,
             isLoading: false,
             groups,
             email: user.signInDetails?.loginId || user.username || null,
-            playerId,
           });
         } else {
           setState({
@@ -100,7 +78,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             isLoading: false,
             groups: [],
             email: null,
-            playerId: null,
           });
         }
       } catch {
@@ -110,7 +87,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           isLoading: false,
           groups: [],
           email: null,
-          playerId: null,
         });
       }
     };
@@ -124,32 +100,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const handleSignIn = useCallback(async (email: string, password: string) => {
     const result = await cognitoAuth.signIn(email, password);
 
-    // Fetch player profile if user is in the Wrestler group
-    let playerId: string | null = null;
-    if (result.groups.includes('Wrestler')) {
-      try {
-        const profile = await profileApi.getMyProfile();
-        playerId = profile.playerId;
-      } catch {
-        // Profile may not exist yet
-      }
-    }
-
     setState({
       isAuthenticated: true,
       isLoading: false,
       groups: result.groups,
       email,
-      playerId,
     });
-  }, []);
-
-  const handleSignUp = useCallback(async (email: string, password: string, options?: { wrestlerName?: string }) => {
-    return cognitoAuth.signUp(email, password, options);
-  }, []);
-
-  const handleConfirmSignUp = useCallback(async (email: string, code: string) => {
-    return cognitoAuth.confirmSignUp(email, code);
   }, []);
 
   const handleSignOut = useCallback(async () => {
@@ -160,17 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading: false,
       groups: [],
       email: null,
-      playerId: null,
     });
-  }, []);
-
-  const refreshProfile = useCallback(async () => {
-    try {
-      const profile = await profileApi.getMyProfile();
-      setState(prev => ({ ...prev, playerId: profile.playerId }));
-    } catch {
-      // Profile may not exist
-    }
   }, []);
 
   const hasRole = useCallback((role: UserRole): boolean => {
@@ -181,7 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Dev-only: sign in as a player without Cognito
   const devSignIn = useCallback((player: { playerId: string; name: string }, roles?: UserRole[]) => {
-    const groups = roles || ['Wrestler'];
+    const groups = roles || ['Admin'];
     sessionStorage.setItem('accessToken', `dev-${player.playerId}`);
     sessionStorage.setItem('userGroups', JSON.stringify(groups));
     sessionStorage.setItem('devPlayer', JSON.stringify({ ...player, groups }));
@@ -190,23 +136,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading: false,
       groups,
       email: `${player.name.toLowerCase().replace(/\s/g, '.')}@dev.local`,
-      playerId: player.playerId,
     });
   }, []);
 
   const value: AuthContextType = {
     ...state,
     signIn: handleSignIn,
-    signUp: handleSignUp,
-    confirmSignUp: handleConfirmSignUp,
     signOut: handleSignOut,
-    refreshProfile,
     ...(import.meta.env.DEV ? { devSignIn } : {}),
     isAdminOrModerator: state.groups.includes('Admin') || state.groups.includes('Moderator'),
     isSuperAdmin: state.groups.includes('Admin'),
     isModerator: state.groups.includes('Moderator'),
-    isWrestler: state.groups.includes('Wrestler'),
-    isFantasy: hasRole('Fantasy'),
     hasRole,
   };
 

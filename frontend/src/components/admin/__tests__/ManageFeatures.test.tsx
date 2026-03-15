@@ -23,9 +23,6 @@ vi.mock('../ManageFeatures.css', () => ({}));
 import ManageFeatures from '../ManageFeatures';
 
 const ALL_FEATURES = {
-  fantasy: true,
-  challenges: true,
-  promos: true,
   contenders: true,
   statistics: true,
 };
@@ -41,22 +38,19 @@ describe('ManageFeatures', () => {
 
   it('renders all feature toggles with correct enabled/disabled state', () => {
     mockUseSiteConfig.mockReturnValue({
-      features: { ...ALL_FEATURES, promos: false },
+      features: { ...ALL_FEATURES, statistics: false },
       refreshConfig: vi.fn(),
     });
 
     render(<ManageFeatures />);
 
     expect(screen.getByText('Feature Management')).toBeInTheDocument();
-    expect(screen.getByText('Fantasy League')).toBeInTheDocument();
-    expect(screen.getByText('Challenges')).toBeInTheDocument();
-    expect(screen.getByText('Promos')).toBeInTheDocument();
     expect(screen.getByText('Contender Rankings')).toBeInTheDocument();
     expect(screen.getByText('Statistics')).toBeInTheDocument();
 
-    // Promos is disabled, rest are enabled
-    expect(screen.getByLabelText('Enable Promos')).toHaveTextContent('Disabled');
-    expect(screen.getByLabelText('Disable Fantasy League')).toHaveTextContent('Enabled');
+    // Statistics is disabled, contenders is enabled
+    expect(screen.getByLabelText('Enable Statistics')).toHaveTextContent('Disabled');
+    expect(screen.getByLabelText('Disable Contender Rankings')).toHaveTextContent('Enabled');
   });
 
   it('toggles a feature flag and calls API then refreshes config', async () => {
@@ -70,11 +64,11 @@ describe('ManageFeatures', () => {
     const user = userEvent.setup();
     render(<ManageFeatures />);
 
-    // Click to disable challenges (currently enabled)
-    await user.click(screen.getByLabelText('Disable Challenges'));
+    // Click to disable contenders (currently enabled)
+    await user.click(screen.getByLabelText('Disable Contender Rankings'));
 
     await waitFor(() => {
-      expect(mockSiteConfigApi.updateFeatures).toHaveBeenCalledWith({ challenges: false });
+      expect(mockSiteConfigApi.updateFeatures).toHaveBeenCalledWith({ contenders: false });
     });
     await waitFor(() => {
       expect(mockRefresh).toHaveBeenCalled();
@@ -87,7 +81,7 @@ describe('ManageFeatures', () => {
     const user = userEvent.setup();
     render(<ManageFeatures />);
 
-    await user.click(screen.getByLabelText('Disable Fantasy League'));
+    await user.click(screen.getByLabelText('Disable Contender Rankings'));
 
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent('Network failure');

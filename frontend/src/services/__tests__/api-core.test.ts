@@ -7,7 +7,7 @@
  * global.fetch was invoked.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { authApi, profileApi, playersApi } from '../api';
+import { authApi, playersApi } from '../api';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 
@@ -151,41 +151,3 @@ describe('authApi', () => {
   });
 });
 
-// ===========================================================================
-// profileApi
-// ===========================================================================
-
-describe('profileApi', () => {
-  it('getMyProfile calls GET /players/me', async () => {
-    const mockPlayer = { playerId: 'p1', name: 'Test', currentWrestler: 'W' };
-    global.fetch = mockFetchResponse(mockPlayer);
-
-    const result = await profileApi.getMyProfile();
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      `${API_BASE}/players/me`,
-      expect.objectContaining({ headers: expect.any(Object) }),
-    );
-    // Default method is GET (no explicit method in options)
-    const callArgs = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
-    expect(callArgs[1].method).toBeUndefined();
-    expect(result).toEqual(mockPlayer);
-  });
-
-  it('updateMyProfile calls PUT /players/me with body', async () => {
-    const updates = { name: 'New Name', imageUrl: 'https://img.com/pic.jpg' };
-    const mockResponse = { playerId: 'p1', ...updates };
-    global.fetch = mockFetchResponse(mockResponse);
-
-    const result = await profileApi.updateMyProfile(updates);
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      `${API_BASE}/players/me`,
-      expect.objectContaining({
-        method: 'PUT',
-        body: JSON.stringify(updates),
-      }),
-    );
-    expect(result).toEqual(mockResponse);
-  });
-});

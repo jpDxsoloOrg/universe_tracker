@@ -8,13 +8,7 @@ export type NavItem = {
   path: string;
   i18nKey: string;
   /** When set, link is only shown when this feature is enabled */
-  feature?: 'challenges' | 'promos' | 'contenders' | 'statistics' | 'fantasy';
-  /** When set, link is only shown when user has this role (and feature if any) */
-  role?: 'Wrestler' | 'Fantasy';
-  /** Disabled label key when role not met (e.g. "Wrestler Only") */
-  roleLockedLabel?: string;
-  /** Coming soon label when feature/role not met */
-  comingSoonLabel?: string;
+  feature?: 'contenders' | 'statistics';
   danger?: boolean;
 };
 
@@ -24,7 +18,7 @@ export type NavGroup = {
   items: NavItem[];
 };
 
-/** Public (user) nav: Core, Wrestler, standalone Fantasy & Help */
+/** Public (user) nav: Core & Help */
 export const USER_NAV_GROUPS: NavGroup[] = [
   {
     key: 'core',
@@ -42,26 +36,10 @@ export const USER_NAV_GROUPS: NavGroup[] = [
       { path: '/stats', i18nKey: 'nav.statistics', feature: 'statistics' },
     ],
   },
-  {
-    key: 'wrestler',
-    i18nKey: 'nav.groups.wrestler',
-    items: [
-      { path: '/profile', i18nKey: 'nav.profile', role: 'Wrestler', roleLockedLabel: 'Wrestler Only' },
-      { path: '/challenges', i18nKey: 'nav.challenges', feature: 'challenges' },
-      { path: '/promos', i18nKey: 'nav.promos', feature: 'promos' },
-    ],
-  },
 ];
 
-/** Standalone user links (no subgroup): Fantasy, Help */
-export const USER_NAV_STANDALONE: (NavItem & { type: 'fantasy' | 'link' })[] = [
-  {
-    type: 'fantasy',
-    path: '/fantasy',
-    i18nKey: 'nav.fantasy',
-    feature: 'fantasy',
-    comingSoonLabel: 'Coming Soon',
-  },
+/** Standalone user links (no subgroup): Help */
+export const USER_NAV_STANDALONE: (NavItem & { type: 'link' })[] = [
   {
     type: 'link',
     path: '/guide',
@@ -97,50 +75,35 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
     key: 'contentSocial',
     i18nKey: 'admin.panel.groups.contentSocial',
     items: [
-      { path: '/admin/challenges', i18nKey: 'admin.panel.tabs.challenges' },
-      { path: '/admin/promos', i18nKey: 'admin.panel.tabs.promos' },
       { path: '/admin/contender-config', i18nKey: 'admin.panel.tabs.contenderConfig' },
-    ],
-  },
-  {
-    key: 'fantasy',
-    i18nKey: 'admin.panel.groups.fantasy',
-    items: [
-      { path: '/admin/fantasy-shows', i18nKey: 'admin.panel.tabs.fantasyShows' },
-      { path: '/admin/fantasy-config', i18nKey: 'admin.panel.tabs.fantasyConfig' },
     ],
   },
   {
     key: 'system',
     i18nKey: 'admin.panel.groups.system',
     items: [
-      { path: '/admin/users', i18nKey: 'admin.panel.tabs.users' },
       { path: '/admin/features', i18nKey: 'admin.panel.tabs.features' },
       { path: '/admin/danger', i18nKey: 'admin.panel.tabs.dangerZone', danger: true },
     ],
   },
 ];
 
-/** Path → group key for user nav (for auto-expand) */
+/** Path -> group key for user nav (for auto-expand) */
 export function getUserGroupForPath(pathname: string): string | null {
   const core = ['/', '/standings', '/activity', '/championships', '/events', '/matches', '/tournaments', '/awards', '/contenders', '/stats'];
-  const wrestler = ['/profile', '/challenges', '/promos'];
   if (core.some((p) => pathname === p) || pathname.startsWith('/events/') || pathname.startsWith('/stats/') || pathname.startsWith('/contenders/')) return 'core';
-  if (wrestler.some((p) => pathname === p || pathname.startsWith(p + '/'))) return 'wrestler';
   return null;
 }
 
-/** Path → admin group key */
+/** Path -> admin group key */
 export function getAdminGroupForPath(pathname: string): string | null {
   const matchOps = ['/admin/schedule', '/admin/results', '/admin/events', '/admin/match-config'];
   const leagueSetup = ['/admin/players', '/admin/divisions', '/admin/seasons', '/admin/season-awards', '/admin/championships', '/admin/tournaments'];
-  const contentSocial = ['/admin/challenges', '/admin/promos', '/admin/contender-config'];
-  const fantasy = ['/admin/fantasy-shows', '/admin/fantasy-config'];
-  const system = ['/admin/users', '/admin/features', '/admin/danger'];
+  const contentSocial = ['/admin/contender-config'];
+  const system = ['/admin/features', '/admin/danger'];
   if (matchOps.some((p) => pathname === p)) return 'matchOps';
   if (leagueSetup.some((p) => pathname === p)) return 'leagueSetup';
   if (contentSocial.some((p) => pathname === p)) return 'contentSocial';
-  if (fantasy.some((p) => pathname === p)) return 'fantasy';
   if (system.some((p) => pathname === p)) return 'system';
   return null;
 }

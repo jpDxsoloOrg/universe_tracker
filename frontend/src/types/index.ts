@@ -33,8 +33,6 @@ export interface Match {
   seasonId?: string;
   status: 'scheduled' | 'completed';
   createdAt: string;
-  challengeId?: string;
-  promoId?: string;
   starRating?: number;
   matchOfTheNight?: boolean;
 }
@@ -53,8 +51,6 @@ export interface ScheduleMatchInput {
   eventId?: string;
   designation?: string;
   status: 'scheduled';
-  challengeId?: string;
-  promoId?: string;
 }
 
 export interface Championship {
@@ -179,7 +175,6 @@ export interface DashboardData {
   recentResults: DashboardMatch[];
   seasonInfo: DashboardSeason | null;
   quickStats: DashboardQuickStats;
-  activeChallengesCount: number;
 }
 
 export interface Season {
@@ -246,9 +241,7 @@ export type ActivityItemType =
   | 'match_result'
   | 'championship_change'
   | 'season_event'
-  | 'tournament_result'
-  | 'challenge_event'
-  | 'promo_posted';
+  | 'tournament_result';
 
 export interface ActivityItem {
   id: string;
@@ -263,64 +256,3 @@ export interface ActivityFeedResponse {
   nextCursor: string | null;
 }
 
-// Dashboard types
-export interface DashboardChampion {
-  championshipId: string;
-  championshipName: string;
-  championName: string;
-  championImageUrl?: string;
-  playerId: string;
-  wonDate?: string;
-  defenses?: number;
-}
-
-export interface DashboardEvent {
-  eventId: string;
-  name: string;
-  date: string;
-  eventType: string;
-  venue?: string;
-  matchCount?: number;
-}
-
-export interface DashboardMatch {
-  matchId: string;
-  date: string;
-  matchType: string;
-  stipulation?: string;
-  isChampionship?: boolean;
-  championshipName?: string;
-  championshipImageUrl?: string;
-  starRating?: number;
-  matchOfTheNight?: boolean;
-  winnerName: string;
-  winnerImageUrl?: string;
-  loserName: string;
-  loserImageUrl?: string;
-  eventId?: string;
-}
-
-export interface DashboardSeason {
-  seasonId: string;
-  name: string;
-  startDate?: string;
-  endDate?: string;
-  status: string;
-  matchesPlayed?: number;
-}
-
-export interface DashboardQuickStats {
-  totalPlayers: number;
-  totalMatches: number;
-  activeChampionships: number;
-  mostWinsPlayer?: { name: string; wins: number };
-}
-
-export interface DashboardData {
-  currentChampions: DashboardChampion[];
-  upcomingEvents: DashboardEvent[];
-  recentResults: DashboardMatch[];
-  seasonInfo: DashboardSeason | null;
-  quickStats: DashboardQuickStats;
-  activeChallengesCount: number;
-}

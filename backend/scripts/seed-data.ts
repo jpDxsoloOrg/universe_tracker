@@ -35,9 +35,6 @@ const TABLES = {
   EVENTS: `universe-tracker-api-events-${STAGE}`,
   CONTENDER_RANKINGS: `universe-tracker-api-contender-rankings-${STAGE}`,
   RANKING_HISTORY: `universe-tracker-api-ranking-history-${STAGE}`,
-  FANTASY_CONFIG: `universe-tracker-api-fantasy-config-${STAGE}`,
-  WRESTLER_COSTS: `universe-tracker-api-wrestler-costs-${STAGE}`,
-  FANTASY_PICKS: `universe-tracker-api-fantasy-picks-${STAGE}`,
   SITE_CONFIG: `universe-tracker-api-site-config-${STAGE}`,
 };
 
@@ -556,70 +553,11 @@ async function seedData() {
     console.log(`  ✓ Ranking history: week ${weekOffset + 1}`);
   }
 
-  // ── Fantasy Config ─────────────────────────────────────────
-  console.log('\nCreating fantasy config...');
-  const fantasyConfig = {
-    configKey: 'GLOBAL',
-    defaultBudget: 500,
-    defaultPicksPerDivision: 2,
-    baseWinPoints: 10,
-    championshipBonus: 5,
-    titleWinBonus: 10,
-    titleDefenseBonus: 5,
-    costFluctuationEnabled: true,
-    costChangePerWin: 10,
-    costChangePerLoss: 5,
-    costResetStrategy: 'reset',
-    underdogMultiplier: 1.5,
-    perfectPickBonus: 50,
-    streakBonusThreshold: 5,
-    streakBonusPoints: 25,
-  };
-
-  await putItem(TABLES.FANTASY_CONFIG, fantasyConfig);
-  console.log('  ✓ Fantasy config: GLOBAL');
-
-  // ── Wrestler Costs ─────────────────────────────────────────
-  console.log('\nCreating wrestler costs...');
-  for (const player of players) {
-    const totalMatches = player.wins + player.losses + player.draws;
-    const winRate = totalMatches > 0 ? Math.round((player.wins / totalMatches) * 100) : 0;
-    const baseCost = 100;
-    const costAdjustment = Math.round((winRate - 50) * 1.5);
-    const currentCost = Math.max(50, baseCost + costAdjustment);
-
-    const wrestlerCost = {
-      playerId: player.playerId,
-      baseCost,
-      currentCost,
-      costHistory: [
-        {
-          date: daysAgo(7).toISOString().split('T')[0],
-          cost: baseCost,
-          reason: 'Initial cost set',
-        },
-        {
-          date: new Date().toISOString().split('T')[0],
-          cost: currentCost,
-          reason: 'Performance adjustment',
-        },
-      ],
-      winRate30Days: winRate,
-      recentRecord: `${player.wins}-${player.losses}-${player.draws}`,
-      updatedAt: now,
-    };
-    await putItem(TABLES.WRESTLER_COSTS, wrestlerCost);
-    console.log(`  ✓ Wrestler cost: ${player.name} → $${currentCost}`);
-  }
-
   // ── Site Config ────────────────────────────────────────────
   console.log('\nCreating site config...');
   const siteConfig = {
     configKey: 'features',
     features: {
-      fantasy: true,
-      challenges: true,
-      promos: true,
       contenders: true,
       statistics: true,
     },
@@ -643,8 +581,6 @@ async function seedData() {
   console.log(`  - ${events.length} events`);
   console.log(`  - ${whcContenders.length + icContenders.length} contender rankings`);
   console.log(`  - ${3 * 3} ranking history entries`);
-  console.log(`  - 1 fantasy config`);
-  console.log(`  - ${players.length} wrestler costs`);
   console.log(`  - 1 site config`);
 }
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import { playersApi } from '../../services/api';
@@ -24,7 +24,7 @@ function DevLogin() {
 
   const handleDevLogin = (player: Player) => {
     devSignIn(player);
-    navigate('/profile');
+    navigate('/');
   };
 
   const handleDevAdminLogin = () => {
@@ -138,12 +138,6 @@ export default function Login() {
           </button>
         </form>
 
-        <div className="auth-footer">
-          <p>
-            {t('auth.noAccount')}{' '}
-            <Link to="/signup">{t('auth.signUpLink')}</Link>
-          </p>
-        </div>
       </div>
 
       {import.meta.env.DEV && <DevLogin />}

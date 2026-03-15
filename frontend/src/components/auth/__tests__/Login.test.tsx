@@ -70,7 +70,6 @@ describe('Login', () => {
     expect(screen.getByLabelText('Password')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Sign In' })).toBeInTheDocument();
     expect(screen.getByText('Sign in to access League SZN')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Sign Up' })).toHaveAttribute('href', '/signup');
   });
 
   it('shows loading state while sign-in is in progress', async () => {

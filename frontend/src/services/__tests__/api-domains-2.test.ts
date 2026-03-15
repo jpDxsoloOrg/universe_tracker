@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   eventsApi,
   contendersApi,
-  usersApi,
   siteConfigApi,
   statisticsApi,
 } from '../api';
@@ -131,55 +130,11 @@ describe('contendersApi', () => {
 });
 
 // ---------------------------------------------------------------------------
-// usersApi
-// ---------------------------------------------------------------------------
-describe('usersApi', () => {
-  it('list calls GET /admin/users', async () => {
-    const data = { users: [{ username: 'john', sub: 's1', email: 'j@e.com', name: 'John', wrestlerName: '', status: 'CONFIRMED', enabled: true, created: '2024-01-01', groups: [] }] };
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(mockResponse(data));
-
-    const result = await usersApi.list();
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      `${API_BASE}/admin/users`,
-      expect.any(Object),
-    );
-    expect(result.users).toHaveLength(1);
-  });
-
-  it('updateRole sends POST to /admin/users/role with username, role, action', async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockResponse({ message: 'ok', username: 'john', groups: ['Wrestler'] }),
-    );
-
-    await usersApi.updateRole('john', 'Wrestler', 'promote');
-
-    const [url, opts] = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
-    expect(url).toBe(`${API_BASE}/admin/users/role`);
-    expect(opts.method).toBe('POST');
-    expect(JSON.parse(opts.body)).toEqual({ username: 'john', role: 'Wrestler', action: 'promote' });
-  });
-
-  it('toggleEnabled sends POST to /admin/users/toggle-enabled', async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockResponse({ message: 'ok', username: 'john', enabled: false }),
-    );
-
-    await usersApi.toggleEnabled('john', false);
-
-    const [url, opts] = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
-    expect(url).toBe(`${API_BASE}/admin/users/toggle-enabled`);
-    expect(opts.method).toBe('POST');
-    expect(JSON.parse(opts.body)).toEqual({ username: 'john', enabled: false });
-  });
-});
-
-// ---------------------------------------------------------------------------
 // siteConfigApi
 // ---------------------------------------------------------------------------
 describe('siteConfigApi', () => {
   it('getFeatures calls GET /site-config', async () => {
-    const data = { features: { fantasy: true, challenges: true, promos: true, contenders: true, statistics: true } };
+    const data = { features: { contenders: true, statistics: true } };
     (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(mockResponse(data));
 
     const result = await siteConfigApi.getFeatures();
@@ -188,19 +143,19 @@ describe('siteConfigApi', () => {
       `${API_BASE}/site-config`,
       expect.any(Object),
     );
-    expect(result.features.fantasy).toBe(true);
+    expect(result.features.contenders).toBe(true);
   });
 
   it('updateFeatures sends PUT to /admin/site-config with features payload', async () => {
-    const updated = { features: { fantasy: false, challenges: true, promos: true, contenders: true, statistics: true } };
+    const updated = { features: { contenders: false, statistics: true } };
     (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(mockResponse(updated));
 
-    await siteConfigApi.updateFeatures({ fantasy: false });
+    await siteConfigApi.updateFeatures({ contenders: false });
 
     const [url, opts] = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(url).toBe(`${API_BASE}/admin/site-config`);
     expect(opts.method).toBe('PUT');
-    expect(JSON.parse(opts.body)).toEqual({ features: { fantasy: false } });
+    expect(JSON.parse(opts.body)).toEqual({ features: { contenders: false } });
   });
 });
 

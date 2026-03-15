@@ -30,12 +30,6 @@ vi.mock('../../../lib/dynamodb', () => ({
 vi.mock('../../../lib/rankingCalculator', () => ({
   calculateRankingsForChampionship: vi.fn().mockResolvedValue([]),
 }));
-vi.mock('../../fantasy/recalculateWrestlerCosts', () => ({
-  recalculateCosts: vi.fn().mockResolvedValue(undefined),
-}));
-vi.mock('../../fantasy/calculateFantasyPoints', () => ({
-  calculateFantasyPoints: vi.fn().mockResolvedValue(undefined),
-}));
 
 import { handler as recordResult } from '../recordResult';
 
@@ -218,14 +212,4 @@ describe('recordResult — background ops', () => {
     expect(r!.statusCode).toBe(200);
   });
 
-  it('succeeds even if cost recalculation throws', async () => {
-    const { recalculateCosts } = await import('../../fantasy/recalculateWrestlerCosts');
-    vi.mocked(recalculateCosts).mockRejectedValue(new Error('fail'));
-    stubSuccess();
-    const r = await recordResult(ev({
-      pathParameters: { matchId: 'm1' },
-      body: JSON.stringify({ winners: ['p1'], losers: ['p2'] }),
-    }), ctx, cb);
-    expect(r!.statusCode).toBe(200);
-  });
 });

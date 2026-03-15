@@ -22,9 +22,6 @@ const ctx = {} as Context;
 const cb: Callback = () => {};
 
 const DEFAULT_FEATURES = {
-  fantasy: true,
-  challenges: true,
-  promos: true,
   contenders: true,
   statistics: true,
 };
@@ -64,11 +61,8 @@ describe('getSiteConfig', () => {
 
   it('returns features from existing config item', async () => {
     const storedFeatures = {
-      fantasy: false,
-      challenges: true,
-      promos: false,
       contenders: true,
-      statistics: true,
+      statistics: false,
     };
     mockGet.mockResolvedValue({
       Item: { configKey: 'features', features: storedFeatures },
@@ -124,7 +118,7 @@ describe('updateSiteConfig', () => {
 
   it('returns 403 when user is not Admin', async () => {
     const event = withAuth(
-      makeEvent({ body: JSON.stringify({ features: { fantasy: false } }) }),
+      makeEvent({ body: JSON.stringify({ features: { contenders: false } }) }),
       'Wrestler',
     );
 
@@ -136,7 +130,7 @@ describe('updateSiteConfig', () => {
 
   it('returns 403 when user is Moderator (not full Admin)', async () => {
     const event = withAuth(
-      makeEvent({ body: JSON.stringify({ features: { fantasy: false } }) }),
+      makeEvent({ body: JSON.stringify({ features: { contenders: false } }) }),
       'Moderator',
     );
 
@@ -193,21 +187,18 @@ describe('updateSiteConfig', () => {
 
   it('returns 400 when a feature value is not a boolean', async () => {
     const event = withAuth(
-      makeEvent({ body: JSON.stringify({ features: { fantasy: 'yes' } }) }),
+      makeEvent({ body: JSON.stringify({ features: { contenders: 'yes' } }) }),
       'Admin',
     );
 
     const result = await updateSiteConfig(event, ctx, cb);
 
     expect(result!.statusCode).toBe(400);
-    expect(JSON.parse(result!.body).message).toBe('Feature value for fantasy must be a boolean');
+    expect(JSON.parse(result!.body).message).toBe('Feature value for contenders must be a boolean');
   });
 
   it('merges new features with existing config and returns updated features', async () => {
     const existingFeatures = {
-      fantasy: true,
-      challenges: true,
-      promos: true,
       contenders: true,
       statistics: true,
     };
@@ -217,7 +208,7 @@ describe('updateSiteConfig', () => {
     mockPut.mockResolvedValue({});
 
     const event = withAuth(
-      makeEvent({ body: JSON.stringify({ features: { fantasy: false, promos: false } }) }),
+      makeEvent({ body: JSON.stringify({ features: { statistics: false } }) }),
       'Admin',
     );
 
@@ -226,11 +217,8 @@ describe('updateSiteConfig', () => {
     expect(result!.statusCode).toBe(200);
     const body = JSON.parse(result!.body);
     expect(body.features).toEqual({
-      fantasy: false,
-      challenges: true,
-      promos: false,
       contenders: true,
-      statistics: true,
+      statistics: false,
     });
     expect(mockPut).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -238,11 +226,8 @@ describe('updateSiteConfig', () => {
         Item: expect.objectContaining({
           configKey: 'features',
           features: {
-            fantasy: false,
-            challenges: true,
-            promos: false,
             contenders: true,
-            statistics: true,
+            statistics: false,
           },
         }),
       }),
@@ -263,9 +248,6 @@ describe('updateSiteConfig', () => {
     expect(result!.statusCode).toBe(200);
     const body = JSON.parse(result!.body);
     expect(body.features).toEqual({
-      fantasy: true,
-      challenges: true,
-      promos: true,
       contenders: true,
       statistics: false,
     });
@@ -275,7 +257,7 @@ describe('updateSiteConfig', () => {
     mockGet.mockRejectedValue(new Error('DynamoDB error'));
 
     const event = withAuth(
-      makeEvent({ body: JSON.stringify({ features: { fantasy: true } }) }),
+      makeEvent({ body: JSON.stringify({ features: { contenders: true } }) }),
       'Admin',
     );
 

@@ -60,8 +60,8 @@ describe('cognito service — tokens, roles & JWT', () => {
     });
 
     it('getUserGroups parses groups from sessionStorage', () => {
-      sessionStorage.setItem('userGroups', JSON.stringify(['Admin', 'Wrestler']));
-      expect(cognitoAuth.getUserGroups()).toEqual(['Admin', 'Wrestler']);
+      sessionStorage.setItem('userGroups', JSON.stringify(['Admin']));
+      expect(cognitoAuth.getUserGroups()).toEqual(['Admin']);
     });
 
     it('getUserGroups returns empty array when no groups stored', () => {
@@ -104,31 +104,12 @@ describe('cognito service — tokens, roles & JWT', () => {
         sessionStorage.setItem('userGroups', JSON.stringify(['Admin']));
         expect(cognitoAuth.hasRole('Admin')).toBe(true);
         expect(cognitoAuth.hasRole('Moderator')).toBe(true);
-        expect(cognitoAuth.hasRole('Wrestler')).toBe(true);
-        expect(cognitoAuth.hasRole('Fantasy')).toBe(true);
       });
 
       it('Moderator has access to non-Admin roles', () => {
         sessionStorage.setItem('userGroups', JSON.stringify(['Moderator']));
         expect(cognitoAuth.hasRole('Admin')).toBe(false);
         expect(cognitoAuth.hasRole('Moderator')).toBe(true);
-        expect(cognitoAuth.hasRole('Wrestler')).toBe(true);
-        expect(cognitoAuth.hasRole('Fantasy')).toBe(true);
-      });
-
-      it('Wrestler only has access to Wrestler role', () => {
-        sessionStorage.setItem('userGroups', JSON.stringify(['Wrestler']));
-        expect(cognitoAuth.hasRole('Admin')).toBe(false);
-        expect(cognitoAuth.hasRole('Moderator')).toBe(false);
-        expect(cognitoAuth.hasRole('Wrestler')).toBe(true);
-        expect(cognitoAuth.hasRole('Fantasy')).toBe(false);
-      });
-
-      it('Fantasy only has access to Fantasy role', () => {
-        sessionStorage.setItem('userGroups', JSON.stringify(['Fantasy']));
-        expect(cognitoAuth.hasRole('Admin')).toBe(false);
-        expect(cognitoAuth.hasRole('Wrestler')).toBe(false);
-        expect(cognitoAuth.hasRole('Fantasy')).toBe(true);
       });
     });
 
@@ -139,16 +120,6 @@ describe('cognito service — tokens, roles & JWT', () => {
       sessionStorage.setItem('userGroups', JSON.stringify(['Moderator']));
       expect(cognitoAuth.isAdmin()).toBe(false);
     });
-
-    it('isWrestler returns true for Wrestler group', () => {
-      sessionStorage.setItem('userGroups', JSON.stringify(['Wrestler']));
-      expect(cognitoAuth.isWrestler()).toBe(true);
-    });
-
-    it('isWrestler returns true for Admin (hierarchy)', () => {
-      sessionStorage.setItem('userGroups', JSON.stringify(['Admin']));
-      expect(cognitoAuth.isWrestler()).toBe(true);
-    });
   });
 
   // =========================================================================
@@ -156,13 +127,13 @@ describe('cognito service — tokens, roles & JWT', () => {
   // =========================================================================
   describe('JWT helpers', () => {
     it('getGroupsFromToken extracts cognito:groups from valid JWT', () => {
-      const token = fakeJwt({ 'cognito:groups': ['Admin', 'Wrestler'] });
-      expect(getGroupsFromToken(token)).toEqual(['Admin', 'Wrestler']);
+      const token = fakeJwt({ 'cognito:groups': ['Admin', 'Moderator'] });
+      expect(getGroupsFromToken(token)).toEqual(['Admin', 'Moderator']);
     });
 
     it('getGroupsFromToken filters out unknown groups', () => {
-      const token = fakeJwt({ 'cognito:groups': ['Admin', 'UnknownRole', 'Fantasy'] });
-      expect(getGroupsFromToken(token)).toEqual(['Admin', 'Fantasy']);
+      const token = fakeJwt({ 'cognito:groups': ['Admin', 'UnknownRole', 'Moderator'] });
+      expect(getGroupsFromToken(token)).toEqual(['Admin', 'Moderator']);
     });
 
     it('getGroupsFromToken returns empty array for malformed token', () => {

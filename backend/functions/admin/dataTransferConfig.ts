@@ -12,12 +12,7 @@ export type ExportDatasetKey =
   | 'events'
   | 'contenderRankings'
   | 'rankingHistory'
-  | 'fantasyConfig'
-  | 'wrestlerCosts'
-  | 'fantasyPicks'
   | 'siteConfig'
-  | 'challenges'
-  | 'promos'
   | 'stipulations'
   | 'matchTypes'
   | 'seasonAwards';
@@ -53,12 +48,7 @@ export const EXPORT_TABLES: readonly ExportTableConfig[] = [
     sortKey: 'playerId',
   },
   { key: 'rankingHistory', tableName: TableNames.RANKING_HISTORY, partitionKey: 'playerId', sortKey: 'weekKey' },
-  { key: 'fantasyConfig', tableName: TableNames.FANTASY_CONFIG, partitionKey: 'configKey' },
-  { key: 'wrestlerCosts', tableName: TableNames.WRESTLER_COSTS, partitionKey: 'playerId' },
-  { key: 'fantasyPicks', tableName: TableNames.FANTASY_PICKS, partitionKey: 'eventId', sortKey: 'fantasyUserId' },
   { key: 'siteConfig', tableName: TableNames.SITE_CONFIG, partitionKey: 'configKey' },
-  { key: 'challenges', tableName: TableNames.CHALLENGES, partitionKey: 'challengeId' },
-  { key: 'promos', tableName: TableNames.PROMOS, partitionKey: 'promoId' },
   { key: 'stipulations', tableName: TableNames.STIPULATIONS, partitionKey: 'stipulationId' },
   { key: 'matchTypes', tableName: TableNames.MATCH_TYPES, partitionKey: 'matchTypeId' },
   { key: 'seasonAwards', tableName: TableNames.SEASON_AWARDS, partitionKey: 'seasonId', sortKey: 'awardId' },

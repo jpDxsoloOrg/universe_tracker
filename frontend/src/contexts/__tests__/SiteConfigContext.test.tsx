@@ -21,9 +21,6 @@ function wrapper({ children }: { children: ReactNode }) {
 }
 
 const ALL_ENABLED = {
-  fantasy: true,
-  challenges: true,
-  promos: true,
   contenders: true,
   statistics: true,
 };
@@ -35,9 +32,6 @@ describe('SiteConfigContext', () => {
 
   it('fetches config on mount and provides features via useSiteConfig()', async () => {
     const serverFeatures = {
-      fantasy: false,
-      challenges: true,
-      promos: false,
       contenders: true,
       statistics: true,
     };
@@ -67,7 +61,7 @@ describe('SiteConfigContext', () => {
   it('merges server response with defaults (fills missing keys)', async () => {
     // Server only returns a subset of features
     mockGetFeatures.mockResolvedValue({
-      features: { fantasy: false, challenges: false },
+      features: { contenders: false },
     });
 
     const { result } = renderHook(() => useSiteConfig(), { wrapper });
@@ -75,10 +69,7 @@ describe('SiteConfigContext', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     expect(result.current.features).toEqual({
-      fantasy: false,
-      challenges: false,
-      promos: true,
-      contenders: true,
+      contenders: false,
       statistics: true,
     });
   });
@@ -93,7 +84,7 @@ describe('SiteConfigContext', () => {
 
     // Server now returns updated features
     mockGetFeatures.mockResolvedValue({
-      features: { ...ALL_ENABLED, fantasy: false },
+      features: { ...ALL_ENABLED, contenders: false },
     });
 
     await act(async () => {
@@ -101,7 +92,7 @@ describe('SiteConfigContext', () => {
     });
 
     expect(mockGetFeatures).toHaveBeenCalledTimes(2);
-    expect(result.current.features.fantasy).toBe(false);
+    expect(result.current.features.contenders).toBe(false);
   });
 
   it('does not update state after unmount (mounted flag cleanup)', async () => {
@@ -119,7 +110,7 @@ describe('SiteConfigContext', () => {
     unmount();
 
     // Now resolve the pending promise
-    resolveFeatures({ features: { fantasy: false } });
+    resolveFeatures({ features: { contenders: false } });
 
     // Allow microtask queue to flush
     await new Promise((r) => setTimeout(r, 50));

@@ -66,9 +66,9 @@ describe('getStandings — all-time (no seasonId)', () => {
     mockScanAll
       .mockResolvedValueOnce([]) // completed matches
       .mockResolvedValueOnce([
-        { playerId: 'p1', name: 'Alice', wins: 10, losses: 2, draws: 1 },
-        { playerId: 'p2', name: 'Bob', wins: 15, losses: 5, draws: 0 },
-        { playerId: 'p3', name: 'Carol', wins: 8, losses: 3, draws: 2 },
+        { playerId: 'p1', name: 'Alice', currentWrestler: 'Wrestler A', wins: 10, losses: 2, draws: 1 },
+        { playerId: 'p2', name: 'Bob', currentWrestler: 'Wrestler B', wins: 15, losses: 5, draws: 0 },
+        { playerId: 'p3', name: 'Carol', currentWrestler: 'Wrestler C', wins: 8, losses: 3, draws: 2 },
       ]);
 
     const result = await getStandings(makeEvent(), ctx, cb);
@@ -87,9 +87,9 @@ describe('getStandings — all-time (no seasonId)', () => {
     mockScanAll
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([
-        { playerId: 'p1', name: 'Alice', wins: 10, losses: 5, draws: 0 },
-        { playerId: 'p2', name: 'Bob', wins: 10, losses: 2, draws: 0 },
-        { playerId: 'p3', name: 'Carol', wins: 10, losses: 8, draws: 0 },
+        { playerId: 'p1', name: 'Alice', currentWrestler: 'Wrestler A', wins: 10, losses: 5, draws: 0 },
+        { playerId: 'p2', name: 'Bob', currentWrestler: 'Wrestler B', wins: 10, losses: 2, draws: 0 },
+        { playerId: 'p3', name: 'Carol', currentWrestler: 'Wrestler C', wins: 10, losses: 8, draws: 0 },
       ]);
 
     const result = await getStandings(makeEvent(), ctx, cb);
@@ -106,8 +106,8 @@ describe('getStandings — all-time (no seasonId)', () => {
     mockScanAll
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([
-        { playerId: 'p1', name: 'NoStats' },
-        { playerId: 'p2', name: 'HasWins', wins: 3, losses: 1 },
+        { playerId: 'p1', name: 'NoStats', currentWrestler: 'Wrestler A' },
+        { playerId: 'p2', name: 'HasWins', currentWrestler: 'Wrestler B', wins: 3, losses: 1 },
       ]);
 
     const result = await getStandings(makeEvent(), ctx, cb);
@@ -165,8 +165,8 @@ describe('getStandings — all-time (no seasonId)', () => {
     mockScanAll
       .mockResolvedValueOnce(completedMatches)
       .mockResolvedValueOnce([
-        { playerId: 'p1', name: 'Alice', wins: 10, losses: 2, draws: 1 },
-        { playerId: 'p2', name: 'Bob', wins: 8, losses: 5, draws: 0 },
+        { playerId: 'p1', name: 'Alice', currentWrestler: 'Wrestler A', wins: 10, losses: 2, draws: 1 },
+        { playerId: 'p2', name: 'Bob', currentWrestler: 'Wrestler B', wins: 8, losses: 5, draws: 0 },
       ]);
 
     const result = await getStandings(makeEvent(), ctx, cb);
@@ -189,8 +189,8 @@ describe('getStandings — all-time (no seasonId)', () => {
     mockScanAll
       .mockResolvedValueOnce(completedMatches)
       .mockResolvedValueOnce([
-        { playerId: 'p1', name: 'Alice', wins: 1, losses: 1, draws: 0 },
-        { playerId: 'p2', name: 'Bob', wins: 1, losses: 1, draws: 0 },
+        { playerId: 'p1', name: 'Alice', currentWrestler: 'Wrestler A', wins: 1, losses: 1, draws: 0 },
+        { playerId: 'p2', name: 'Bob', currentWrestler: 'Wrestler B', wins: 1, losses: 1, draws: 0 },
       ]);
 
     const result = await getStandings(makeEvent(), ctx, cb);
@@ -206,7 +206,7 @@ describe('getStandings — all-time (no seasonId)', () => {
   it('returns empty recentForm and zero streak when no completed matches', async () => {
     mockScanAll
       .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([{ playerId: 'p1', name: 'Alice', wins: 0, losses: 0, draws: 0 }]);
+      .mockResolvedValueOnce([{ playerId: 'p1', name: 'Alice', currentWrestler: 'Wrestler A', wins: 0, losses: 0, draws: 0 }]);
 
     const result = await getStandings(makeEvent(), ctx, cb);
 

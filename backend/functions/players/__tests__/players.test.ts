@@ -42,8 +42,6 @@ import { handler as createPlayer } from '../createPlayer';
 import { handler as getPlayers } from '../getPlayers';
 import { handler as updatePlayer } from '../updatePlayer';
 import { handler as deletePlayer } from '../deletePlayer';
-import { handler as getMyProfile } from '../getMyProfile';
-import { handler as updateMyProfile } from '../updateMyProfile';
 
 // ─── Helpers ─────────────────────────────────────────────────────────
 
@@ -65,16 +63,6 @@ function makeEvent(overrides: Partial<APIGatewayProxyEvent> = {}): APIGatewayPro
     resource: '',
     requestContext: { authorizer: {} } as any,
     ...overrides,
-  };
-}
-
-function withAuth(event: APIGatewayProxyEvent, groups: string, sub = 'user-sub-1'): APIGatewayProxyEvent {
-  return {
-    ...event,
-    requestContext: {
-      ...event.requestContext,
-      authorizer: { groups, username: 'testuser', email: 'test@test.com', principalId: sub },
-    } as any,
   };
 }
 
@@ -162,15 +150,32 @@ describe('createPlayer', () => {
 describe('getPlayers', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('returns all players', async () => {
+  it('returns all players with wrestlers assigned', async () => {
     mockScan.mockResolvedValue({
-      Items: [{ playerId: '1', name: 'P1' }, { playerId: '2', name: 'P2' }],
+      Items: [
+        { playerId: '1', name: 'P1', currentWrestler: 'Stone Cold' },
+        { playerId: '2', name: 'P2', currentWrestler: 'The Rock' },
+      ],
     });
 
     const result = await getPlayers(makeEvent(), ctx, cb);
 
     expect(result!.statusCode).toBe(200);
     expect(JSON.parse(result!.body)).toHaveLength(2);
+  });
+
+  it('excludes players without currentWrestler', async () => {
+    mockScan.mockResolvedValue({
+      Items: [
+        { playerId: '1', name: 'P1', currentWrestler: 'Stone Cold' },
+        { playerId: '2', name: 'P2' },
+      ],
+    });
+
+    const result = await getPlayers(makeEvent(), ctx, cb);
+
+    expect(result!.statusCode).toBe(200);
+    expect(JSON.parse(result!.body)).toHaveLength(1);
   });
 
   it('returns empty array when no players exist', async () => {
@@ -420,221 +425,5 @@ describe('deletePlayer', () => {
 
     // 1 player delete + 2 standings deletes = 3 total
     expect(mockDelete).toHaveBeenCalledTimes(3);
-  });
-});
-
-// ─── getMyProfile ────────────────────────────────────────────────────
-
-describe('getMyProfile', () => {
-  beforeEach(() => vi.clearAllMocks());
-
-  it('returns 403 if not Wrestler role', async () => {
-    const event = withAuth(makeEvent(), 'Fantasy');
-
-    const result = await getMyProfile(event, ctx, cb);
-
-    expect(result!.statusCode).toBe(403);
-  });
-
-  it('returns player profile with season records for Wrestler', async () => {
-    mockQuery.mockResolvedValue({
-      Items: [{ playerId: 'p1', name: 'John', userId: 'user-sub-1' }],
-    });
-    mockScanAll.mockResolvedValue([
-      { seasonId: 's1', name: 'Season 1', status: 'active' },
-    ]);
-    mockQueryAll.mockResolvedValue([
-      { seasonId: 's1', playerId: 'p1', wins: 5, losses: 2, draws: 1 },
-    ]);
-
-    const event = withAuth(makeEvent(), 'Wrestler');
-
-    const result = await getMyProfile(event, ctx, cb);
-
-    expect(result!.statusCode).toBe(200);
-    const body = JSON.parse(result!.body);
-    expect(body.playerId).toBe('p1');
-    expect(body.seasonRecords).toHaveLength(1);
-    expect(body.seasonRecords[0].wins).toBe(5);
-  });
-
-  it('returns 404 if no player linked to user', async () => {
-    mockQuery.mockResolvedValue({ Items: [] });
-
-    const event = withAuth(makeEvent(), 'Wrestler');
-
-    const result = await getMyProfile(event, ctx, cb);
-
-    expect(result!.statusCode).toBe(404);
-    expect(JSON.parse(result!.body).message).toBe('No player profile found for this user');
-  });
-
-  it('shows 0-0-0 for seasons with no standings', async () => {
-    mockQuery.mockResolvedValue({
-      Items: [{ playerId: 'p1', userId: 'user-sub-1' }],
-    });
-    mockScanAll.mockResolvedValue([
-      { seasonId: 's1', name: 'Season 1', status: 'active' },
-    ]);
-    mockQueryAll.mockResolvedValue([]); // no standings
-
-    const event = withAuth(makeEvent(), 'Wrestler');
-
-    const result = await getMyProfile(event, ctx, cb);
-
-    expect(result!.statusCode).toBe(200);
-    const body = JSON.parse(result!.body);
-    expect(body.seasonRecords[0]).toMatchObject({ wins: 0, losses: 0, draws: 0 });
-  });
-
-  it('returns 500 when an unexpected error occurs', async () => {
-    mockQuery.mockRejectedValue(new Error('DynamoDB failure'));
-
-    const event = withAuth(makeEvent(), 'Wrestler');
-
-    const result = await getMyProfile(event, ctx, cb);
-
-    expect(result!.statusCode).toBe(500);
-    expect(JSON.parse(result!.body).message).toBe('Failed to fetch player profile');
-  });
-});
-
-// ─── updateMyProfile ─────────────────────────────────────────────────
-
-describe('updateMyProfile', () => {
-  beforeEach(() => vi.clearAllMocks());
-
-  it('returns 403 if not Wrestler role', async () => {
-    const event = withAuth(makeEvent({ body: JSON.stringify({ name: 'X' }) }), 'Fantasy');
-
-    const result = await updateMyProfile(event, ctx, cb);
-
-    expect(result!.statusCode).toBe(403);
-  });
-
-  it('updates own profile via userId lookup', async () => {
-    mockQuery.mockResolvedValue({
-      Items: [{ playerId: 'p1', userId: 'user-sub-1', name: 'Old' }],
-    });
-    mockUpdate.mockResolvedValue({
-      Attributes: { playerId: 'p1', name: 'New Name' },
-    });
-
-    const event = withAuth(
-      makeEvent({ body: JSON.stringify({ name: 'New Name' }) }),
-      'Wrestler',
-    );
-
-    const result = await updateMyProfile(event, ctx, cb);
-
-    expect(result!.statusCode).toBe(200);
-    expect(JSON.parse(result!.body).name).toBe('New Name');
-  });
-
-  it('returns 404 if no player profile found', async () => {
-    mockQuery.mockResolvedValue({ Items: [] });
-
-    const event = withAuth(
-      makeEvent({ body: JSON.stringify({ name: 'X' }) }),
-      'Wrestler',
-    );
-
-    const result = await updateMyProfile(event, ctx, cb);
-
-    expect(result!.statusCode).toBe(404);
-  });
-
-  it('returns 400 when no valid fields to update', async () => {
-    mockQuery.mockResolvedValue({
-      Items: [{ playerId: 'p1', userId: 'user-sub-1' }],
-    });
-
-    const event = withAuth(
-      makeEvent({ body: JSON.stringify({ hackedField: 'nope' }) }),
-      'Wrestler',
-    );
-
-    const result = await updateMyProfile(event, ctx, cb);
-
-    expect(result!.statusCode).toBe(400);
-    expect(JSON.parse(result!.body).message).toContain('No valid fields');
-  });
-
-  it('rejects non-string field values', async () => {
-    mockQuery.mockResolvedValue({
-      Items: [{ playerId: 'p1', userId: 'user-sub-1' }],
-    });
-
-    const event = withAuth(
-      makeEvent({ body: JSON.stringify({ name: 123 }) }),
-      'Wrestler',
-    );
-
-    const result = await updateMyProfile(event, ctx, cb);
-
-    expect(result!.statusCode).toBe(400);
-    expect(JSON.parse(result!.body).message).toContain('must be a string');
-  });
-
-  it('rejects empty name', async () => {
-    mockQuery.mockResolvedValue({
-      Items: [{ playerId: 'p1', userId: 'user-sub-1' }],
-    });
-
-    const event = withAuth(
-      makeEvent({ body: JSON.stringify({ name: '   ' }) }),
-      'Wrestler',
-    );
-
-    const result = await updateMyProfile(event, ctx, cb);
-
-    expect(result!.statusCode).toBe(400);
-    expect(JSON.parse(result!.body).message).toBe('Name cannot be empty');
-  });
-
-  it('rejects name exceeding MAX_NAME_LENGTH (100 chars)', async () => {
-    mockQuery.mockResolvedValue({
-      Items: [{ playerId: 'p1', userId: 'user-sub-1' }],
-    });
-
-    const event = withAuth(
-      makeEvent({ body: JSON.stringify({ name: 'A'.repeat(101) }) }),
-      'Wrestler',
-    );
-
-    const result = await updateMyProfile(event, ctx, cb);
-
-    expect(result!.statusCode).toBe(400);
-    expect(JSON.parse(result!.body).message).toContain('100 characters or less');
-  });
-
-  it('rejects imageUrl exceeding MAX_URL_LENGTH (2048 chars)', async () => {
-    mockQuery.mockResolvedValue({
-      Items: [{ playerId: 'p1', userId: 'user-sub-1' }],
-    });
-
-    const event = withAuth(
-      makeEvent({ body: JSON.stringify({ imageUrl: 'https://x.com/' + 'a'.repeat(2048) }) }),
-      'Wrestler',
-    );
-
-    const result = await updateMyProfile(event, ctx, cb);
-
-    expect(result!.statusCode).toBe(400);
-    expect(JSON.parse(result!.body).message).toContain('2048 characters');
-  });
-
-  it('returns 500 when an unexpected error occurs', async () => {
-    mockQuery.mockRejectedValue(new Error('DynamoDB failure'));
-
-    const event = withAuth(
-      makeEvent({ body: JSON.stringify({ name: 'X' }) }),
-      'Wrestler',
-    );
-
-    const result = await updateMyProfile(event, ctx, cb);
-
-    expect(result!.statusCode).toBe(500);
-    expect(JSON.parse(result!.body).message).toBe('Failed to update player profile');
   });
 });

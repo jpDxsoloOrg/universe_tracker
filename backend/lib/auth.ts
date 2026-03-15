@@ -1,7 +1,7 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { forbidden } from './response';
 
-export type UserRole = 'Admin' | 'Moderator' | 'Wrestler' | 'Fantasy';
+export type UserRole = 'Admin';
 
 export interface AuthContext {
   username: string;
@@ -31,11 +31,8 @@ export function getAuthContext(event: APIGatewayProxyEvent): AuthContext {
 
 /**
  * Check if user has at least one of the required roles.
- * Admin has access to everything. Moderator has access to all roles except Admin-only operations.
  */
 export function hasRole(context: AuthContext, ...requiredRoles: UserRole[]): boolean {
-  if (context.groups.includes('Admin')) return true;
-  if (context.groups.includes('Moderator') && !requiredRoles.includes('Admin')) return true;
   return requiredRoles.some((role) => context.groups.includes(role));
 }
 

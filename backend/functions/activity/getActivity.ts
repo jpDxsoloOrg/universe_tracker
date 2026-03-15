@@ -2,16 +2,14 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import { dynamoDb, TableNames } from '../../lib/dynamodb';
 import { success, serverError } from '../../lib/response';
 
-const ACTIVITY_TYPES = ['match', 'championship', 'challenge', 'promo', 'tournament', 'season'] as const;
+const ACTIVITY_TYPES = ['match', 'championship', 'tournament', 'season'] as const;
 type ActivityTypeFilter = (typeof ACTIVITY_TYPES)[number];
 
 export type ActivityItemType =
   | 'match_result'
   | 'championship_change'
   | 'season_event'
-  | 'tournament_result'
-  | 'challenge_event'
-  | 'promo_posted';
+  | 'tournament_result';
 
 export interface ActivityItem {
   id: string;
@@ -77,9 +75,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     const includeChampionship = !typeFilter || typeFilter === 'championship';
     const includeSeason = !typeFilter || typeFilter === 'season';
     const includeTournament = !typeFilter || typeFilter === 'tournament';
-    const includeChallenge = !typeFilter || typeFilter === 'challenge';
-    const includePromo = !typeFilter || typeFilter === 'promo';
-
     const rawItems: { type: ActivityItemType; timestamp: string; id: string; summary: string; metadata: Record<string, unknown> }[] = [];
     const playerIds = new Set<string>();
     const championshipIds = new Set<string>();
@@ -219,56 +214,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       }
     }
 
-    if (includeChallenge) {
-      const challenges = await dynamoDb.scanAll({
-        TableName: TableNames.CHALLENGES,
-      });
-      for (const c of challenges) {
-        const updatedAt = (c.updatedAt as string | undefined) || (c.createdAt as string | undefined);
-        if (!updatedAt) continue; // only show challenges with updatedAt or createdAt
-        playerIds.add(c.challengerId as string);
-        playerIds.add(c.challengedId as string);
-        rawItems.push({
-          type: 'challenge_event',
-          timestamp: updatedAt,
-          id: `challenge-${c.challengeId as string}`,
-          summary: '',
-          metadata: {
-            challengeId: c.challengeId,
-            challengerId: c.challengerId,
-            challengedId: c.challengedId,
-            status: c.status,
-            createdAt: c.createdAt,
-            updatedAt: c.updatedAt,
-          },
-        });
-      }
-    }
-
-    if (includePromo) {
-      const promos = await dynamoDb.scanAll({
-        TableName: TableNames.PROMOS,
-      });
-      for (const p of promos) {
-        const updatedAt = (p.updatedAt as string | undefined) || (p.createdAt as string | undefined);
-        if (!updatedAt) continue; // only show promos with updatedAt or createdAt
-        playerIds.add(p.playerId as string);
-        rawItems.push({
-          type: 'promo_posted',
-          timestamp: updatedAt,
-          id: `promo-${p.promoId as string}`,
-          summary: '',
-          metadata: {
-            promoId: p.promoId,
-            playerId: p.playerId,
-            promoType: p.promoType,
-            title: p.title,
-            createdAt: p.createdAt,
-          },
-        });
-      }
-    }
-
     const playerNames = await fetchPlayerNames(playerIds);
     const championshipNames = await fetchChampionshipNames(championshipIds);
 
@@ -305,15 +250,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         item.summary = winner
           ? `Tournament "${name}" completed — ${meta.winnerName || winner} won`
           : `Tournament "${name}"`;
-      } else if (item.type === 'challenge_event') {
-        const meta = item.metadata;
-        meta.challengerName = playerNames[meta.challengerId as string] || meta.challengerId;
-        meta.challengedName = playerNames[meta.challengedId as string] || meta.challengedId;
-        item.summary = `${meta.challengerName} challenged ${meta.challengedName}`;
-      } else if (item.type === 'promo_posted') {
-        const meta = item.metadata;
-        meta.playerName = playerNames[meta.playerId as string] || meta.playerId;
-        item.summary = `${meta.playerName} posted a promo`;
       }
     }
 

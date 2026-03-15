@@ -10,24 +10,19 @@ import RecordResult from './RecordResult';
 import ManageChampionships from './ManageChampionships';
 import CreateTournament from './CreateTournament';
 
-import AdminPromos from './AdminPromos';
 import ManageSeasons from './ManageSeasons';
 import CreateEvent from './CreateEvent';
 import MatchCardBuilder from './MatchCardBuilder';
-import ManageFantasyShows from './ManageFantasyShows';
-import FantasyConfig from './FantasyConfig';
-import AdminChallenges from './AdminChallenges';
 import ClearAllData from './ClearAllData';
-import ManageUsers from './ManageUsers';
 import ManageFeatures from './ManageFeatures';
 import './AdminPanel.css';
 
 import ManageSeasonAwards from './ManageSeasonAwards';
 import AdminContenderConfig from './AdminContenderConfig';
 
-type AdminTab = 'players' | 'divisions' | 'match-config' | 'schedule' | 'results' | 'championships' | 'tournaments' | 'challenges' | 'promos' | 'seasons' | 'season-awards' | 'events' | 'fantasy-shows' | 'fantasy-config' | 'contender-config' | 'danger' | 'users' | 'features';
+type AdminTab = 'players' | 'divisions' | 'match-config' | 'schedule' | 'results' | 'championships' | 'tournaments' | 'seasons' | 'season-awards' | 'events' | 'contender-config' | 'danger' | 'features';
 
-const VALID_TABS: AdminTab[] = ['players', 'divisions', 'match-config', 'schedule', 'results', 'championships', 'tournaments', 'challenges', 'promos', 'seasons', 'season-awards', 'events', 'fantasy-shows', 'fantasy-config', 'contender-config', 'danger', 'users', 'features'];
+const VALID_TABS: AdminTab[] = ['players', 'divisions', 'match-config', 'schedule', 'results', 'championships', 'tournaments', 'seasons', 'season-awards', 'events', 'contender-config', 'danger', 'features'];
 
 
 export default function AdminPanel() {
@@ -64,7 +59,6 @@ export default function AdminPanel() {
   }
 
   const tabContent: Record<AdminTab, JSX.Element> = {
-    users: <ManageUsers />,
     features: <ManageFeatures />,
     players: <ManagePlayers />,
     divisions: <ManageDivisions />,
@@ -73,8 +67,6 @@ export default function AdminPanel() {
     results: <RecordResult />,
     championships: <ManageChampionships />,
     tournaments: <CreateTournament />,
-    challenges: <AdminChallenges />,
-    promos: <AdminPromos />,
     seasons: <ManageSeasons />,
     'season-awards': <ManageSeasonAwards />,
     events: (
@@ -83,8 +75,6 @@ export default function AdminPanel() {
         <MatchCardBuilder />
       </>
     ),
-    'fantasy-shows': <ManageFantasyShows />,
-    'fantasy-config': <FantasyConfig />,
     'contender-config': <AdminContenderConfig />,
     danger: <ClearAllData />,
   };

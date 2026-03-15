@@ -35,17 +35,11 @@ import Sidebar from '../Sidebar';
 
 // --- Helpers ---
 const ALL_FEATURES = {
-  fantasy: true,
-  challenges: true,
-  promos: true,
   contenders: true,
   statistics: true,
 };
 
 const NO_FEATURES = {
-  fantasy: false,
-  challenges: false,
-  promos: false,
   contenders: false,
   statistics: false,
 };
@@ -55,8 +49,6 @@ function baseAuth(overrides = {}) {
     isAuthenticated: false,
     isAdminOrModerator: false,
     isSuperAdmin: false,
-    isWrestler: false,
-    isFantasy: false,
     signOut: vi.fn(),
     ...overrides,
   };
@@ -86,9 +78,8 @@ describe('Sidebar', () => {
     expect(screen.getByText('nav.tournaments')).toBeInTheDocument();
     expect(screen.getByText('nav.help')).toBeInTheDocument();
 
-    // Auth section shows Sign In / Sign Up for unauthenticated
+    // Auth section shows Sign In for unauthenticated (no Sign Up)
     expect(screen.getByText('Sign In')).toBeInTheDocument();
-    expect(screen.getByText('Sign Up')).toBeInTheDocument();
   });
 
   it('shows admin section with sub-group headers when user is admin', () => {
@@ -105,7 +96,6 @@ describe('Sidebar', () => {
     expect(screen.getByText('admin.panel.groups.matchOps')).toBeInTheDocument();
     expect(screen.getByText('admin.panel.groups.leagueSetup')).toBeInTheDocument();
     expect(screen.getByText('admin.panel.groups.contentSocial')).toBeInTheDocument();
-    expect(screen.getByText('admin.panel.groups.fantasy')).toBeInTheDocument();
     expect(screen.getByText('admin.panel.groups.system')).toBeInTheDocument();
 
     // League Setup auto-expands because route is /admin/players
@@ -113,7 +103,6 @@ describe('Sidebar', () => {
     expect(screen.getByText('admin.panel.tabs.divisions')).toBeInTheDocument();
 
     // Items in other collapsed sub-groups should not be visible
-    expect(screen.queryByText('User Management')).not.toBeInTheDocument();
     expect(screen.queryByText('admin.panel.tabs.scheduleMatch')).not.toBeInTheDocument();
 
     // Danger zone only for SuperAdmin (and System group is collapsed)
@@ -137,11 +126,8 @@ describe('Sidebar', () => {
     mockUseSiteConfig.mockReturnValue({ features: NO_FEATURES, isLoading: false });
     renderSidebar();
 
-    expect(screen.queryByText('nav.challenges')).not.toBeInTheDocument();
-    expect(screen.queryByText('nav.promos')).not.toBeInTheDocument();
     expect(screen.queryByText('nav.contenders')).not.toBeInTheDocument();
     expect(screen.queryByText('nav.statistics')).not.toBeInTheDocument();
-    expect(screen.queryByText('nav.fantasy')).not.toBeInTheDocument();
   });
 
   it('toggles admin section expand/collapse', async () => {
@@ -178,27 +164,5 @@ describe('Sidebar', () => {
     expect(logoutBtn).toBeInTheDocument();
     await user.click(logoutBtn);
     expect(mockSignOut).toHaveBeenCalledTimes(1);
-  });
-
-  it('shows wrestler-specific links (profile, challenges, promos) for wrestler role', async () => {
-    const user = userEvent.setup();
-    mockUseAuth.mockReturnValue(baseAuth({
-      isAuthenticated: true,
-      isWrestler: true,
-    }));
-    renderSidebar();
-
-    // Wrestler group starts collapsed — expand it
-    const wrestlerToggle = screen.getByText('nav.groups.wrestler').closest('button')!;
-    await user.click(wrestlerToggle);
-
-    // Wrestler gets direct profile link (not disabled)
-    const profileLink = screen.getByText('nav.profile');
-    expect(profileLink.tagName).not.toBe('SPAN');
-    expect(profileLink.closest('a')).toHaveAttribute('href', '/profile');
-
-    // Feature-gated links visible when features enabled
-    expect(screen.getByText('nav.challenges')).toBeInTheDocument();
-    expect(screen.getByText('nav.promos')).toBeInTheDocument();
   });
 });

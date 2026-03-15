@@ -15,8 +15,6 @@ interface ScheduleMatchBody {
   seasonId?: string;
   eventId?: string;
   designation?: string;
-  challengeId?: string;
-  promoId?: string;
 }
 
 export const handler: APIGatewayProxyHandler = async (event) => {
@@ -156,55 +154,11 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       status: 'scheduled',
       createdAt: now,
     };
-    if (body.challengeId) match.challengeId = body.challengeId;
-    if (body.promoId) match.promoId = body.promoId;
 
     await dynamoDb.put({
       TableName: TableNames.MATCHES,
       Item: match,
     });
-
-    // If challengeId provided, mark challenge as scheduled and link match
-    if (body.challengeId) {
-      const challengeResult = await dynamoDb.get({
-        TableName: TableNames.CHALLENGES,
-        Key: { challengeId: body.challengeId },
-      });
-      const challenge = challengeResult.Item as Record<string, unknown> | undefined;
-      if (challenge && ['pending', 'countered', 'accepted'].includes(challenge.status as string)) {
-        await dynamoDb.update({
-          TableName: TableNames.CHALLENGES,
-          Key: { challengeId: body.challengeId },
-          UpdateExpression: 'SET #s = :status, matchId = :matchId, updatedAt = :now',
-          ExpressionAttributeNames: { '#s': 'status' },
-          ExpressionAttributeValues: {
-            ':status': 'scheduled',
-            ':matchId': match.matchId,
-            ':now': now,
-          },
-        });
-      }
-    }
-
-    // If promoId provided, hide promo and optionally link match (scheduling from call-out auto-hides it)
-    if (body.promoId) {
-      const promoResult = await dynamoDb.get({
-        TableName: TableNames.PROMOS,
-        Key: { promoId: body.promoId },
-      });
-      if (promoResult.Item) {
-        await dynamoDb.update({
-          TableName: TableNames.PROMOS,
-          Key: { promoId: body.promoId },
-          UpdateExpression: 'SET isHidden = :hidden, matchId = :matchId, updatedAt = :now',
-          ExpressionAttributeValues: {
-            ':hidden': true,
-            ':matchId': match.matchId,
-            ':now': now,
-          },
-        });
-      }
-    }
 
     // If an event was specified, auto-add the match to the event's matchCards
     if (body.eventId) {

@@ -60,13 +60,12 @@ interface DashboardResponse {
   recentResults: DashboardMatch[];
   seasonInfo: DashboardSeason | null;
   quickStats: DashboardQuickStats;
-  activeChallengesCount: number;
 }
 
 export const handler: APIGatewayProxyHandler = async () => {
   try {
-    // Fetch data: championships, players, seasons, matches, stipulations; events and challenges via query
-    const [championships, players, seasons, matches, stipulations, upcomingEventsResult, pendingChallenges] =
+    // Fetch data: championships, players, seasons, matches, stipulations; events via query
+    const [championships, players, seasons, matches, stipulations, upcomingEventsResult] =
       await Promise.all([
         dynamoDb.scanAll({ TableName: TableNames.CHAMPIONSHIPS }),
         dynamoDb.scanAll({ TableName: TableNames.PLAYERS }),
@@ -82,16 +81,9 @@ export const handler: APIGatewayProxyHandler = async () => {
           ScanIndexForward: true,
           Limit: 3,
         }),
-        dynamoDb.queryAll({
-          TableName: TableNames.CHALLENGES,
-          IndexName: 'StatusIndex',
-          KeyConditionExpression: '#s = :status',
-          ExpressionAttributeNames: { '#s': 'status' },
-          ExpressionAttributeValues: { ':status': 'pending' },
-        }),
       ]);
 
-    // Only include players who have a wrestler assigned (exclude Fantasy-only users)
+    // Only include players who have a wrestler assigned
     const wrestlerPlayers = (players as Record<string, unknown>[]).filter((p) => p.currentWrestler);
 
     const playerMap = new Map<string, Record<string, unknown>>();
@@ -292,7 +284,6 @@ export const handler: APIGatewayProxyHandler = async () => {
       recentResults,
       seasonInfo,
       quickStats,
-      activeChallengesCount: pendingChallenges.length,
     };
 
     return success(response);

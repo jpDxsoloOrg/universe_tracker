@@ -9,20 +9,14 @@ const {
   mockGetUserGroups,
   mockIsAuthenticatedSync,
   mockSignIn,
-  mockSignUp,
-  mockConfirmSignUp,
   mockSignOut,
-  mockGetMyProfile,
 } = vi.hoisted(() => ({
   mockGetCurrentUser: vi.fn(),
   mockRefreshSession: vi.fn(),
   mockGetUserGroups: vi.fn(),
   mockIsAuthenticatedSync: vi.fn(),
   mockSignIn: vi.fn(),
-  mockSignUp: vi.fn(),
-  mockConfirmSignUp: vi.fn(),
   mockSignOut: vi.fn(),
-  mockGetMyProfile: vi.fn(),
 }));
 
 vi.mock('../../services/cognito', () => ({
@@ -32,15 +26,9 @@ vi.mock('../../services/cognito', () => ({
     getUserGroups: mockGetUserGroups,
     isAuthenticatedSync: mockIsAuthenticatedSync,
     signIn: mockSignIn,
-    signUp: mockSignUp,
-    confirmSignUp: mockConfirmSignUp,
+    signUp: vi.fn(),
+    confirmSignUp: vi.fn(),
     signOut: mockSignOut,
-  },
-}));
-
-vi.mock('../../services/api', () => ({
-  profileApi: {
-    getMyProfile: mockGetMyProfile,
   },
 }));
 
@@ -58,10 +46,7 @@ function mockUnauthenticatedUser() {
   mockGetCurrentUser.mockResolvedValue(null);
 }
 
-function mockAuthenticatedUser(
-  groups: string[],
-  opts?: { playerId?: string; email?: string }
-) {
+function mockAuthenticatedUser(groups: string[], opts?: { email?: string }) {
   mockIsAuthenticatedSync.mockReturnValue(true);
   mockGetUserGroups.mockReturnValue(groups);
   mockGetCurrentUser.mockResolvedValue({
@@ -69,9 +54,6 @@ function mockAuthenticatedUser(
     signInDetails: { loginId: opts?.email ?? 'test@example.com' },
   });
   mockRefreshSession.mockResolvedValue({ groups });
-  if (groups.includes('Wrestler') && opts?.playerId) {
-    mockGetMyProfile.mockResolvedValue({ playerId: opts.playerId });
-  }
 }
 
 describe('AuthContext', () => {
@@ -105,30 +87,6 @@ describe('AuthContext', () => {
       expect(result.current.isAuthenticated).toBe(false);
       expect(result.current.groups).toEqual([]);
       expect(result.current.email).toBeNull();
-      expect(result.current.playerId).toBeNull();
-    });
-
-    it('fetches player profile and sets playerId for Wrestlers', async () => {
-      mockAuthenticatedUser(['Wrestler'], { playerId: 'player-456' });
-
-      const { result } = renderHook(() => useAuth(), { wrapper });
-
-      await waitFor(() => expect(result.current.isLoading).toBe(false));
-
-      expect(mockGetMyProfile).toHaveBeenCalled();
-      expect(result.current.playerId).toBe('player-456');
-      expect(result.current.isWrestler).toBe(true);
-    });
-
-    it('does not fetch player profile for non-Wrestlers', async () => {
-      mockAuthenticatedUser(['Fantasy']);
-
-      const { result } = renderHook(() => useAuth(), { wrapper });
-
-      await waitFor(() => expect(result.current.isLoading).toBe(false));
-
-      expect(mockGetMyProfile).not.toHaveBeenCalled();
-      expect(result.current.playerId).toBeNull();
     });
 
     it('handles getCurrentUser throwing by setting unauthenticated state', async () => {
@@ -142,24 +100,6 @@ describe('AuthContext', () => {
 
       expect(result.current.isAuthenticated).toBe(false);
       expect(result.current.groups).toEqual([]);
-    });
-
-    it('handles profile fetch failure gracefully (playerId stays null)', async () => {
-      mockIsAuthenticatedSync.mockReturnValue(true);
-      mockGetUserGroups.mockReturnValue(['Wrestler']);
-      mockGetCurrentUser.mockResolvedValue({
-        username: 'u-1',
-        signInDetails: { loginId: 'w@test.com' },
-      });
-      mockRefreshSession.mockResolvedValue({ groups: ['Wrestler'] });
-      mockGetMyProfile.mockRejectedValue(new Error('404 not found'));
-
-      const { result } = renderHook(() => useAuth(), { wrapper });
-
-      await waitFor(() => expect(result.current.isLoading).toBe(false));
-
-      expect(result.current.isAuthenticated).toBe(true);
-      expect(result.current.playerId).toBeNull();
     });
   });
 
@@ -186,26 +126,6 @@ describe('AuthContext', () => {
       expect(result.current.isModerator).toBe(true);
     });
 
-    it('isWrestler and isFantasy return correct values for Wrestler group', async () => {
-      mockAuthenticatedUser(['Wrestler'], { playerId: 'p-1' });
-      const { result } = renderHook(() => useAuth(), { wrapper });
-      await waitFor(() => expect(result.current.isLoading).toBe(false));
-
-      expect(result.current.isWrestler).toBe(true);
-      expect(result.current.isFantasy).toBe(false);
-      expect(result.current.isAdminOrModerator).toBe(false);
-      expect(result.current.isModerator).toBe(false);
-    });
-
-    it('isFantasy returns true for Fantasy group', async () => {
-      mockAuthenticatedUser(['Fantasy']);
-      const { result } = renderHook(() => useAuth(), { wrapper });
-      await waitFor(() => expect(result.current.isLoading).toBe(false));
-
-      expect(result.current.isFantasy).toBe(true);
-      expect(result.current.isWrestler).toBe(false);
-    });
-
     it('hasRole checks role hierarchy -- Admin has all roles', async () => {
       mockAuthenticatedUser(['Admin']);
       const { result } = renderHook(() => useAuth(), { wrapper });
@@ -213,30 +133,16 @@ describe('AuthContext', () => {
 
       expect(result.current.hasRole('Admin')).toBe(true);
       expect(result.current.hasRole('Moderator')).toBe(true);
-      expect(result.current.hasRole('Wrestler')).toBe(true);
-      expect(result.current.hasRole('Fantasy')).toBe(true);
-    });
-
-    it('hasRole -- Moderator has all roles except Admin', async () => {
-      mockAuthenticatedUser(['Moderator']);
-      const { result } = renderHook(() => useAuth(), { wrapper });
-      await waitFor(() => expect(result.current.isLoading).toBe(false));
-
-      expect(result.current.hasRole('Admin')).toBe(false);
-      expect(result.current.hasRole('Moderator')).toBe(true);
-      expect(result.current.hasRole('Wrestler')).toBe(true);
-      expect(result.current.hasRole('Fantasy')).toBe(true);
     });
   });
 
   // ===========================================================================
-  // P1: Sign in / sign out / refreshProfile
+  // P1: Sign in / sign out
   // ===========================================================================
-  describe('signIn / signOut / refreshProfile', () => {
+  describe('signIn / signOut', () => {
     it('signIn updates state with authenticated user data', async () => {
       mockUnauthenticatedUser();
-      mockSignIn.mockResolvedValue({ groups: ['Wrestler'] });
-      mockGetMyProfile.mockResolvedValue({ playerId: 'p-99' });
+      mockSignIn.mockResolvedValue({ groups: ['Admin'] });
 
       const { result } = renderHook(() => useAuth(), { wrapper });
       await waitFor(() => expect(result.current.isLoading).toBe(false));
@@ -249,9 +155,8 @@ describe('AuthContext', () => {
 
       expect(mockSignIn).toHaveBeenCalledWith('user@test.com', 'Password1');
       expect(result.current.isAuthenticated).toBe(true);
-      expect(result.current.groups).toEqual(['Wrestler']);
+      expect(result.current.groups).toEqual(['Admin']);
       expect(result.current.email).toBe('user@test.com');
-      expect(result.current.playerId).toBe('p-99');
     });
 
     it('signOut clears all auth state', async () => {
@@ -271,25 +176,6 @@ describe('AuthContext', () => {
       expect(result.current.isAuthenticated).toBe(false);
       expect(result.current.groups).toEqual([]);
       expect(result.current.email).toBeNull();
-      expect(result.current.playerId).toBeNull();
-    });
-
-    it('refreshProfile re-fetches player profile and updates playerId', async () => {
-      mockAuthenticatedUser(['Wrestler'], { playerId: 'p-1' });
-
-      const { result } = renderHook(() => useAuth(), { wrapper });
-      await waitFor(() => expect(result.current.isLoading).toBe(false));
-
-      expect(result.current.playerId).toBe('p-1');
-
-      // Simulate profile update
-      mockGetMyProfile.mockResolvedValue({ playerId: 'p-2' });
-
-      await act(async () => {
-        await result.current.refreshProfile();
-      });
-
-      expect(result.current.playerId).toBe('p-2');
     });
   });
 
@@ -324,7 +210,6 @@ describe('AuthContext', () => {
       await new Promise((r) => setTimeout(r, 50));
 
       // No "Can't perform a React state update on an unmounted component" warning
-      // The mounted flag in the useEffect prevents the setState call
       const stateUpdateWarnings = consoleSpy.mock.calls.filter(
         (call) => typeof call[0] === 'string' && call[0].includes('unmounted')
       );

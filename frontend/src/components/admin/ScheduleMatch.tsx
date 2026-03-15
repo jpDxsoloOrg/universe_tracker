@@ -1,28 +1,16 @@
-import { useState, useEffect, useRef, FormEvent } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect, FormEvent } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { matchesApi, playersApi, championshipsApi, tournamentsApi, seasonsApi, eventsApi, stipulationsApi, matchTypesApi } from '../../services/api';
 import type { Player, Championship, Tournament, Season, Stipulation, MatchType } from '../../types';
 import type { LeagueEvent, MatchDesignation } from '../../types/event';
-import type { ChallengeWithPlayers } from '../../types/challenge';
-import type { PromoWithContext } from '../../types/promo';
 import SearchableSelect from './SearchableSelect';
 import Skeleton from '../ui/Skeleton';
 import './ScheduleMatch.css';
 
-type ScheduleLocationState = {
-  fromChallenge?: ChallengeWithPlayers;
-  fromPromo?: PromoWithContext;
-};
-
 export default function ScheduleMatch() {
   const { t } = useTranslation();
-  const location = useLocation();
   const navigate = useNavigate();
-  const state = (location.state as ScheduleLocationState | undefined) ?? undefined;
-  const preFillApplied = useRef(false);
-  const [linkChallengeId, setLinkChallengeId] = useState<string | null>(null);
-  const [linkPromoId, setLinkPromoId] = useState<string | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [championships, setChampionships] = useState<Championship[]>([]);
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
@@ -80,38 +68,6 @@ export default function ScheduleMatch() {
       if (activeSeason) {
         setFormData(prev => ({ ...prev, seasonId: activeSeason.seasonId }));
       }
-
-      // Pre-fill from challenge or promo (once per navigation)
-      if (state && !preFillApplied.current) {
-        preFillApplied.current = true;
-        if (state.fromChallenge) {
-          const ch = state.fromChallenge;
-          const matchFormat = matchTypesData.some((mt) => mt.name === ch.matchType)
-            ? ch.matchType
-            : matchTypesData[0]?.name ?? 'Singles';
-          const stipulationId = ch.stipulation
-            ? (stipulationsData.find((s) => s.name === ch.stipulation)?.stipulationId ?? '')
-            : '';
-          setFormData((prev) => ({
-            ...prev,
-            participants: [ch.challengerId, ch.challengedId],
-            matchFormat,
-            stipulationId,
-            championshipId: ch.championshipId ?? prev.championshipId,
-          }));
-          setLinkChallengeId(ch.challengeId);
-        } else if (state.fromPromo && state.fromPromo.targetPlayerId) {
-          const promo = state.fromPromo;
-          const targetId = promo.targetPlayerId;
-          const defaultFormat = matchTypesData.find((mt) => mt.name === 'Singles')?.name ?? matchTypesData[0]?.name ?? 'Singles';
-          setFormData((prev) => ({
-            ...prev,
-            participants: targetId ? [promo.playerId, targetId] : prev.participants,
-            matchFormat: defaultFormat,
-          }));
-          setLinkPromoId(promo.promoId);
-        }
-      }
     } catch (_err) {
       setError('Failed to load data');
     } finally {
@@ -162,14 +118,9 @@ export default function ScheduleMatch() {
           eventId: formData.eventId || undefined,
           designation: formData.eventId ? formData.designation : undefined,
           status: 'scheduled',
-          ...(linkChallengeId ? { challengeId: linkChallengeId } : {}),
-          ...(linkPromoId ? { promoId: linkPromoId } : {}),
         });
 
         setSuccess(t('scheduleMatch.success'));
-        setLinkChallengeId(null);
-        setLinkPromoId(null);
-        preFillApplied.current = false;
         navigate('/admin/schedule', { replace: true, state: {} });
         resetForm();
       } catch (err) {
@@ -197,14 +148,9 @@ export default function ScheduleMatch() {
           eventId: formData.eventId || undefined,
           designation: formData.eventId ? formData.designation : undefined,
           status: 'scheduled',
-          ...(linkChallengeId ? { challengeId: linkChallengeId } : {}),
-          ...(linkPromoId ? { promoId: linkPromoId } : {}),
         });
 
         setSuccess(t('scheduleMatch.success'));
-        setLinkChallengeId(null);
-        setLinkPromoId(null);
-        preFillApplied.current = false;
         navigate('/admin/schedule', { replace: true, state: {} });
         resetForm();
       } catch (err) {

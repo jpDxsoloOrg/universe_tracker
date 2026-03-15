@@ -53,7 +53,7 @@ describe('cognito service — auth flows', () => {
 
   describe('signIn', () => {
     it('calls Amplify signIn, stores tokens in sessionStorage, returns auth result with groups', async () => {
-      const accessToken = fakeJwt({ 'cognito:groups': ['Admin', 'Wrestler'] });
+      const accessToken = fakeJwt({ 'cognito:groups': ['Admin'] });
       const idToken = fakeJwt({ email: 'test@test.com' });
 
       mockAmplifySignOut.mockResolvedValue(undefined);
@@ -73,7 +73,7 @@ describe('cognito service — auth flows', () => {
       });
       expect(sessionStorage.getItem('accessToken')).toBe(accessToken);
       expect(sessionStorage.getItem('idToken')).toBe(idToken);
-      expect(result.groups).toEqual(['Admin', 'Wrestler']);
+      expect(result.groups).toEqual(['Admin']);
       expect(result.expiresIn).toBe(86400);
     });
 
@@ -239,7 +239,7 @@ describe('cognito service — auth flows', () => {
 
   describe('refreshSession', () => {
     it('calls fetchAuthSession with forceRefresh and updates sessionStorage', async () => {
-      const accessToken = fakeJwt({ 'cognito:groups': ['Wrestler'] });
+      const accessToken = fakeJwt({ 'cognito:groups': ['Moderator'] });
       const idToken = fakeJwt({ email: 'w@test.com' });
 
       mockAmplifyFetchAuthSession.mockResolvedValue({
@@ -258,7 +258,7 @@ describe('cognito service — auth flows', () => {
         accessToken,
         idToken,
         expiresIn: 86400,
-        groups: ['Wrestler'],
+        groups: ['Moderator'],
       });
     });
 

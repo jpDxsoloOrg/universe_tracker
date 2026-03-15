@@ -27,12 +27,7 @@ export default function TopBar() {
         divisions: t('admin.panel.tabs.divisions'),
         championships: t('admin.panel.tabs.championships'),
         tournaments: t('admin.panel.tabs.tournaments'),
-        challenges: t('admin.panel.tabs.challenges'),
-        promos: t('admin.panel.tabs.promos'),
         'contender-config': t('admin.panel.tabs.contenderConfig'),
-        'fantasy-shows': t('admin.panel.tabs.fantasyShows'),
-        'fantasy-config': t('admin.panel.tabs.fantasyConfig'),
-        users: t('admin.panel.tabs.users'),
         features: t('admin.panel.tabs.features'),
         danger: t('admin.panel.tabs.dangerZone'),
       };
@@ -48,12 +43,7 @@ export default function TopBar() {
         'season-awards': t('admin.panel.groups.leagueSetup'),
         championships: t('admin.panel.groups.leagueSetup'),
         tournaments: t('admin.panel.groups.leagueSetup'),
-        challenges: t('admin.panel.groups.contentSocial'),
-        promos: t('admin.panel.groups.contentSocial'),
         'contender-config': t('admin.panel.groups.contentSocial'),
-        'fantasy-shows': t('admin.panel.groups.fantasy'),
-        'fantasy-config': t('admin.panel.groups.fantasy'),
-        users: t('admin.panel.groups.system'),
         features: t('admin.panel.groups.system'),
         danger: t('admin.panel.groups.system'),
       };
@@ -78,24 +68,6 @@ export default function TopBar() {
       return { title: t('contenders.myStatus.title'), parent: t('nav.contenders') };
     }
 
-    // Fantasy sub-routes
-    if (path.startsWith('/fantasy/')) {
-      const segment = path.split('/')[2] ?? '';
-      const fantasyMap: Record<string, string> = {
-        login: t('fantasy.auth.loginTitle'),
-        signup: t('fantasy.auth.signupTitle'),
-        dashboard: t('fantasy.dashboard.welcome', { username: '' }).replace(', !', ''),
-        picks: t('fantasy.picks.title'),
-        leaderboard: t('fantasy.leaderboard.title'),
-        costs: t('fantasy.costs.title'),
-        shows: t('fantasy.results.yourPoints'),
-      };
-      return {
-        title: fantasyMap[segment] || t('nav.fantasy'),
-        parent: t('nav.fantasy'),
-      };
-    }
-
     // Stats sub-routes
     if (path.startsWith('/stats/')) {
       const segment = path.split('/')[2] ?? '';
@@ -113,23 +85,6 @@ export default function TopBar() {
       };
     }
 
-    // Challenge sub-routes
-    // /challenges/issue now redirects to /promos/new — breadcrumb unreachable but kept for safety
-    if (path === '/challenges/my') {
-      return { title: t('challenges.my.title'), parent: t('nav.challenges') };
-    }
-    if (path.match(/^\/challenges\/[^/]+/)) {
-      return { title: t('challenges.detail.title'), parent: t('nav.challenges') };
-    }
-
-    // Promo sub-routes
-    if (path === '/promos/new') {
-      return { title: t('promos.editor.title'), parent: t('nav.promos') };
-    }
-    if (path.match(/^\/promos\/[^/]+/)) {
-      return { title: t('promos.thread.title'), parent: t('nav.promos') };
-    }
-
     // Top-level routes
     const topLevelMap: Record<string, string> = {
       '/': t('nav.dashboard'),
@@ -140,10 +95,7 @@ export default function TopBar() {
       '/events': t('nav.events'),
       '/matches': t('nav.matchSearch'),
       '/contenders': t('nav.contenders'),
-      '/challenges': t('nav.challenges'),
-      '/promos': t('nav.promos'),
       '/stats': t('statistics.playerStats.title'),
-      '/fantasy': t('nav.fantasy'),
       '/guide': t('nav.help'),
     };
 

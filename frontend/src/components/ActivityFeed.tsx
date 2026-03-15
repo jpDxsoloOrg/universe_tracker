@@ -8,14 +8,12 @@ import EmptyState from './ui/EmptyState';
 import './ActivityFeed.css';
 
 const DEFAULT_LIMIT = 20;
-/** Backend expects type=match|championship|season|tournament|challenge|promo */
+/** Backend expects type=match|championship|season|tournament */
 const TYPE_TO_PARAM: Record<ActivityItemType, string> = {
   match_result: 'match',
   championship_change: 'championship',
   season_event: 'season',
   tournament_result: 'tournament',
-  challenge_event: 'challenge',
-  promo_posted: 'promo',
 };
 
 const TYPE_FILTERS: { value: '' | ActivityItemType; key: string }[] = [
@@ -24,8 +22,6 @@ const TYPE_FILTERS: { value: '' | ActivityItemType; key: string }[] = [
   { value: 'championship_change', key: 'activity.types.championship_change' },
   { value: 'season_event', key: 'activity.types.season_event' },
   { value: 'tournament_result', key: 'activity.types.tournament_result' },
-  { value: 'challenge_event', key: 'activity.types.challenge_event' },
-  { value: 'promo_posted', key: 'activity.types.promo_posted' },
 ];
 
 function getDetailLink(item: ActivityItem): string {
@@ -39,10 +35,6 @@ function getDetailLink(item: ActivityItem): string {
       return meta['seasonId'] ? `/?seasonId=${meta['seasonId']}` : '/';
     case 'tournament_result':
       return '/tournaments';
-    case 'challenge_event':
-      return meta['challengeId'] ? `/challenges/${meta['challengeId']}` : '/challenges';
-    case 'promo_posted':
-      return meta['promoId'] ? `/promos/${meta['promoId']}` : '/promos';
     default:
       return '/';
   }
@@ -66,8 +58,6 @@ const TYPE_ICONS: Record<ActivityItemType, string> = {
   championship_change: '🏆',
   season_event: '📅',
   tournament_result: '🏅',
-  challenge_event: '🤝',
-  promo_posted: '🎤',
 };
 
 export default function ActivityFeed() {

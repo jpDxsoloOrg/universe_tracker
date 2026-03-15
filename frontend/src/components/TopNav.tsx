@@ -19,21 +19,9 @@ import './TopNav.css';
 function isUserItemVisible(
   item: NavItem,
   features: SiteFeatures,
-  isWrestler: boolean,
-  isFantasy: boolean
-): { show: boolean; disabled: boolean; disabledLabel?: string } {
+): { show: boolean; disabled: boolean } {
   if (item.feature && !features[item.feature]) return { show: false, disabled: false };
-  if (item.role === 'Wrestler') {
-    return { show: true, disabled: !isWrestler, disabledLabel: item.roleLockedLabel };
-  }
-  if (item.role === 'Fantasy' || (item as { type?: string }).type === 'fantasy') {
-    return { show: true, disabled: !isFantasy, disabledLabel: (item as { comingSoonLabel?: string }).comingSoonLabel };
-  }
   return { show: true, disabled: false };
-}
-
-function showWrestlerGroup(features: SiteFeatures, isWrestler: boolean): boolean {
-  return isWrestler || features.challenges || features.promos;
 }
 
 const MOBILE_BREAKPOINT = 768;
@@ -41,7 +29,7 @@ const MOBILE_BREAKPOINT = 768;
 export default function TopNav() {
   const { t } = useTranslation();
   const location = useLocation();
-  const { isAuthenticated, isAdminOrModerator, isSuperAdmin, isWrestler, isFantasy, signOut } = useAuth();
+  const { isAuthenticated, isAdminOrModerator, isSuperAdmin, signOut } = useAuth();
   const { features } = useSiteConfig();
   const { setMode: setNavLayout } = useNavLayout();
   const [openGroup, setOpenGroup] = useState<string | null>(null);
@@ -112,15 +100,8 @@ export default function TopNav() {
   };
 
   function renderUserItem(item: NavItem) {
-    const { show, disabled, disabledLabel } = isUserItemVisible(item, features, isWrestler, isFantasy);
+    const { show } = isUserItemVisible(item, features);
     if (!show) return null;
-    if (disabled && disabledLabel) {
-      return (
-        <span key={item.path} className="topnav-item-disabled">
-          {t(item.i18nKey)} <span className="topnav-item-badge">{disabledLabel}</span>
-        </span>
-      );
-    }
     const usePrefix = ['/stats', '/events', '/contenders'].includes(item.path);
     const active = usePrefix ? isActivePrefix(item.path) : (item.path === '/' ? isActive('/') : isActive(item.path));
     return (
@@ -130,26 +111,9 @@ export default function TopNav() {
     );
   }
 
-  function renderStandaloneItem(item: (NavItem & { type: 'fantasy' | 'link' })) {
-    if (item.type === 'fantasy' && !features.fantasy) return null;
-    if (item.type === 'link') {
-      return (
-        <Link key={item.path} to={item.path} className={isActive(item.path) ? 'active' : ''} onClick={closeDropdown}>
-          {t(item.i18nKey)}
-        </Link>
-      );
-    }
-    const { show, disabled, disabledLabel } = isUserItemVisible(item, features, isWrestler, isFantasy);
-    if (!show) return null;
-    if (disabled && disabledLabel) {
-      return (
-        <span key={item.path} className="topnav-item-disabled">
-          {t(item.i18nKey)} <span className="topnav-item-badge">{disabledLabel}</span>
-        </span>
-      );
-    }
+  function renderStandaloneItem(item: (NavItem & { type: 'link' })) {
     return (
-      <Link key={item.path} to={item.path} className={location.pathname.startsWith(item.path) ? 'active' : ''} onClick={closeDropdown}>
+      <Link key={item.path} to={item.path} className={isActive(item.path) ? 'active' : ''} onClick={closeDropdown}>
         {t(item.i18nKey)}
       </Link>
     );
@@ -158,7 +122,6 @@ export default function TopNav() {
   const sharedNavContent = (
     <>
       {USER_NAV_GROUPS.map((group) => {
-        if (group.key === 'wrestler' && !showWrestlerGroup(features, isWrestler)) return null;
         return (
           <div key={group.key} className="topnav-group">
             <button
@@ -255,10 +218,7 @@ export default function TopNav() {
                     {t('common.logout')}
                   </button>
                 ) : (
-                  <>
-                    <Link to="/login" className={isActive('/login') ? 'active' : ''} onClick={() => setMobileMenuOpen(false)}>{t('common.signIn')}</Link>
-                    <Link to="/signup" className={isActive('/signup') ? 'active' : ''} onClick={() => setMobileMenuOpen(false)}>{t('common.signUp')}</Link>
-                  </>
+                  <Link to="/login" className={isActive('/login') ? 'active' : ''} onClick={() => setMobileMenuOpen(false)}>{t('common.signIn')}</Link>
                 )}
               </div>
             </div>
@@ -274,7 +234,6 @@ export default function TopNav() {
         <h2 className="topnav-title">{t('header.title')}</h2>
         <nav className="topnav-menu" aria-label="Main navigation">
           {USER_NAV_GROUPS.map((group) => {
-            if (group.key === 'wrestler' && !showWrestlerGroup(features, isWrestler)) return null;
             const isOpen = openGroup === group.key;
             return (
               <div key={group.key} className="topnav-dropdown-wrap">
@@ -291,15 +250,8 @@ export default function TopNav() {
                 {isOpen && (
                   <div className="topnav-flyout" role="menu">
                     {group.items.map((item) => {
-                      const { show, disabled, disabledLabel } = isUserItemVisible(item, features, isWrestler, isFantasy);
+                      const { show } = isUserItemVisible(item, features);
                       if (!show) return null;
-                      if (disabled && disabledLabel) {
-                        return (
-                          <span key={item.path} className="topnav-item-disabled" role="none">
-                            {t(item.i18nKey)} <span className="topnav-item-badge">{disabledLabel}</span>
-                          </span>
-                        );
-                      }
                       const usePrefix = ['/stats', '/events', '/contenders'].includes(item.path);
                       const active = usePrefix ? isActivePrefix(item.path) : (item.path === '/' ? isActive('/') : isActive(item.path));
                       return (
@@ -313,28 +265,11 @@ export default function TopNav() {
               </div>
             );
           })}
-          {USER_NAV_STANDALONE.filter((item) => (item.type === 'fantasy' ? features.fantasy : true)).map((item) => {
-            if (item.type === 'link') {
-              return (
-                <Link key={item.path} to={item.path} className={`topnav-menu-link ${isActive(item.path) ? 'active' : ''}`}>
-                  {t(item.i18nKey)}
-                </Link>
-              );
-            }
-            const { disabled } = isUserItemVisible(item, features, isWrestler, isFantasy);
-            if (disabled) {
-              return (
-                <span key={item.path} className="topnav-menu-link topnav-item-disabled">
-                  {t(item.i18nKey)}
-                </span>
-              );
-            }
-            return (
-              <Link key={item.path} to={item.path} className={`topnav-menu-link ${location.pathname.startsWith(item.path) ? 'active' : ''}`}>
-                {t(item.i18nKey)}
-              </Link>
-            );
-          })}
+          {USER_NAV_STANDALONE.map((item) => (
+            <Link key={item.path} to={item.path} className={`topnav-menu-link ${isActive(item.path) ? 'active' : ''}`}>
+              {t(item.i18nKey)}
+            </Link>
+          ))}
           {isAdminOrModerator && (
             <div className="topnav-dropdown-wrap">
               <button
@@ -388,10 +323,7 @@ export default function TopNav() {
               {t('common.logout')}
             </button>
           ) : (
-            <>
-              <Link to="/login" className={`topnav-menu-link ${isActive('/login') ? 'active' : ''}`}>{t('common.signIn')}</Link>
-              <Link to="/signup" className={`topnav-menu-link ${isActive('/signup') ? 'active' : ''}`}>{t('common.signUp')}</Link>
-            </>
+            <Link to="/login" className={`topnav-menu-link ${isActive('/login') ? 'active' : ''}`}>{t('common.signIn')}</Link>
           )}
         </div>
       </div>

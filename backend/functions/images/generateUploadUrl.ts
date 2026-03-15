@@ -17,7 +17,7 @@ interface GenerateUploadUrlBody {
 }
 
 export const handler: APIGatewayProxyHandler = async (event) => {
-  const denied = requireRole(event, 'Wrestler');
+  const denied = requireRole(event, 'Admin');
   if (denied) return denied;
 
   try {

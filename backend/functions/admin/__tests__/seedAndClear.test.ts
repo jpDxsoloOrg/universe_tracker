@@ -20,9 +20,8 @@ vi.mock('../../../lib/dynamodb', () => ({
     CHAMPIONSHIPS: 'Championships', CHAMPIONSHIP_HISTORY: 'ChampionshipHistory',
     SEASON_STANDINGS: 'SeasonStandings', SEASONS: 'Seasons', MATCHES: 'Matches',
     TOURNAMENTS: 'Tournaments', EVENTS: 'Events', CONTENDER_RANKINGS: 'ContenderRankings',
-    RANKING_HISTORY: 'RankingHistory', FANTASY_CONFIG: 'FantasyConfig',
-    WRESTLER_COSTS: 'WrestlerCosts', FANTASY_PICKS: 'FantasyPicks',
-    CHALLENGES: 'Challenges', PROMOS: 'Promos',
+    RANKING_HISTORY: 'RankingHistory', MATCH_TYPES: 'MatchTypes',
+    STIPULATIONS: 'Stipulations', SEASON_AWARDS: 'SeasonAwards',
   },
 }));
 
@@ -100,14 +99,11 @@ describe('seedData', () => {
     expect(body.createdCounts.events).toBe(3);
     expect(body.createdCounts.contenderRankings).toBe(8);
     expect(body.createdCounts.rankingHistory).toBe(9);
-    expect(body.createdCounts.fantasyConfig).toBe(1);
-    expect(body.createdCounts.wrestlerCosts).toBe(12);
-    expect(body.createdCounts.challenges).toBe(6);
-    expect(body.createdCounts.promos).toBe(7);
     expect(body.createdCounts.siteConfig).toBe(1);
+    expect(body.createdCounts.matchTypes).toBe(6);
 
     // Verify put was called many times for all entity inserts
-    expect(mockPut.mock.calls.length).toBeGreaterThan(90);
+    expect(mockPut.mock.calls.length).toBeGreaterThan(60);
   });
 
   it('returns 500 when DynamoDB throws during seeding', async () => {
@@ -152,13 +148,13 @@ describe('seedData', () => {
     expect(JSON.parse(resultEmptyModules!.body).createdCounts.players).toBe(12);
   });
 
-  it('returns 500 when body has only invalid module IDs', async () => {
+  it('returns 400 when body has only invalid module IDs', async () => {
     const result = await seedData(
       makeEvent({ body: '{"modules":["unknown-module"]}' }),
       ctx,
       cb
     );
-    expect(result!.statusCode).toBe(500);
+    expect(result!.statusCode).toBe(400);
     expect(JSON.parse(result!.body).message).toMatch(/Invalid|unknown/i);
   });
 });
@@ -204,11 +200,11 @@ describe('clearAll', () => {
     expect(result!.statusCode).toBe(200);
     const body = JSON.parse(result!.body);
     expect(body.message).toBe('All data cleared successfully');
-    expect(mockDelete).toHaveBeenCalledTimes(26); // 13 tables * 2 items
+    expect(mockDelete).toHaveBeenCalledTimes(22); // 11 tables * 2 items
 
     const labels = ['players', 'matches', 'championships', 'championshipHistory',
       'tournaments', 'seasons', 'seasonStandings', 'divisions', 'events',
-      'contenderRankings', 'rankingHistory', 'challenges', 'promos'];
+      'contenderRankings', 'rankingHistory'];
     for (const label of labels) {
       expect(body.deletedCounts[label]).toBe(2);
     }
@@ -283,7 +279,7 @@ describe('clearAll', () => {
     await clearAll(event, ctx, cb);
 
     const scanCalls = mockScanAll.mock.calls;
-    expect(scanCalls.length).toBe(13);
+    expect(scanCalls.length).toBe(11);
     for (const call of scanCalls) {
       expect(call[0].ExpressionAttributeNames).toHaveProperty('#pk');
       expect(call[0].ProjectionExpression).toContain('#pk');

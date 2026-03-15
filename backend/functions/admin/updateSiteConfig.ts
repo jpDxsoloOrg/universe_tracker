@@ -4,7 +4,7 @@ import { success, badRequest, serverError } from '../../lib/response';
 import { requireRole } from '../../lib/auth';
 import { parseBody } from '../../lib/parseBody';
 
-const VALID_FEATURES = ['fantasy', 'challenges', 'promos', 'contenders', 'statistics'];
+const VALID_FEATURES = ['contenders', 'statistics'];
 
 interface UpdateSiteConfigBody {
   features: Record<string, boolean>;
@@ -40,9 +40,6 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     });
 
     const currentFeatures = existing.Item?.features || {
-      fantasy: true,
-      challenges: true,
-      promos: true,
       contenders: true,
       statistics: true,
     };

@@ -31,9 +31,6 @@ vi.mock('react-router-dom', async () => {
 import FeatureRoute from '../FeatureRoute';
 
 const ALL_FEATURES_ENABLED = {
-  fantasy: true,
-  challenges: true,
-  promos: true,
   contenders: true,
   statistics: true,
 };
@@ -59,7 +56,7 @@ describe('FeatureRoute', () => {
       isLoading: false,
     });
 
-    renderFeatureRoute('challenges');
+    renderFeatureRoute('contenders');
 
     expect(screen.getByTestId('feature-content')).toBeInTheDocument();
     expect(screen.getByText('Feature Page')).toBeInTheDocument();
@@ -67,11 +64,11 @@ describe('FeatureRoute', () => {
 
   it('redirects to home when the feature is disabled', () => {
     mockUseSiteConfig.mockReturnValue({
-      features: { ...ALL_FEATURES_ENABLED, fantasy: false },
+      features: { ...ALL_FEATURES_ENABLED, statistics: false },
       isLoading: false,
     });
 
-    renderFeatureRoute('fantasy');
+    renderFeatureRoute('statistics');
 
     expect(screen.getByTestId('navigate')).toHaveAttribute('data-to', '/');
     expect(screen.queryByTestId('feature-content')).not.toBeInTheDocument();
@@ -83,7 +80,7 @@ describe('FeatureRoute', () => {
       isLoading: true,
     });
 
-    renderFeatureRoute('promos');
+    renderFeatureRoute('contenders');
 
     expect(screen.getByText('Loading...')).toBeInTheDocument();
     expect(screen.queryByTestId('feature-content')).not.toBeInTheDocument();

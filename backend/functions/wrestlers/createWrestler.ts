@@ -7,7 +7,7 @@ export const handler = handlerFactory({
   idField: 'wrestlerId',
   entityName: 'wrestler',
   requiredFields: ['name'],
-  optionalFields: ['imageUrl', 'divisionId', 'nickname', 'finisher', 'weight', 'height', 'hometown', 'alignment'],
+  optionalFields: ['imageUrl', 'divisionId', 'nickname', 'finisher', 'weight', 'height', 'hometown', 'alignment', 'companyId'],
   defaults: {
     wins: 0,
     losses: 0,
@@ -21,6 +21,15 @@ export const handler = handlerFactory({
       });
       if (!divisionResult.Item) {
         return notFound(`Division ${body.divisionId} not found`);
+      }
+    }
+    if (body.companyId) {
+      const companyResult = await dynamoDb.get({
+        TableName: TableNames.COMPANIES,
+        Key: { companyId: body.companyId },
+      });
+      if (!companyResult.Item) {
+        return notFound('Company not found');
       }
     }
     if (body.alignment && !['face', 'heel', 'tweener'].includes(body.alignment as string)) {

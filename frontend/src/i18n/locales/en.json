@@ -350,11 +350,44 @@
       "points": "Points"
     }
   },
+  "companies": {
+    "title": "Companies",
+    "name": "Company Name",
+    "abbreviation": "Abbreviation",
+    "description": "Description",
+    "create": "Create Company",
+    "edit": "Edit Company",
+    "delete": "Delete Company",
+    "noCompanies": "No companies yet",
+    "createFirst": "Create your first company to get started",
+    "confirmDelete": "Are you sure you want to delete this company?",
+    "rosterCount": "Roster",
+    "deleteBlocked": "Cannot delete company with assigned wrestlers or shows"
+  },
+  "shows": {
+    "title": "Shows",
+    "name": "Show Name",
+    "company": "Company",
+    "schedule": "Schedule",
+    "description": "Description",
+    "weekly": "Weekly",
+    "ppv": "PPV",
+    "special": "Special",
+    "create": "Create Show",
+    "edit": "Edit Show",
+    "delete": "Delete Show",
+    "noShows": "No shows yet",
+    "createFirst": "Create your first show to get started",
+    "confirmDelete": "Are you sure you want to delete this show?",
+    "selectCompany": "Select a company"
+  },
   "admin": {
     "panel": {
       "title": "Admin Panel",
       "tabs": {
         "manageWrestlers": "Manage Wrestlers",
+        "companies": "Companies",
+        "shows": "Shows",
         "divisions": "Divisions",
         "stipulations": "Stipulations",
         "matchConfig": "Match Config",

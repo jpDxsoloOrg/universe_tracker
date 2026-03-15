@@ -1,11 +1,14 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { divisionsApi } from '../../services/api';
-import type { Division } from '../../types';
+import { useTranslation } from 'react-i18next';
+import { divisionsApi, companiesApi } from '../../services/api';
+import type { Division, Company } from '../../types';
 import Skeleton from '../ui/Skeleton';
 import './ManageDivisions.css';
 
 export default function ManageDivisions() {
+  const { t } = useTranslation();
   const [divisions, setDivisions] = useState<Division[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -16,22 +19,33 @@ export default function ManageDivisions() {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
+    companyId: '',
   });
 
   useEffect(() => {
-    loadDivisions();
+    loadData();
   }, []);
 
-  const loadDivisions = async () => {
+  const loadData = async () => {
     try {
       setLoading(true);
-      const data = await divisionsApi.getAll();
-      setDivisions(data);
+      const [divisionsData, companiesData] = await Promise.all([
+        divisionsApi.getAll(),
+        companiesApi.getAll(),
+      ]);
+      setDivisions(divisionsData);
+      setCompanies(companiesData);
     } catch (_err) {
       setError('Failed to load divisions');
     } finally {
       setLoading(false);
     }
+  };
+
+  const getCompanyName = (companyId?: string) => {
+    if (!companyId) return 'None';
+    const company = companies.find(c => c.companyId === companyId);
+    return company?.name || t('common.unknown');
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -44,20 +58,22 @@ export default function ManageDivisions() {
         await divisionsApi.update(editingDivision.divisionId, {
           name: formData.name,
           description: formData.description || undefined,
+          companyId: formData.companyId || undefined,
         });
         setSuccess('Division updated successfully!');
       } else {
         await divisionsApi.create({
           name: formData.name,
           description: formData.description || undefined,
+          companyId: formData.companyId || undefined,
         });
         setSuccess('Division created successfully!');
       }
 
-      setFormData({ name: '', description: '' });
+      setFormData({ name: '', description: '', companyId: '' });
       setShowAddForm(false);
       setEditingDivision(null);
-      await loadDivisions();
+      await loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save division');
     }
@@ -68,6 +84,7 @@ export default function ManageDivisions() {
     setFormData({
       name: division.name,
       description: division.description || '',
+      companyId: division.companyId || '',
     });
     setShowAddForm(true);
   };
@@ -84,7 +101,7 @@ export default function ManageDivisions() {
     try {
       await divisionsApi.delete(divisionId);
       setSuccess('Division deleted successfully!');
-      await loadDivisions();
+      await loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete division');
     } finally {
@@ -93,7 +110,7 @@ export default function ManageDivisions() {
   };
 
   const handleCancel = () => {
-    setFormData({ name: '', description: '' });
+    setFormData({ name: '', description: '', companyId: '' });
     setShowAddForm(false);
     setEditingDivision(null);
   };
@@ -143,6 +160,22 @@ export default function ManageDivisions() {
               />
             </div>
 
+            <div className="form-group">
+              <label htmlFor="division-company">Company</label>
+              <select
+                id="division-company"
+                value={formData.companyId}
+                onChange={(e) => setFormData({ ...formData, companyId: e.target.value })}
+              >
+                <option value="">No Company</option>
+                {companies.map((company) => (
+                  <option key={company.companyId} value={company.companyId}>
+                    {company.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <div className="form-actions">
               <button type="submit">
                 {editingDivision ? 'Update Division' : 'Create Division'}
@@ -164,6 +197,9 @@ export default function ManageDivisions() {
             {divisions.map(division => (
               <div key={division.divisionId} className="division-card">
                 <h4>{division.name}</h4>
+                {division.companyId && (
+                  <p className="division-company">Company: {getCompanyName(division.companyId)}</p>
+                )}
                 {division.description && (
                   <p className="division-description">{division.description}</p>
                 )}

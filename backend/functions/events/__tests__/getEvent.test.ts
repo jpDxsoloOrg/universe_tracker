@@ -16,6 +16,7 @@ vi.mock('../../../lib/dynamodb', () => ({
   TableNames: {
     EVENTS: 'Events', MATCHES: 'Matches',
     WRESTLERS: 'Wrestlers', CHAMPIONSHIPS: 'Championships',
+    COMPANIES: 'Companies',
   },
 }));
 

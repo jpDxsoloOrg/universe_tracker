@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
-import { championshipsApi, divisionsApi, wrestlersApi, imagesApi } from '../../services/api';
+import { championshipsApi, divisionsApi, wrestlersApi, imagesApi, companiesApi } from '../../services/api';
 import { sanitizeName } from '../../utils/sanitize';
 import { logger } from '../../utils/logger';
 import { FILE_UPLOAD_LIMITS, VALIDATION } from '../../constants';
@@ -8,7 +8,7 @@ import {
   applyImageFallback,
   resolveImageSrc,
 } from '../../constants/imageFallbacks';
-import type { Championship, Division, Wrestler } from '../../types';
+import type { Championship, Division, Wrestler, Company } from '../../types';
 import './ManageChampionships.css';
 
 export default function ManageChampionships() {
@@ -25,11 +25,13 @@ export default function ManageChampionships() {
 
   const [divisions, setDivisions] = useState<Division[]>([]);
   const [wrestlers, setWrestlers] = useState<Wrestler[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
 
   const [formData, setFormData] = useState({
     name: '',
     type: 'singles' as 'singles' | 'tag',
     divisionId: '',
+    companyId: '',
     imageUrl: '',
   });
 
@@ -41,6 +43,7 @@ export default function ManageChampionships() {
     loadChampionships();
     loadDivisions();
     loadWrestlers();
+    loadCompanies();
   }, []);
 
   const loadChampionships = async () => {
@@ -71,6 +74,21 @@ export default function ManageChampionships() {
     } catch (_err) {
       // Non-critical — used for champion display
     }
+  };
+
+  const loadCompanies = async () => {
+    try {
+      const data = await companiesApi.getAll();
+      setCompanies(data);
+    } catch (_err) {
+      // Non-critical — companies are optional
+    }
+  };
+
+  const getCompanyName = (companyId?: string) => {
+    if (!companyId) return 'None';
+    const company = companies.find(c => c.companyId === companyId);
+    return company ? company.name : 'Unknown';
   };
 
   const getChampionName = (currentChampion?: string | string[]): string => {
@@ -189,6 +207,7 @@ export default function ManageChampionships() {
           name: sanitizedName,
           type: formData.type,
           divisionId: formData.divisionId || undefined,
+          companyId: formData.companyId || undefined,
           imageUrl: imageUrl || undefined,
         });
         setSuccess('Championship updated successfully!');
@@ -197,13 +216,14 @@ export default function ManageChampionships() {
           name: sanitizedName,
           type: formData.type,
           divisionId: formData.divisionId || undefined,
+          companyId: formData.companyId || undefined,
           imageUrl: imageUrl || undefined,
           isActive: true,
         });
         setSuccess('Championship created successfully!');
       }
 
-      setFormData({ name: '', type: 'singles', divisionId: '', imageUrl: '' });
+      setFormData({ name: '', type: 'singles', divisionId: '', companyId: '', imageUrl: '' });
       setSelectedFile(null);
       setImagePreview(null);
       setShowAddForm(false);
@@ -222,6 +242,7 @@ export default function ManageChampionships() {
       name: championship.name,
       type: championship.type,
       divisionId: championship.divisionId || '',
+      companyId: championship.companyId || '',
       imageUrl: championship.imageUrl || '',
     });
     setImagePreview(championship.imageUrl || null);
@@ -230,7 +251,7 @@ export default function ManageChampionships() {
   };
 
   const handleCancel = () => {
-    setFormData({ name: '', type: 'singles', divisionId: '', imageUrl: '' });
+    setFormData({ name: '', type: 'singles', divisionId: '', companyId: '', imageUrl: '' });
     setSelectedFile(null);
     setImagePreview(null);
     setShowAddForm(false);
@@ -341,6 +362,22 @@ export default function ManageChampionships() {
             </div>
 
             <div className="form-group">
+              <label htmlFor="companyId">Company</label>
+              <select
+                id="companyId"
+                value={formData.companyId}
+                onChange={(e) => setFormData({ ...formData, companyId: e.target.value })}
+              >
+                <option value="">No Company</option>
+                {companies.map((company) => (
+                  <option key={company.companyId} value={company.companyId}>
+                    {company.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="form-group">
               <label htmlFor="championship-image">Championship Belt Image</label>
               <div className="image-upload-container">
                 {imagePreview ? (
@@ -397,6 +434,9 @@ export default function ManageChampionships() {
                 <h4>{championship.name}</h4>
                 <div className="championship-type">
                   {championship.type === 'singles' ? 'Singles' : 'Tag Team'}
+                </div>
+                <div className="championship-company">
+                  Company: {getCompanyName(championship.companyId)}
                 </div>
                 <div className="championship-division">
                   Division: {getDivisionName(championship.divisionId)}

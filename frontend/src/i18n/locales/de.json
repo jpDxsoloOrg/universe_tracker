@@ -350,11 +350,44 @@
       "points": "Punkte"
     }
   },
+  "companies": {
+    "title": "Companies",
+    "name": "Company-Name",
+    "abbreviation": "Abkürzung",
+    "description": "Beschreibung",
+    "create": "Company erstellen",
+    "edit": "Company bearbeiten",
+    "delete": "Company löschen",
+    "noCompanies": "Noch keine Companies",
+    "createFirst": "Erstelle deine erste Company, um loszulegen",
+    "confirmDelete": "Möchtest du diese Company wirklich löschen?",
+    "rosterCount": "Kader",
+    "deleteBlocked": "Company mit zugewiesenen Wrestlern oder Shows kann nicht gelöscht werden"
+  },
+  "shows": {
+    "title": "Shows",
+    "name": "Show-Name",
+    "company": "Company",
+    "schedule": "Zeitplan",
+    "description": "Beschreibung",
+    "weekly": "Wöchentlich",
+    "ppv": "PPV",
+    "special": "Spezial",
+    "create": "Show erstellen",
+    "edit": "Show bearbeiten",
+    "delete": "Show löschen",
+    "noShows": "Noch keine Shows",
+    "createFirst": "Erstelle deine erste Show, um loszulegen",
+    "confirmDelete": "Möchtest du diese Show wirklich löschen?",
+    "selectCompany": "Company auswählen"
+  },
   "admin": {
     "panel": {
       "title": "Admin-Bereich",
       "tabs": {
         "manageWrestlers": "Wrestler verwalten",
+        "companies": "Companies",
+        "shows": "Shows",
         "divisions": "Divisionen",
         "stipulations": "Stipulationen",
         "matchConfig": "Match-Konfiguration",

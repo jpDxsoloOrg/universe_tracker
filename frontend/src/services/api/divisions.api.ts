@@ -1,14 +1,14 @@
 import type { Division } from '../../types';
 import { createCrudApi } from './crudFactory';
 
-const baseDivisionsApi = createCrudApi<Division, { name: string; description?: string }>('divisions');
+const baseDivisionsApi = createCrudApi<Division, { name: string; description?: string; companyId?: string }>('divisions');
 
 export const divisionsApi = {
   getAll: async (signal?: AbortSignal): Promise<Division[]> => {
     return baseDivisionsApi.getAll(signal);
   },
 
-  create: async (division: { name: string; description?: string }): Promise<Division> => {
+  create: async (division: { name: string; description?: string; companyId?: string }): Promise<Division> => {
     return baseDivisionsApi.create(division);
   },
 

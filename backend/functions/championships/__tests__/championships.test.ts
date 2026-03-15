@@ -11,7 +11,7 @@ vi.mock('../../../lib/dynamodb', () => ({
     get: mockGet, put: mockPut, scan: mockScan, query: mockQuery,
     update: mockUpdate, delete: mockDelete, transactWrite: mockTransactWrite,
   },
-  TableNames: { CHAMPIONSHIPS: 'Championships', CHAMPIONSHIP_HISTORY: 'ChampionshipHistory' },
+  TableNames: { CHAMPIONSHIPS: 'Championships', CHAMPIONSHIP_HISTORY: 'ChampionshipHistory', COMPANIES: 'Companies' },
 }));
 vi.mock('uuid', () => ({ v4: () => 'test-uuid-1234' }));
 

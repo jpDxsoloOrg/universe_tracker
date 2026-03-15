@@ -202,6 +202,30 @@ const tables = [
     AttributeDefinitions: [{ AttributeName: 'matchTypeId', AttributeType: 'S' }],
     BillingMode: 'PAY_PER_REQUEST',
   },
+  {
+    TableName: `universe-tracker-api-companies-${STAGE}`,
+    KeySchema: [{ AttributeName: 'companyId', KeyType: 'HASH' }],
+    AttributeDefinitions: [{ AttributeName: 'companyId', AttributeType: 'S' }],
+    BillingMode: 'PAY_PER_REQUEST',
+  },
+  {
+    TableName: `universe-tracker-api-shows-${STAGE}`,
+    KeySchema: [{ AttributeName: 'showId', KeyType: 'HASH' }],
+    AttributeDefinitions: [
+      { AttributeName: 'showId', AttributeType: 'S' },
+      { AttributeName: 'companyId', AttributeType: 'S' },
+    ],
+    BillingMode: 'PAY_PER_REQUEST',
+    GlobalSecondaryIndexes: [
+      {
+        IndexName: 'CompanyShowsIndex',
+        KeySchema: [
+          { AttributeName: 'companyId', KeyType: 'HASH' },
+        ],
+        Projection: { ProjectionType: 'ALL' },
+      },
+    ],
+  },
 ];
 
 async function createTables() {

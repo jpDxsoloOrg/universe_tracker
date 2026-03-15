@@ -113,6 +113,12 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     // Delete all ranking history
     await clearTable('rankingHistory', TableNames.RANKING_HISTORY, 'wrestlerId', 'weekKey');
 
+    // Delete all companies
+    await clearTable('companies', TableNames.COMPANIES, 'companyId');
+
+    // Delete all shows
+    await clearTable('shows', TableNames.SHOWS, 'showId');
+
     const response: Record<string, unknown> = {
       message: totalErrors > 0
         ? `Data cleared with ${totalErrors} individual delete error(s)`

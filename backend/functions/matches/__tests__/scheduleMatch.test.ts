@@ -202,11 +202,12 @@ describe('scheduleMatch', () => {
   });
 
   it('resolves date from event when date not provided', async () => {
-    // Call order: 1) event for date resolution, 2) wrestler p1, 3) wrestler p2, 4) event for matchCards
+    // Call order: 1) event for date resolution, 2) wrestler p1, 3) wrestler p2, 4) event for roster validation, 5) event for matchCards
     mockGet
       .mockResolvedValueOnce({ Item: { eventId: 'e1', date: '2024-07-04T00:00:00Z' } })
       .mockResolvedValueOnce({ Item: { wrestlerId: 'p1' } })
       .mockResolvedValueOnce({ Item: { wrestlerId: 'p2' } })
+      .mockResolvedValueOnce({ Item: { eventId: 'e1' } }) // roster validation
       .mockResolvedValueOnce({ Item: { eventId: 'e1', matchCards: [] } });
     mockPut.mockResolvedValue({});
     mockUpdate.mockResolvedValue({});
@@ -221,6 +222,7 @@ describe('scheduleMatch', () => {
     mockGet
       .mockResolvedValueOnce({ Item: { wrestlerId: 'p1' } })
       .mockResolvedValueOnce({ Item: { wrestlerId: 'p2' } })
+      .mockResolvedValueOnce({ Item: { eventId: 'e1' } }) // roster validation fetch
       .mockResolvedValueOnce({ Item: { eventId: 'e1', matchCards: [{ matchId: 'x' }] } });
     mockPut.mockResolvedValue({});
     mockUpdate.mockResolvedValue({});

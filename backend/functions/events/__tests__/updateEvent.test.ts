@@ -13,7 +13,7 @@ vi.mock('../../../lib/dynamodb', () => ({
     get: mockGet, put: vi.fn(), scan: vi.fn(), query: vi.fn(),
     update: mockUpdate, delete: vi.fn(), scanAll: vi.fn(), queryAll: vi.fn(),
   },
-  TableNames: { EVENTS: 'Events' },
+  TableNames: { EVENTS: 'Events', COMPANIES: 'Companies' },
 }));
 
 import { handler as updateEvent } from '../updateEvent';

@@ -19,6 +19,9 @@ vi.mock('../../../services/api', () => ({
   wrestlersApi: mockWrestlersApi,
   divisionsApi: mockDivisionsApi,
   imagesApi: mockImagesApi,
+  companiesApi: {
+    getAll: vi.fn().mockResolvedValue([]),
+  },
 }));
 
 import ManageWrestlers from '../ManageWrestlers';

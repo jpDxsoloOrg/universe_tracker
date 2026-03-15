@@ -67,6 +67,27 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       return notFound(`Wrestlers not found: ${missingWrestlers.join(', ')}`);
     }
 
+    // Validate participants belong to hosting companies if event has companyIds
+    if (body.eventId) {
+      const eventForCompanies = await dynamoDb.get({
+        TableName: TableNames.EVENTS,
+        Key: { eventId: body.eventId },
+      });
+
+      if (eventForCompanies.Item) {
+        const companyIds = (eventForCompanies.Item as Record<string, unknown>).companyIds as string[] | undefined;
+        if (companyIds && companyIds.length > 0) {
+          for (const result of wrestlerResults) {
+            const wrestlerCompanyId = (result.wrestler as Record<string, unknown>)?.companyId as string | undefined;
+            if (wrestlerCompanyId && !companyIds.includes(wrestlerCompanyId)) {
+              const wrestlerName = (result.wrestler as Record<string, unknown>)?.name as string || result.wrestlerId;
+              return badRequest(`Wrestler ${wrestlerName} is not on a hosting company's roster`);
+            }
+          }
+        }
+      }
+    }
+
     // Validate championship exists if provided
     if (body.championshipId) {
       const championship = await dynamoDb.get({

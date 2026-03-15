@@ -68,6 +68,12 @@
   font-size: 1.25rem;
 }
 
+.division-company {
+  color: #999;
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+}
+
 .division-description {
   color: #bbb;
   margin-bottom: 1rem;

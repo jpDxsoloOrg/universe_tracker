@@ -15,7 +15,9 @@ export type ExportDatasetKey =
   | 'siteConfig'
   | 'stipulations'
   | 'matchTypes'
-  | 'seasonAwards';
+  | 'seasonAwards'
+  | 'companies'
+  | 'shows';
 
 export interface ExportTableConfig {
   key: ExportDatasetKey;
@@ -52,6 +54,8 @@ export const EXPORT_TABLES: readonly ExportTableConfig[] = [
   { key: 'stipulations', tableName: TableNames.STIPULATIONS, partitionKey: 'stipulationId' },
   { key: 'matchTypes', tableName: TableNames.MATCH_TYPES, partitionKey: 'matchTypeId' },
   { key: 'seasonAwards', tableName: TableNames.SEASON_AWARDS, partitionKey: 'seasonId', sortKey: 'awardId' },
+  { key: 'companies', tableName: TableNames.COMPANIES, partitionKey: 'companyId' },
+  { key: 'shows', tableName: TableNames.SHOWS, partitionKey: 'showId' },
 ] as const;
 
 export type ExportData = Record<ExportDatasetKey, Record<string, unknown>[]>;

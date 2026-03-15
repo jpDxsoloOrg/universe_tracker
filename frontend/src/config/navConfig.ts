@@ -64,6 +64,8 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
     i18nKey: 'admin.panel.groups.leagueSetup',
     items: [
       { path: '/admin/wrestlers', i18nKey: 'admin.panel.tabs.manageWrestlers' },
+      { path: '/admin/companies', i18nKey: 'admin.panel.tabs.companies' },
+      { path: '/admin/shows', i18nKey: 'admin.panel.tabs.shows' },
       { path: '/admin/divisions', i18nKey: 'admin.panel.tabs.divisions' },
       { path: '/admin/seasons', i18nKey: 'admin.panel.tabs.seasons' },
       { path: '/admin/season-awards', i18nKey: 'admin.panel.tabs.seasonAwards' },
@@ -98,7 +100,7 @@ export function getUserGroupForPath(pathname: string): string | null {
 /** Path -> admin group key */
 export function getAdminGroupForPath(pathname: string): string | null {
   const matchOps = ['/admin/schedule', '/admin/results', '/admin/events', '/admin/match-config'];
-  const leagueSetup = ['/admin/wrestlers', '/admin/divisions', '/admin/seasons', '/admin/season-awards', '/admin/championships', '/admin/tournaments'];
+  const leagueSetup = ['/admin/wrestlers', '/admin/companies', '/admin/shows', '/admin/divisions', '/admin/seasons', '/admin/season-awards', '/admin/championships', '/admin/tournaments'];
   const contentSocial = ['/admin/contender-config'];
   const system = ['/admin/features', '/admin/danger'];
   if (matchOps.some((p) => pathname === p)) return 'matchOps';

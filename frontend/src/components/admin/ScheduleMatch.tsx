@@ -77,6 +77,13 @@ export default function ScheduleMatch() {
 
   const isTagTeamMatch = formData.matchFormat.toLowerCase().includes('tag');
 
+  // Filter wrestlers by event's hosting companies
+  const selectedEvent = events.find(ev => ev.eventId === formData.eventId);
+  const eventCompanyIds = selectedEvent?.companyIds;
+  const filteredWrestlers = (eventCompanyIds && eventCompanyIds.length > 0)
+    ? wrestlers.filter(w => !w.companyId || eventCompanyIds.includes(w.companyId))
+    : wrestlers;
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (submitting) return; // Prevent double submission
@@ -315,7 +322,10 @@ export default function ScheduleMatch() {
             <SearchableSelect
               id="event"
               value={formData.eventId}
-              onChange={(value) => setFormData({ ...formData, eventId: value })}
+              onChange={(value) => {
+                setFormData({ ...formData, eventId: value, participants: [] });
+                setTeams([[], []]);
+              }}
               placeholder={t('scheduleMatch.noEvent', 'No Event (Standalone Match)')}
               options={[
                 { value: '', label: t('scheduleMatch.noEvent', 'No Event (Standalone Match)') },
@@ -432,7 +442,7 @@ export default function ScheduleMatch() {
                     )}
                   </div>
                   <div className="team-wrestlers-grid">
-                    {wrestlers.filter(p => !team.includes(p.wrestlerId)).map(wrestler => {
+                    {filteredWrestlers.filter(p => !team.includes(p.wrestlerId)).map(wrestler => {
                       const wrestlerTeamIndex = getWrestlerTeamIndex(wrestler.wrestlerId);
                       const isInOtherTeam = wrestlerTeamIndex !== -1 && wrestlerTeamIndex !== teamIndex;
                       return (
@@ -471,7 +481,7 @@ export default function ScheduleMatch() {
           <div className="form-group">
             <label>{t('scheduleMatch.participants')} ({formData.matchFormat.toLowerCase() === 'singles' ? '2' : '2+'})</label>
             <div className="participants-grid">
-              {wrestlers.map(wrestler => (
+              {filteredWrestlers.map(wrestler => (
                 <div
                   key={wrestler.wrestlerId}
                   className={`participant-card ${formData.participants.includes(wrestler.wrestlerId) ? 'selected' : ''}`}

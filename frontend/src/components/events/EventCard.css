@@ -18,6 +18,24 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
+.event-card-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  float: right;
+  margin-left: 12px;
+  margin-bottom: 4px;
+}
+
+.event-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .event-card-header {
   display: flex;
   justify-content: space-between;

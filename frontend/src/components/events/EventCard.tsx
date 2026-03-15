@@ -45,6 +45,11 @@ export default function EventCard({ event }: EventCardProps) {
         className={`event-card${event.status === 'completed' ? ' completed' : ''}`}
         style={{ borderLeftColor: typeColor }}
       >
+        {event.imageUrl && (
+          <div className="event-card-thumb">
+            <img src={event.imageUrl} alt={event.name} />
+          </div>
+        )}
         <div className="event-card-header">
           <h3 className="event-card-name">{event.name}</h3>
           <span

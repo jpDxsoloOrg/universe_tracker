@@ -1,5 +1,6 @@
 import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { wrestlersApi, imagesApi, divisionsApi, companiesApi } from '../../services/api';
 import { sanitizeName } from '../../utils/sanitize';
 import { logger } from '../../utils/logger';
@@ -10,15 +11,18 @@ import {
   resolveImageSrc,
 } from '../../constants/imageFallbacks';
 import type { Wrestler, Division, Company } from '../../types';
+import ImportWrestlers from './ImportWrestlers';
 import './ManageWrestlers.css';
 
 export default function ManageWrestlers() {
+  const { t } = useTranslation();
   const [wrestlers, setWrestlers] = useState<Wrestler[]>([]);
   const [divisions, setDivisions] = useState<Division[]>([]);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showImport, setShowImport] = useState(false);
   const [editingWrestler, setEditingWrestler] = useState<Wrestler | null>(null);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -253,12 +257,27 @@ export default function ManageWrestlers() {
             details? <Link to="/guide/wiki/admin-manage-wrestlers">Learn more</Link>.
           </p>
         </div>
+        <button
+          onClick={() => setShowImport(!showImport)}
+          className={showImport ? 'cancel-btn' : ''}
+        >
+          {showImport ? t('wrestlers.import.backToList') : t('wrestlers.import.title')}
+        </button>
       </div>
 
       {error && <div className="error-message">{error}</div>}
       {success && <div className="success-message">{success}</div>}
 
-      {showAddForm && (
+      {showImport && (
+        <ImportWrestlers
+          onImportComplete={() => {
+            setShowImport(false);
+            loadData();
+          }}
+        />
+      )}
+
+      {!showImport && showAddForm && (
         <div className="wrestler-form-container">
           <h3>{editingWrestler ? 'Edit Wrestler' : 'Add New Wrestler'}</h3>
           <form onSubmit={handleSubmit} className="wrestler-form">
@@ -346,7 +365,7 @@ export default function ManageWrestlers() {
         </div>
       )}
 
-      <div className="wrestlers-list">
+      {!showImport && <div className="wrestlers-list">
         <h3>All Wrestlers ({wrestlers.length})</h3>
         {wrestlers.length === 0 ? (
           <p>No wrestlers yet. Add your first wrestler!</p>
@@ -405,7 +424,7 @@ export default function ManageWrestlers() {
           </table>
           </div>
         )}
-      </div>
+      </div>}
     </div>
   );
 }

@@ -694,6 +694,33 @@
       "addMatch": "Add Match"
     }
   },
+  "wrestlers": {
+    "import": {
+      "title": "Import Wrestlers",
+      "description": "Upload a CSV or JSON file to bulk import wrestlers.",
+      "selectFile": "Select File",
+      "downloadTemplate": "Download CSV Template",
+      "preview": "Preview",
+      "importButton": "Import Wrestlers",
+      "importing": "Importing...",
+      "results": "Import Results",
+      "imported": "Imported",
+      "failed": "Failed",
+      "total": "Total",
+      "errors": "Errors",
+      "noFile": "No file selected",
+      "invalidFile": "Invalid file type. Please upload a .csv or .json file.",
+      "parseError": "Failed to parse file",
+      "emptyFile": "File contains no wrestler data",
+      "assignToCompany": "Assign to Company (optional)",
+      "noCompany": "No company (global pool)",
+      "clear": "Clear",
+      "backToList": "Back to Wrestler List",
+      "missingName": "Name is required",
+      "invalidAlignment": "Invalid alignment (must be face, heel, or tweener)",
+      "duplicateName": "Duplicate name in import"
+    }
+  },
   "contenders": {
     "title": "Contender Rankings",
     "subtitle": "Official rankings determining championship contenders",

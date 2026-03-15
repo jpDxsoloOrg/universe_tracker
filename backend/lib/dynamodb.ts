@@ -9,6 +9,7 @@ import {
   ScanCommand,
   QueryCommand,
   TransactWriteCommand,
+  BatchWriteCommand,
   GetCommandInput,
   PutCommandInput,
   UpdateCommandInput,
@@ -70,6 +71,47 @@ export const dynamoDb = {
   transactWrite: async (params: TransactWriteCommandInput) => {
     const command = new TransactWriteCommand(params);
     return docClient.send(command);
+  },
+
+  /**
+   * Writes items in batches of 25 (DynamoDB limit).
+   * Retries unprocessed items up to 3 times with exponential backoff.
+   */
+  batchWrite: async (tableName: string, items: Record<string, unknown>[]): Promise<void> => {
+    const MAX_BATCH_SIZE = 25;
+    const MAX_RETRIES = 3;
+
+    for (let i = 0; i < items.length; i += MAX_BATCH_SIZE) {
+      let writeRequests: { PutRequest?: { Item: Record<string, unknown> } }[] =
+        items.slice(i, i + MAX_BATCH_SIZE).map((item) => ({
+          PutRequest: { Item: item },
+        }));
+
+      for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+        const command = new BatchWriteCommand({
+          RequestItems: {
+            [tableName]: writeRequests,
+          },
+        });
+
+        const result = await docClient.send(command);
+        const unprocessed = result.UnprocessedItems?.[tableName];
+
+        if (!unprocessed || unprocessed.length === 0) {
+          break;
+        }
+
+        if (attempt === MAX_RETRIES) {
+          throw new Error(
+            `Failed to write ${unprocessed.length} items after ${MAX_RETRIES} retries`
+          );
+        }
+
+        writeRequests = unprocessed as typeof writeRequests;
+        // Exponential backoff
+        await new Promise((resolve) => setTimeout(resolve, Math.pow(2, attempt) * 100));
+      }
+    }
   },
 
   /**

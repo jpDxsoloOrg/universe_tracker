@@ -182,14 +182,20 @@ functions:
           cors: *corsConfig
           authorizer: adminAuthorizer
 
-  # Wrestlers (Phase 2 consolidated: getWrestlers, createWrestler, updateWrestler, deleteWrestler)
+  # Wrestlers (Phase 2 consolidated: getWrestlers, createWrestler, updateWrestler, deleteWrestler, importWrestlers)
   wrestlers:
     handler: functions/wrestlers/handler.handler
+    timeout: 30
     events:
       - http:
           path: wrestlers
           method: get
           cors: *corsConfig
+      - http:
+          path: wrestlers/import
+          method: post
+          cors: *corsConfig
+          authorizer: adminAuthorizer
       - http:
           path: wrestlers
           method: post

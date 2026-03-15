@@ -8,18 +8,18 @@
 
 .import-header h3 {
   margin: 0 0 0.5rem 0;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .import-header p {
-  color: #bbb;
+  color: #94a3b8;
   margin: 0;
   font-size: 0.875rem;
 }
 
 .file-upload-section {
-  background-color: #1a1a1a;
-  border: 2px solid #d4af37;
+  background-color: #0f1429;
+  border: 2px solid #00d4ff;
   border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
@@ -41,11 +41,11 @@
 
 .file-input-wrapper label {
   font-size: 0.875rem;
-  color: #ccc;
+  color: #cbd5e1;
 }
 
 .template-download-link {
-  color: #d4af37;
+  color: #00d4ff;
   text-decoration: underline;
   font-size: 0.875rem;
   padding-bottom: 0.25rem;
@@ -64,15 +64,15 @@
 
 .company-selector label {
   font-size: 0.875rem;
-  color: #ccc;
+  color: #cbd5e1;
 }
 
 .company-selector select {
   width: 100%;
   max-width: 300px;
   padding: 0.75rem;
-  background-color: #222;
-  border: 2px solid #444;
+  background-color: #161d3a;
+  border: 2px solid #334155;
   border-radius: 4px;
   color: #fff;
   font-size: 1rem;
@@ -80,12 +80,12 @@
 
 .company-selector select:focus {
   outline: none;
-  border-color: #d4af37;
+  border-color: #00d4ff;
 }
 
 .preview-section {
-  background-color: #1a1a1a;
-  border: 2px solid #d4af37;
+  background-color: #0f1429;
+  border: 2px solid #00d4ff;
   border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
@@ -93,7 +93,7 @@
 
 .preview-section h4 {
   margin: 0 0 1rem 0;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .preview-table-wrapper {
@@ -111,11 +111,11 @@
 .preview-table td {
   padding: 0.5rem 0.75rem;
   text-align: left;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #1e2a4a;
 }
 
 .preview-table th {
-  color: #d4af37;
+  color: #00d4ff;
   font-weight: bold;
   white-space: nowrap;
 }
@@ -136,8 +136,8 @@
 }
 
 .results-section {
-  background-color: #1a1a1a;
-  border: 2px solid #d4af37;
+  background-color: #0f1429;
+  border: 2px solid #00d4ff;
   border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
@@ -145,7 +145,7 @@
 
 .results-section h4 {
   margin: 0 0 1rem 0;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .results-summary {
@@ -161,7 +161,7 @@
 }
 
 .result-imported {
-  color: #4ade80;
+  color: #34d399;
 }
 
 .result-failed {
@@ -169,7 +169,7 @@
 }
 
 .result-total {
-  color: #ccc;
+  color: #cbd5e1;
 }
 
 .error-list {

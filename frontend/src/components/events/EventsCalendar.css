@@ -16,14 +16,14 @@
   display: flex;
   gap: 4px;
   margin-bottom: 24px;
-  border-bottom: 2px solid #333;
+  border-bottom: 2px solid #1e2a4a;
   overflow-x: auto;
 }
 
 .events-filter-tab {
   background: none;
   border: none;
-  color: #bbb;
+  color: #94a3b8;
   padding: 10px 16px;
   font-size: 0.9rem;
   cursor: pointer;
@@ -42,7 +42,7 @@
 
 .events-filter-tab.active {
   color: white;
-  border-bottom-color: #d4af37;
+  border-bottom-color: #00d4ff;
 }
 
 .filter-dot {
@@ -70,8 +70,8 @@
 }
 
 .calendar-nav-btn {
-  background: #333;
-  border: 1px solid #444;
+  background: #1e2a4a;
+  border: 1px solid #334155;
   color: white;
   width: 36px;
   height: 36px;
@@ -85,7 +85,7 @@
 }
 
 .calendar-nav-btn:hover {
-  background: #444;
+  background: #334155;
 }
 
 .calendar-month-label {
@@ -104,7 +104,7 @@
 
 .calendar-day-header {
   text-align: center;
-  color: #bbb;
+  color: #94a3b8;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -113,7 +113,7 @@
 
 .calendar-day-cell {
   min-height: 60px;
-  background: #222;
+  background: #161d3a;
   border-radius: 4px;
   padding: 6px;
   display: flex;
@@ -128,12 +128,12 @@
 
 .calendar-day-cell.has-events {
   background: #2a2a2a;
-  border: 1px solid #444;
+  border: 1px solid #334155;
 }
 
 .calendar-day-number {
   font-size: 0.8rem;
-  color: #bbb;
+  color: #94a3b8;
 }
 
 .calendar-day-events {
@@ -165,14 +165,14 @@
   gap: 16px;
   margin-top: 16px;
   padding-top: 12px;
-  border-top: 1px solid #333;
+  border-top: 1px solid #1e2a4a;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #bbb;
+  color: #94a3b8;
   font-size: 0.8rem;
 }
 
@@ -202,7 +202,7 @@
 }
 
 .no-events-message {
-  color: #bbb;
+  color: #94a3b8;
   text-align: center;
   padding: 32px;
   background: #2d2d2d;
@@ -214,7 +214,7 @@
 .recent-results-section {
   margin-top: 32px;
   padding-top: 24px;
-  border-top: 1px solid #333;
+  border-top: 1px solid #1e2a4a;
 }
 
 .recent-results-title {

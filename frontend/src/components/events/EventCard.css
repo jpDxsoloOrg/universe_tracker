@@ -40,7 +40,7 @@
   letter-spacing: 0.5px;
   padding: 3px 8px;
   border-radius: 4px;
-  color: #1a1a1a;
+  color: #0f1429;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -55,7 +55,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #bbb;
+  color: #94a3b8;
   font-size: 0.9rem;
 }
 
@@ -82,16 +82,16 @@
 
 .event-match-count {
   font-size: 0.8rem;
-  color: #bbb;
-  background: #333;
+  color: #94a3b8;
+  background: #1e2a4a;
   padding: 2px 8px;
   border-radius: 4px;
 }
 
 .event-championship-count {
   font-size: 0.8rem;
-  color: #d4af37;
-  background: rgba(212, 175, 55, 0.15);
+  color: #00d4ff;
+  background: rgba(0, 212, 255, 0.15);
   padding: 2px 8px;
   border-radius: 4px;
   font-weight: 600;
@@ -116,7 +116,7 @@
   padding-top: 8px;
   border-top: 1px solid #3a3a3a;
   font-size: 0.8rem;
-  color: #888;
+  color: #64748b;
   transition: color 0.15s ease;
 }
 
@@ -125,12 +125,12 @@
 }
 
 .event-card:hover .event-card-view-results {
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .event-card:hover .event-card-view-results-arrow {
   transform: translateX(3px);
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 @media (max-width: 768px) {

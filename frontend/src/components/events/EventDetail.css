@@ -20,7 +20,7 @@
 .event-not-found {
   text-align: center;
   padding: 60px 20px;
-  color: #bbb;
+  color: #94a3b8;
 }
 
 .event-not-found p {
@@ -35,7 +35,7 @@
   border-radius: 8px;
   padding: 24px;
   margin-bottom: 24px;
-  border-top: 4px solid #d4af37;
+  border-top: 4px solid #00d4ff;
 }
 
 .event-detail-title-row {
@@ -67,7 +67,7 @@
   letter-spacing: 0.5px;
   padding: 4px 10px;
   border-radius: 4px;
-  color: #1a1a1a;
+  color: #0f1429;
 }
 
 .event-detail-status-badge {
@@ -88,35 +88,35 @@
 }
 
 .event-detail-info-item {
-  color: #bbb;
+  color: #94a3b8;
   font-size: 0.95rem;
   display: flex;
   gap: 8px;
 }
 
 .info-label {
-  color: #888;
+  color: #64748b;
   font-weight: 600;
   min-width: 90px;
 }
 
 .event-rating {
-  color: #d4af37;
+  color: #00d4ff;
   font-weight: 600;
 }
 
 .event-detail-description {
-  color: #bbb;
+  color: #94a3b8;
   line-height: 1.6;
   margin: 0 0 16px 0;
   padding-top: 12px;
-  border-top: 1px solid #333;
+  border-top: 1px solid #1e2a4a;
 }
 
 .view-results-btn {
   display: inline-block;
-  background: #d4af37;
-  color: #1a1a1a;
+  background: #00d4ff;
+  color: #0f1429;
   padding: 8px 20px;
   border-radius: 4px;
   text-decoration: none;
@@ -132,7 +132,7 @@
 /* ── Match Card Section ────────────────────────────────────────────────────── */
 
 .event-match-card-section {
-  background: #222;
+  background: #161d3a;
   border-radius: 8px;
   padding: 24px;
 }
@@ -144,7 +144,7 @@
 }
 
 .no-matches-message {
-  color: #bbb;
+  color: #94a3b8;
   text-align: center;
   padding: 32px;
 }
@@ -166,7 +166,7 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: #444;
+  background: #334155;
 }
 
 .pre-show-divider span {
@@ -178,7 +178,7 @@
 }
 
 .main-card-divider span {
-  color: #d4af37;
+  color: #00d4ff;
   font-size: 0.8rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -201,11 +201,11 @@
   background: #2d2d2d;
   border-radius: 8px;
   padding: 16px;
-  border-left: 3px solid #444;
+  border-left: 3px solid #334155;
 }
 
 .match-entry.main-event-match {
-  border-left: 3px solid #d4af37;
+  border-left: 3px solid #00d4ff;
   background: linear-gradient(135deg, #2d2d2d 0%, #332d1a 100%);
 }
 
@@ -224,11 +224,11 @@
   letter-spacing: 0.5px;
   padding: 2px 8px;
   border-radius: 4px;
-  color: #1a1a1a;
+  color: #0f1429;
 }
 
 .match-type-label {
-  color: #bbb;
+  color: #94a3b8;
   font-size: 0.85rem;
   text-transform: capitalize;
 }
@@ -236,8 +236,8 @@
 .match-championship-badge {
   font-size: 0.75rem;
   font-weight: 600;
-  color: #d4af37;
-  background: rgba(212, 175, 55, 0.15);
+  color: #00d4ff;
+  background: rgba(0, 212, 255, 0.15);
   padding: 2px 8px;
   border-radius: 4px;
 }
@@ -255,13 +255,13 @@
   gap: 4px;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #d4af37;
+  color: #00d4ff;
   letter-spacing: 0.02em;
 }
 
 .match-star-value {
   font-size: 0.8rem;
-  color: #888;
+  color: #64748b;
   font-weight: 500;
 }
 
@@ -274,7 +274,7 @@
   background: linear-gradient(135deg, #fef3c7, #fde68a);
   padding: 2px 8px;
   border-radius: 4px;
-  border: 1px solid rgba(212, 175, 55, 0.35);
+  border: 1px solid rgba(0, 212, 255, 0.35);
 }
 
 .match-participants {
@@ -289,14 +289,14 @@
   font-size: 1rem;
   font-weight: 500;
   padding: 4px 10px;
-  background: #333;
+  background: #1e2a4a;
   border-radius: 4px;
 }
 
 .participant.winner {
-  background: rgba(74, 222, 128, 0.15);
-  border: 1px solid #4ade80;
-  color: #4ade80;
+  background: rgba(52, 211, 153, 0.15);
+  border: 1px solid #34d399;
+  color: #34d399;
 }
 
 .participant.loser {
@@ -305,7 +305,7 @@
 
 .participant-wrestler {
   font-size: 0.8rem;
-  color: #888;
+  color: #64748b;
   margin-left: 4px;
   font-weight: 400;
 }
@@ -314,13 +314,13 @@
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: #4ade80;
+  color: #34d399;
 }
 
 .match-notes {
   margin-top: 8px;
   font-size: 0.8rem;
-  color: #888;
+  color: #64748b;
   font-style: italic;
 }
 

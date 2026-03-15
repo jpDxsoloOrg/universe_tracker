@@ -19,7 +19,10 @@ main {
 }
 
 h2 {
-  color: var(--color-primary);
+  background: linear-gradient(135deg, #00d4ff 0%, #a855f7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 1rem;
 }
 
@@ -36,7 +39,7 @@ h2 {
 
 .btn-primary {
   background-color: var(--color-primary);
-  color: #000;
+  color: #080c1a;
 }
 
 .btn-primary:hover {
@@ -76,7 +79,7 @@ h2 {
 /* Exclude nav/sidebar/topnav/language/hamburger so their own styles (e.g. gold text on dark) apply */
 button:not([class*="btn-"]):not(.sidebar-collapse-toggle):not(.nav-section-toggle):not(.nav-subgroup-toggle):not(.user-nav-toggle):not(.topnav-menu-btn):not(.topnav-logout):not(.topnav-layout-btn):not(.top-bar-layout-toggle):not(.hamburger-btn):not(.language-switcher-btn) {
   background-color: var(--color-primary);
-  color: #000;
+  color: #080c1a;
   border: none;
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
@@ -120,6 +123,10 @@ th {
   background-color: var(--color-surface);
   color: var(--color-primary);
   font-weight: bold;
+}
+
+tr {
+  transition: background-color 0.2s ease;
 }
 
 tr:hover {

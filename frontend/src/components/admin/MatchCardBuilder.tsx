@@ -19,7 +19,7 @@ const designationColors: Record<MatchDesignation, string> = {
   'opener': '#60a5fa',
   'midcard': '#a78bfa',
   'co-main': '#f59e0b',
-  'main-event': '#d4af37',
+  'main-event': '#00d4ff',
 };
 
 interface AvailableMatch {

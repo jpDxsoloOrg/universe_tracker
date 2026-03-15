@@ -5,8 +5,8 @@
   transition: left 0.2s ease;
   right: 0;
   height: 56px;
-  background-color: #1a1a1a;
-  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  background-color: #0d1225;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -30,7 +30,7 @@
 .top-bar-layout-toggle:hover {
   color: var(--color-primary-hover);
   border-color: var(--color-primary-hover);
-  background-color: rgba(212, 175, 55, 0.1) !important;
+  background-color: rgba(0, 212, 255, 0.1) !important;
 }
 
 .top-bar-breadcrumb {
@@ -42,18 +42,18 @@
 .top-bar-parent {
   font-size: 0.875rem;
   font-weight: 400;
-  color: #999;
+  color: #64748b;
 }
 
 .top-bar-separator {
   font-size: 0.875rem;
-  color: rgba(212, 175, 55, 0.4);
+  color: rgba(0, 212, 255, 0.3);
 }
 
 .top-bar-title {
   font-size: 1rem;
   font-weight: 500;
-  color: #fff;
+  color: #e2e8f0;
 }
 
 @media (max-width: 768px) {

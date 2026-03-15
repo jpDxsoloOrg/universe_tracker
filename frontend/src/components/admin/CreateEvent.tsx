@@ -13,7 +13,7 @@ const eventTypeOptions: { value: EventType; labelKey: string }[] = [
 ];
 
 const presetColors = [
-  '#d4af37', '#dc2626', '#1e40af', '#a78bfa',
+  '#00d4ff', '#dc2626', '#1e40af', '#a78bfa',
   '#4ade80', '#f59e0b', '#ec4899', '#6b7280',
 ];
 
@@ -44,7 +44,7 @@ export default function CreateEvent() {
   const [date, setDate] = useState('');
   const [venue, setVenue] = useState('');
   const [description, setDescription] = useState('');
-  const [themeColor, setThemeColor] = useState('#d4af37');
+  const [themeColor, setThemeColor] = useState('#00d4ff');
   const [seasonId, setSeasonId] = useState('');
   const [selectedCompanyIds, setSelectedCompanyIds] = useState<string[]>([]);
   const [seasons, setSeasons] = useState<Season[]>([]);

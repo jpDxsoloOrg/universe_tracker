@@ -22,17 +22,17 @@
 }
 
 .rb-nav-links a {
-  color: #d4af37;
+  color: #00d4ff;
   text-decoration: none;
   font-size: 0.85rem;
   padding: 0.3rem 0.6rem;
-  border: 1px solid #333;
+  border: 1px solid #1e2a4a;
   border-radius: 4px;
   transition: background-color 0.3s;
 }
 
 .rb-nav-links a:hover {
-  background-color: #333;
+  background-color: #1e2a4a;
 }
 
 /* Category Tabs */
@@ -45,9 +45,9 @@
 
 .rb-tab {
   padding: 0.5rem 1rem;
-  background-color: #222;
-  color: #bbb;
-  border: 1px solid #333;
+  background-color: #161d3a;
+  color: #94a3b8;
+  border: 1px solid #1e2a4a;
   border-radius: 20px;
   cursor: pointer;
   font-size: 0.85rem;
@@ -55,14 +55,14 @@
 }
 
 .rb-tab:hover {
-  background-color: #333;
+  background-color: #1e2a4a;
   color: #fff;
 }
 
 .rb-tab-active {
-  background-color: #d4af37;
+  background-color: #00d4ff;
   color: #000;
-  border-color: #d4af37;
+  border-color: #00d4ff;
   font-weight: bold;
 }
 
@@ -75,11 +75,11 @@
 }
 
 .rb-record-card {
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: #0f1429;
+  border: 1px solid #1e2a4a;
   border-radius: 8px;
   padding: 1.25rem;
-  border-top: 3px solid #d4af37;
+  border-top: 3px solid #00d4ff;
 }
 
 .rb-record-header {
@@ -98,7 +98,7 @@
 .rb-record-value {
   font-size: 1.4rem;
   font-weight: bold;
-  color: #d4af37;
+  color: #00d4ff;
   white-space: nowrap;
 }
 
@@ -108,25 +108,25 @@
 
 .rb-holder-name {
   font-weight: bold;
-  color: #4ade80;
+  color: #34d399;
   margin-right: 0.5rem;
 }
 
 .rb-holder-wrestler {
-  color: #bbb;
+  color: #94a3b8;
   font-size: 0.9rem;
 }
 
 .rb-record-desc {
   font-size: 0.85rem;
-  color: #888;
+  color: #64748b;
   margin-bottom: 0.5rem;
   line-height: 1.4;
 }
 
 .rb-record-date {
   font-size: 0.75rem;
-  color: #666;
+  color: #475569;
 }
 
 /* Active Threats */
@@ -141,7 +141,7 @@
 }
 
 .rb-threats-desc {
-  color: #bbb;
+  color: #94a3b8;
   font-size: 0.9rem;
   margin-bottom: 1rem;
 }
@@ -153,8 +153,8 @@
 }
 
 .rb-threat-card {
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: #0f1429;
+  border: 1px solid #1e2a4a;
   border-radius: 8px;
   padding: 1rem;
   border-left: 3px solid #f87171;
@@ -184,18 +184,18 @@
 
 .rb-threat-label {
   font-size: 0.7rem;
-  color: #888;
+  color: #64748b;
   text-transform: uppercase;
 }
 
 .rb-threat-holder {
   font-weight: bold;
-  color: #bbb;
+  color: #94a3b8;
   font-size: 0.9rem;
 }
 
 .rb-threat-current .rb-threat-holder {
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .rb-threat-challenger .rb-threat-holder {
@@ -209,7 +209,7 @@
 }
 
 .rb-threat-arrow {
-  color: #555;
+  color: #334155;
   font-weight: bold;
   font-size: 0.9rem;
 }

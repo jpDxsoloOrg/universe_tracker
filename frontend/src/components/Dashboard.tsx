@@ -11,6 +11,7 @@ import {
   resolveImageSrc,
 } from '../constants/imageFallbacks';
 import Skeleton from './ui/Skeleton';
+import AnimatedCounter from './ui/AnimatedCounter';
 import './Dashboard.css';
 
 function renderStarRating(rating: number): string {
@@ -289,20 +290,20 @@ export default function Dashboard() {
         <h3>{t('dashboard.quickStats')}</h3>
         <div className="dashboard-quick-stats">
           <div className="dashboard-stat-card">
-            <div className="stat-value">{data.quickStats.totalWrestlers}</div>
+            <div className="stat-value"><AnimatedCounter value={data.quickStats.totalWrestlers} /></div>
             <div className="stat-label">{t('standings.table.wrestler')}</div>
           </div>
           <div className="dashboard-stat-card">
-            <div className="stat-value">{data.quickStats.totalMatches}</div>
+            <div className="stat-value"><AnimatedCounter value={data.quickStats.totalMatches} /></div>
             <div className="stat-label">{t('dashboard.matchesPlayed')}</div>
           </div>
           <div className="dashboard-stat-card">
-            <div className="stat-value">{data.quickStats.activeChampionships}</div>
+            <div className="stat-value"><AnimatedCounter value={data.quickStats.activeChampionships} /></div>
             <div className="stat-label">{t('dashboard.champions')}</div>
           </div>
           {data.quickStats.mostWinsWrestler && (
             <div className="dashboard-stat-card">
-              <div className="stat-value">{data.quickStats.mostWinsWrestler.wins}</div>
+              <div className="stat-value"><AnimatedCounter value={data.quickStats.mostWinsWrestler.wins} /></div>
               <div className="stat-label">{t('dashboard.mostWins')}: {data.quickStats.mostWinsWrestler.name}</div>
             </div>
           )}

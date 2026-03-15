@@ -16,12 +16,12 @@
 }
 
 .wrestlers-subtext a {
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .wrestler-form-container {
-  background-color: #1a1a1a;
-  border: 2px solid #d4af37;
+  background-color: #0f1429;
+  border: 2px solid #00d4ff;
   border-radius: 8px;
   padding: 2rem;
   margin-bottom: 2rem;
@@ -30,29 +30,12 @@
 .wrestler-form-container h3 {
   margin-top: 0;
   margin-bottom: 1.5rem;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .wrestler-form {
   display: grid;
   gap: 1.5rem;
-}
-
-.form-actions {
-  display: flex;
-  gap: 1rem;
-}
-
-.form-actions button {
-  flex: 1;
-}
-
-.cancel-btn {
-  background-color: #333 !important;
-}
-
-.cancel-btn:hover {
-  background-color: #444 !important;
 }
 
 .wrestlers-list h3 {
@@ -74,7 +57,7 @@
 
 .wrestlers-table .record {
   font-family: monospace;
-  color: #bbb;
+  color: #94a3b8;
 }
 
 .actions-cell {
@@ -109,63 +92,27 @@
   cursor: not-allowed;
 }
 
-.error-message {
-  background-color: #7f1d1d;
-  color: #fecaca;
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  border: 1px solid #991b1b;
-}
-
 /* Image Upload Styles */
 .image-upload-container {
   margin-top: 0.5rem;
 }
 
 .image-upload-box {
-  border: 2px dashed #444;
+  border: 2px dashed #334155;
   border-radius: 8px;
   padding: 2rem;
   text-align: center;
-  background-color: #222;
+  background-color: #161d3a;
   transition: border-color 0.2s;
 }
 
 .image-upload-box:hover {
-  border-color: #d4af37;
-}
-
-.file-input {
-  display: none;
-}
-
-.file-input-label,
-.form-group .file-input-label,
-.image-upload-box .file-input-label,
-label.file-input-label {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background-color: #d4af37;
-  color: #000 !important;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s;
-  text-shadow: none;
-}
-
-.file-input-label:hover,
-.form-group .file-input-label:hover,
-.image-upload-box .file-input-label:hover,
-label.file-input-label:hover {
-  background-color: #b8962e;
-  color: #000 !important;
+  border-color: #00d4ff;
 }
 
 .upload-hint {
   margin-top: 0.75rem;
-  color: #888;
+  color: #64748b;
   font-size: 0.875rem;
 }
 
@@ -180,7 +127,7 @@ label.file-input-label:hover {
   max-width: 200px;
   max-height: 200px;
   border-radius: 8px;
-  border: 2px solid #d4af37;
+  border: 2px solid #00d4ff;
   object-fit: cover;
 }
 
@@ -201,19 +148,19 @@ label.file-input-label:hover {
   height: 50px;
   border-radius: 4px;
   object-fit: cover;
-  border: 1px solid #444;
+  border: 1px solid #334155;
 }
 
 .no-image {
   width: 50px;
   height: 50px;
   border-radius: 4px;
-  background-color: #333;
+  background-color: #1e2a4a;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.625rem;
-  color: #666;
+  color: #475569;
   text-align: center;
 }
 
@@ -235,9 +182,9 @@ label.file-input-label:hover {
   font-size: 0.75rem;
   font-weight: bold;
   border-radius: 4px;
-  background-color: #333;
-  color: #888;
-  border: 1px solid #444;
+  background-color: #1e2a4a;
+  color: #64748b;
+  border: 1px solid #334155;
 }
 
 @media (max-width: 768px) {
@@ -249,10 +196,6 @@ label.file-input-label:hover {
 
   .wrestler-form-container {
     padding: 1rem;
-  }
-
-  .form-actions {
-    flex-direction: column;
   }
 
   .image-upload-box {

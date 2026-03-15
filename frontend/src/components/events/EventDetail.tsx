@@ -7,7 +7,7 @@ import Skeleton from '../ui/Skeleton';
 import './EventDetail.css';
 
 const eventTypeColors: Record<string, string> = {
-  ppv: '#d4af37',
+  ppv: '#00d4ff',
   weekly: '#60a5fa',
   special: '#a78bfa',
   house: '#9ca3af',
@@ -33,7 +33,7 @@ const designationColors: Record<MatchDesignation, string> = {
   'opener': '#60a5fa',
   'midcard': '#a78bfa',
   'co-main': '#f59e0b',
-  'main-event': '#d4af37',
+  'main-event': '#00d4ff',
 };
 
 export default function EventDetail() {

@@ -4,7 +4,7 @@
 
 .dashboard-title {
   margin: 0 0 1.5rem 0;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .dashboard-section {
@@ -13,12 +13,12 @@
 
 .dashboard-section h3 {
   font-size: 1.125rem;
-  color: #d4af37;
+  color: #00d4ff;
   margin-bottom: 0.75rem;
 }
 
 .dashboard-empty {
-  color: #888;
+  color: #64748b;
   font-size: 0.9375rem;
   margin: 0;
 }
@@ -32,7 +32,7 @@
 
 .dashboard-empty-action {
   font-size: 0.85rem;
-  color: #d4af37;
+  color: #00d4ff;
   text-decoration: none;
 }
 
@@ -52,11 +52,18 @@
 .dashboard-champion-card {
   flex: 0 0 auto;
   width: 180px;
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: #0f1429;
+  border: 1px solid #1e2a4a;
   border-radius: 8px;
   padding: 1rem;
   text-align: center;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.dashboard-champion-card:hover {
+  border-color: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1);
+  transform: translateY(-2px);
 }
 
 .dashboard-champion-card img {
@@ -69,7 +76,7 @@
 
 .dashboard-champion-card .champ-belt {
   font-size: 0.75rem;
-  color: #d4af37;
+  color: #00d4ff;
   margin-bottom: 0.25rem;
 }
 
@@ -86,10 +93,17 @@
 }
 
 .dashboard-event-card {
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: #0f1429;
+  border: 1px solid #1e2a4a;
   border-radius: 8px;
   padding: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.dashboard-event-card:hover {
+  border-color: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1);
+  transform: translateY(-2px);
 }
 
 .dashboard-event-card .event-name {
@@ -99,13 +113,13 @@
 
 .dashboard-event-card .event-date {
   font-size: 0.875rem;
-  color: #bbb;
+  color: #94a3b8;
 }
 
 .dashboard-event-card .event-countdown {
   margin-top: 0.5rem;
   font-size: 0.875rem;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 /* Recent results */
@@ -124,11 +138,11 @@
 .dashboard-results-date-separator {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #d4af37;
+  color: #00d4ff;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding-bottom: 0.25rem;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #1e2a4a;
 }
 
 .dashboard-results-list {
@@ -143,16 +157,19 @@
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: #0f1429;
+  border: 1px solid #1e2a4a;
   border-radius: 6px;
   text-decoration: none;
   color: inherit;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 
 .dashboard-result-card:hover {
-  border-color: #d4af37;
-  background-color: #222;
+  border-color: rgba(0, 212, 255, 0.3);
+  background-color: #161d3a;
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1);
+  transform: translateY(-2px);
 }
 
 .dashboard-result-outcome {
@@ -164,16 +181,16 @@
 
 .dashboard-result-card .result-winner {
   font-weight: 600;
-  color: #4ade80;
+  color: #34d399;
 }
 
 .dashboard-result-card .result-vs {
-  color: #888;
+  color: #64748b;
   font-size: 0.875rem;
 }
 
 .dashboard-result-card .result-loser {
-  color: #bbb;
+  color: #94a3b8;
 }
 
 .dashboard-result-meta {
@@ -198,22 +215,22 @@
 .dashboard-result-card .result-star-value {
   margin-left: 2px;
   font-size: 0.7rem;
-  color: #888;
+  color: #64748b;
 }
 
 .dashboard-result-card .result-motn-badge {
   font-size: 0.65rem;
   font-weight: 700;
-  color: #d4af37;
+  color: #00d4ff;
   text-transform: uppercase;
   padding: 2px 6px;
-  border: 1px solid rgba(212, 175, 55, 0.5);
+  border: 1px solid rgba(0, 212, 255, 0.5);
   border-radius: 4px;
 }
 
 .dashboard-result-card .result-type {
   font-size: 0.75rem;
-  color: #888;
+  color: #64748b;
 }
 
 .dashboard-result-card .result-championship-image {
@@ -224,15 +241,22 @@
 
 .dashboard-result-card .result-championship-name {
   font-size: 0.75rem;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 /* Season progress */
 .dashboard-season-card {
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: #0f1429;
+  border: 1px solid #1e2a4a;
   border-radius: 8px;
   padding: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.dashboard-season-card:hover {
+  border-color: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1);
+  transform: translateY(-2px);
 }
 
 .dashboard-season-card .season-name {
@@ -242,20 +266,20 @@
 
 .dashboard-season-card .season-meta {
   font-size: 0.875rem;
-  color: #bbb;
+  color: #94a3b8;
   margin-bottom: 0.75rem;
 }
 
 .dashboard-season-card .season-progress-bar {
   height: 8px;
-  background-color: #333;
+  background-color: #1e2a4a;
   border-radius: 4px;
   overflow: hidden;
 }
 
 .dashboard-season-card .season-progress-fill {
   height: 100%;
-  background-color: #d4af37;
+  background-color: #00d4ff;
   border-radius: 4px;
   transition: width 0.3s ease;
 }
@@ -268,22 +292,29 @@
 }
 
 .dashboard-stat-card {
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: #0f1429;
+  border: 1px solid #1e2a4a;
   border-radius: 8px;
   padding: 1rem;
   text-align: center;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.dashboard-stat-card:hover {
+  border-color: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1);
+  transform: translateY(-2px);
 }
 
 .dashboard-stat-card .stat-value {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .dashboard-stat-card .stat-label {
   font-size: 0.75rem;
-  color: #888;
+  color: #64748b;
   margin-top: 0.25rem;
 }
 
@@ -293,20 +324,20 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background-color: #1a1a1a;
-  border: 1px solid #d4af37;
+  background-color: #0f1429;
+  border: 1px solid #00d4ff;
   border-radius: 6px;
-  color: #d4af37;
+  color: #00d4ff;
   text-decoration: none;
   font-weight: 600;
 }
 
 .dashboard-challenges-cta:hover {
-  background-color: #222;
+  background-color: #161d3a;
 }
 
 .dashboard-challenges-cta .badge {
-  background-color: #d4af37;
+  background-color: #00d4ff;
   color: #000;
   font-size: 0.75rem;
   padding: 0.15rem 0.5rem;
@@ -316,22 +347,22 @@
 /* Loading skeleton */
 .dashboard-loading .dashboard-section {
   min-height: 80px;
-  background-color: #1a1a1a;
+  background-color: #0f1429;
   border-radius: 8px;
-  border: 1px solid #333;
+  border: 1px solid #1e2a4a;
 }
 
 .dashboard-error {
   padding: 2rem;
   text-align: center;
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: #0f1429;
+  border: 1px solid #1e2a4a;
   border-radius: 8px;
 }
 
 .dashboard-error p {
   margin-bottom: 1rem;
-  color: #ccc;
+  color: #cbd5e1;
 }
 
 @media (max-width: 768px) {

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './i18n';
 import { AuthProvider } from './contexts/AuthContext';
 import { SiteConfigProvider } from './contexts/SiteConfigContext';
@@ -42,6 +42,8 @@ import EventDetail from './components/events/EventDetail';
 import EventResults from './components/events/EventResults';
 // Route guard
 import FeatureRoute from './components/FeatureRoute';
+import PageTransition from './components/ui/PageTransition';
+import ToastProvider from './components/ui/ToastProvider';
 import './App.css';
 
 function App() {
@@ -63,8 +65,10 @@ function App() {
 
 function AppLayout() {
   const { mode } = useNavLayout();
+  const location = useLocation();
   return (
     <div className={`App layout-${mode}`}>
+      <ToastProvider />
       {mode === 'sidebar' ? (
         <>
           <Sidebar />
@@ -74,6 +78,7 @@ function AppLayout() {
         <TopNav />
       )}
       <main>
+        <PageTransition key={location.pathname}>
           <Routes>
             {/* Auth Routes */}
             <Route path="/login" element={<Login />} />
@@ -143,7 +148,8 @@ function AppLayout() {
 
             {/* Catch-all 404 */}
             <Route path="*" element={<NotFound />} />
-        </Routes>
+          </Routes>
+        </PageTransition>
       </main>
     </div>
   );

@@ -10,8 +10,8 @@
 }
 
 .championship-form-container {
-  background-color: #1a1a1a;
-  border: 2px solid #d4af37;
+  background-color: #0f1429;
+  border: 2px solid #00d4ff;
   border-radius: 8px;
   padding: 2rem;
   margin-bottom: 2rem;
@@ -20,7 +20,7 @@
 .championship-form-container h3 {
   margin-top: 0;
   margin-bottom: 1.5rem;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .championship-form {
@@ -39,8 +39,8 @@
 }
 
 .championship-card {
-  background-color: #1a1a1a;
-  border: 2px solid #d4af37;
+  background-color: #0f1429;
+  border: 2px solid #00d4ff;
   border-radius: 8px;
   padding: 1.5rem;
   min-width: 0;
@@ -48,12 +48,12 @@
 
 .championship-card h4 {
   margin: 0 0 1rem 0;
-  color: #d4af37;
+  color: #00d4ff;
   font-size: 1.125rem;
 }
 
 .championship-type {
-  color: #bbb;
+  color: #94a3b8;
   margin-bottom: 0.75rem;
   font-size: 0.875rem;
 }
@@ -64,7 +64,7 @@
 
 .status-active {
   background-color: #14532d;
-  color: #4ade80;
+  color: #34d399;
   padding: 0.25rem 0.75rem;
   border-radius: 4px;
   font-size: 0.875rem;
@@ -86,48 +86,21 @@
 }
 
 .image-upload-box {
-  border: 2px dashed #444;
+  border: 2px dashed #334155;
   border-radius: 8px;
   padding: 2rem;
   text-align: center;
-  background-color: #222;
+  background-color: #161d3a;
   transition: border-color 0.2s;
 }
 
 .image-upload-box:hover {
-  border-color: #d4af37;
-}
-
-.file-input {
-  display: none;
-}
-
-.file-input-label,
-.form-group .file-input-label,
-.image-upload-box .file-input-label,
-label.file-input-label {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  background-color: #d4af37;
-  color: #000 !important;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s;
-  text-shadow: none;
-}
-
-.file-input-label:hover,
-.form-group .file-input-label:hover,
-.image-upload-box .file-input-label:hover,
-label.file-input-label:hover {
-  background-color: #b8962e;
-  color: #000 !important;
+  border-color: #00d4ff;
 }
 
 .upload-hint {
   margin-top: 0.75rem;
-  color: #888;
+  color: #64748b;
   font-size: 0.875rem;
 }
 
@@ -142,7 +115,7 @@ label.file-input-label:hover {
   max-width: 200px;
   max-height: 200px;
   border-radius: 8px;
-  border: 2px solid #d4af37;
+  border: 2px solid #00d4ff;
   object-fit: cover;
 }
 
@@ -157,32 +130,6 @@ label.file-input-label:hover {
   background-color: #991b1b !important;
 }
 
-.form-actions {
-  display: flex;
-  gap: 1rem;
-}
-
-.form-actions button {
-  flex: 1;
-}
-
-.cancel-btn {
-  background-color: #333 !important;
-}
-
-.cancel-btn:hover {
-  background-color: #444 !important;
-}
-
-.error-message {
-  background-color: #7f1d1d;
-  color: #fecaca;
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  border: 1px solid #991b1b;
-}
-
 /* Championship Image in Card */
 .championship-image {
   width: 100%;
@@ -190,26 +137,26 @@ label.file-input-label:hover {
   object-fit: contain;
   border-radius: 4px;
   margin-bottom: 1rem;
-  background-color: #222;
+  background-color: #161d3a;
 }
 
 .championship-no-image {
   width: 100%;
   height: 150px;
   border-radius: 4px;
-  background-color: #222;
+  background-color: #161d3a;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #666;
+  color: #475569;
   margin-bottom: 1rem;
-  border: 1px dashed #444;
+  border: 1px dashed #334155;
 }
 
 .championship-actions {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #333;
+  border-top: 1px solid #1e2a4a;
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
@@ -277,13 +224,13 @@ label.file-input-label:hover {
 }
 
 .championship-division {
-  color: #bbb;
+  color: #94a3b8;
   margin-bottom: 0.5rem;
   font-size: 0.875rem;
 }
 
 .championship-champion {
-  color: #d4af37;
+  color: #00d4ff;
   font-weight: bold;
   margin-bottom: 0.5rem;
   font-size: 0.875rem;
@@ -316,10 +263,6 @@ label.file-input-label:hover {
   .championship-vacate-btn,
   .championship-delete-btn {
     min-width: 100%;
-  }
-
-  .form-actions {
-    flex-direction: column;
   }
 
   .image-upload-box {

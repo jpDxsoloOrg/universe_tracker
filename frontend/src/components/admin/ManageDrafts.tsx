@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import ConfettiExplosion from 'react-confetti-explosion';
 import { draftsApi, companiesApi, wrestlersApi } from '../../services/api';
 import type { Draft, Company, Wrestler } from '../../types';
+import { useConfetti } from '../../hooks/useConfetti';
 import Skeleton from '../ui/Skeleton';
 import './ManageDrafts.css';
 
@@ -36,6 +38,7 @@ export default function ManageDrafts() {
   const [picking, setPicking] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [protecting, setProtecting] = useState(false);
+  const { isExploding, triggerConfetti } = useConfetti();
 
   // --- Helper functions ---
 
@@ -298,6 +301,7 @@ export default function ManageDrafts() {
     try {
       const updated = await draftsApi.complete(draft.draftId);
       setSuccess(t('drafts.completeDraft') + ' - OK');
+      triggerConfetti();
       await loadDrafts();
       if (view === 'detail') {
         setSelectedDraft(updated);
@@ -335,6 +339,9 @@ export default function ManageDrafts() {
     try {
       const result = await draftsApi.makePick(selectedDraft.draftId, currentCompany, selectedWrestlerId);
       setSelectedDraft(result.draft);
+      if (result.draft.status === 'completed') {
+        triggerConfetti();
+      }
       setSelectedWrestlerId('');
       setSuccess(t('drafts.pickSuccess'));
       await loadDrafts();
@@ -884,6 +891,16 @@ export default function ManageDrafts() {
 
   return (
     <div className="manage-drafts">
+      {isExploding && (
+        <div style={{ position: 'fixed', top: '50%', left: '50%', zIndex: 9999 }}>
+          <ConfettiExplosion
+            force={0.8}
+            duration={3000}
+            particleCount={150}
+            colors={['#00d4ff', '#a855f7', '#34d399', '#fbbf24', '#f43f5e']}
+          />
+        </div>
+      )}
       {view === 'list' && renderListView()}
       {view === 'create' && renderCreateView()}
       {view === 'detail' && renderDetailView()}

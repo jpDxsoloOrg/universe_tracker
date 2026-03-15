@@ -10,7 +10,7 @@ import EventCard from './EventCard';
 import './EventsCalendar.css';
 
 const eventTypeColors: Record<string, string> = {
-  ppv: '#d4af37',
+  ppv: '#00d4ff',
   weekly: '#60a5fa',
   special: '#a78bfa',
   house: '#9ca3af',
@@ -277,7 +277,7 @@ export default function EventsCalendar() {
         {/* Legend */}
         <div className="calendar-legend">
           <div className="legend-item">
-            <span className="legend-dot" style={{ backgroundColor: '#d4af37' }} />
+            <span className="legend-dot" style={{ backgroundColor: '#00d4ff' }} />
             <span>{t('events.types.ppv')}</span>
           </div>
           <div className="legend-item">

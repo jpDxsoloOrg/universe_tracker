@@ -7,7 +7,7 @@
   display: flex;
   gap: 0;
   margin-bottom: 2rem;
-  border-bottom: 2px solid #333;
+  border-bottom: 2px solid #1e2a4a;
 }
 
 .match-config-tab-btn {
@@ -15,7 +15,7 @@
   background-color: transparent;
   border: none;
   border-bottom: 3px solid transparent;
-  color: #999;
+  color: #64748b;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -23,12 +23,12 @@
 }
 
 .match-config-tab-btn:hover {
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .match-config-tab-btn.active {
-  color: #d4af37;
-  border-bottom-color: #d4af37;
+  color: #00d4ff;
+  border-bottom-color: #00d4ff;
 }
 
 /* Header */
@@ -41,8 +41,8 @@
 
 /* Form container */
 .match-config-form-container {
-  background-color: #1a1a1a;
-  border: 2px solid #d4af37;
+  background-color: #0f1429;
+  border: 2px solid #00d4ff;
   border-radius: 8px;
   padding: 2rem;
   margin-bottom: 2rem;
@@ -51,7 +51,7 @@
 .match-config-form-container h3 {
   margin-top: 0;
   margin-bottom: 1.5rem;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 /* Form grid */
@@ -63,8 +63,8 @@
 .match-config-form textarea {
   width: 100%;
   padding: 0.75rem;
-  background-color: #222;
-  border: 2px solid #444;
+  background-color: #161d3a;
+  border: 2px solid #334155;
   border-radius: 4px;
   color: #fff;
   font-family: inherit;
@@ -74,7 +74,7 @@
 
 .match-config-form textarea:focus {
   outline: none;
-  border-color: #d4af37;
+  border-color: #00d4ff;
 }
 
 /* List section */
@@ -91,20 +91,20 @@
 
 /* Individual card */
 .match-config-card {
-  background-color: #1a1a1a;
-  border: 2px solid #d4af37;
+  background-color: #0f1429;
+  border: 2px solid #00d4ff;
   border-radius: 8px;
   padding: 1.5rem;
 }
 
 .match-config-card h4 {
   margin: 0 0 0.75rem 0;
-  color: #d4af37;
+  color: #00d4ff;
   font-size: 1.25rem;
 }
 
 .match-config-description {
-  color: #bbb;
+  color: #94a3b8;
   margin-bottom: 1rem;
   font-size: 0.875rem;
   line-height: 1.5;
@@ -116,7 +116,7 @@
   gap: 0.75rem;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #333;
+  border-top: 1px solid #1e2a4a;
 }
 
 .match-config-edit-btn {

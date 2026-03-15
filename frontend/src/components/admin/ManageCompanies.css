@@ -10,8 +10,8 @@
 }
 
 .company-form-container {
-  background-color: #1a1a1a;
-  border: 2px solid #d4af37;
+  background-color: #0f1429;
+  border: 2px solid #00d4ff;
   border-radius: 8px;
   padding: 2rem;
   margin-bottom: 2rem;
@@ -20,7 +20,7 @@
 .company-form-container h3 {
   margin-top: 0;
   margin-bottom: 1.5rem;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .company-form {
@@ -31,8 +31,8 @@
 .company-form textarea {
   width: 100%;
   padding: 0.75rem;
-  background-color: #222;
-  border: 2px solid #444;
+  background-color: #161d3a;
+  border: 2px solid #334155;
   border-radius: 4px;
   color: #fff;
   font-family: inherit;
@@ -42,7 +42,7 @@
 
 .company-form textarea:focus {
   outline: none;
-  border-color: #d4af37;
+  border-color: #00d4ff;
 }
 
 .companies-list h3 {
@@ -56,22 +56,22 @@
 }
 
 .company-card {
-  background-color: #1a1a1a;
-  border: 2px solid #d4af37;
+  background-color: #0f1429;
+  border: 2px solid #00d4ff;
   border-radius: 8px;
   padding: 1.5rem;
 }
 
 .company-card h4 {
   margin: 0 0 0.5rem 0;
-  color: #d4af37;
+  color: #00d4ff;
   font-size: 1.25rem;
 }
 
 .company-abbreviation {
   display: inline-block;
-  background-color: #333;
-  color: #d4af37;
+  background-color: #1e2a4a;
+  color: #00d4ff;
   padding: 0.15rem 0.5rem;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -80,7 +80,7 @@
 }
 
 .company-description {
-  color: #bbb;
+  color: #94a3b8;
   margin-bottom: 1rem;
   font-size: 0.875rem;
   line-height: 1.5;
@@ -91,7 +91,7 @@
   gap: 0.75rem;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #333;
+  border-top: 1px solid #1e2a4a;
 }
 
 .company-edit-btn {
@@ -125,7 +125,7 @@
 .empty-state {
   text-align: center;
   padding: 2rem;
-  color: #888;
+  color: #64748b;
 }
 
 @media (max-width: 768px) {

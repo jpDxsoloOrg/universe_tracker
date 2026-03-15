@@ -10,8 +10,8 @@
 }
 
 .season-form-container {
-  background-color: #1a1a1a;
-  border: 2px solid #d4af37;
+  background-color: #0f1429;
+  border: 2px solid #00d4ff;
   border-radius: 8px;
   padding: 2rem;
   margin-bottom: 2rem;
@@ -20,7 +20,7 @@
 .season-form-container h3 {
   margin-top: 0;
   margin-bottom: 1.5rem;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .season-form {
@@ -36,7 +36,7 @@
 
 .active-season-banner {
   background: linear-gradient(135deg, #1a3a1a 0%, #0d2a0d 100%);
-  border: 2px solid #4ade80;
+  border: 2px solid #34d399;
   border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 2rem;
@@ -53,7 +53,7 @@
 
 .active-season-info p {
   margin: 0;
-  color: #bbb;
+  color: #94a3b8;
 }
 
 .status-badge {
@@ -67,12 +67,12 @@
 
 .status-badge.active {
   background-color: #14532d;
-  color: #4ade80;
+  color: #34d399;
 }
 
 .status-badge.completed {
-  background-color: #333;
-  color: #999;
+  background-color: #1e2a4a;
+  color: #64748b;
 }
 
 .end-season-btn {
@@ -130,15 +130,15 @@
 }
 
 .season-card {
-  background-color: #1a1a1a;
-  border: 2px solid #333;
+  background-color: #0f1429;
+  border: 2px solid #1e2a4a;
   border-radius: 8px;
   padding: 1.5rem;
   transition: border-color 0.2s;
 }
 
 .season-card.active {
-  border-color: #4ade80;
+  border-color: #34d399;
 }
 
 .season-card-header {
@@ -150,12 +150,12 @@
 
 .season-card h4 {
   margin: 0;
-  color: #d4af37;
+  color: #00d4ff;
   font-size: 1.125rem;
 }
 
 .season-dates {
-  color: #bbb;
+  color: #94a3b8;
   font-size: 0.875rem;
 }
 
@@ -166,31 +166,13 @@
 .season-card .season-actions {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #333;
+  border-top: 1px solid #1e2a4a;
 }
 
 .empty-state {
-  color: #888;
+  color: #64748b;
   text-align: center;
   padding: 2rem;
-}
-
-.error-message {
-  background-color: #7f1d1d;
-  color: #fecaca;
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  border: 1px solid #991b1b;
-}
-
-.success-message {
-  background-color: #14532d;
-  color: #4ade80;
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  border: 1px solid #166534;
 }
 
 @media (max-width: 768px) {

@@ -11,8 +11,8 @@
   z-index: 10;
   min-width: 140px;
   padding: 0.5rem 0.75rem;
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: #0f1429;
+  border: 1px solid #1e2a4a;
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   pointer-events: none;
@@ -20,7 +20,7 @@
 
 .wrestler-hover-card-row {
   font-size: 0.8rem;
-  color: #ccc;
+  color: #cbd5e1;
   white-space: nowrap;
 }
 
@@ -29,6 +29,6 @@
 }
 
 .wrestler-hover-card-label {
-  color: #888;
+  color: #64748b;
   margin-right: 0.5rem;
 }

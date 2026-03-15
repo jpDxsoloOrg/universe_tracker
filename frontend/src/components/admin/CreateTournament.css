@@ -5,8 +5,8 @@
 }
 
 .tournament-form {
-  background-color: #1a1a1a;
-  border: 2px solid #333;
+  background-color: #0f1429;
+  border: 2px solid #1e2a4a;
   border-radius: 8px;
   padding: 2rem;
   margin-top: 1.5rem;
@@ -15,12 +15,12 @@
 .help-text {
   display: block;
   margin-top: 0.5rem;
-  color: #888;
+  color: #64748b;
   font-size: 0.875rem;
 }
 
 .participant-card .participant-record {
-  color: #888;
+  color: #64748b;
   font-size: 0.75rem;
   margin-top: 0.25rem;
   font-family: monospace;
@@ -37,8 +37,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: #0f1429;
+  border: 1px solid #1e2a4a;
   border-radius: 6px;
   padding: 0.6rem 0.75rem;
 }
@@ -50,9 +50,9 @@
 }
 
 .seed-badge {
-  background-color: #2a2416;
-  color: #d4af37;
-  border: 1px solid #d4af37;
+  background-color: #0a1a2e;
+  color: #00d4ff;
+  border: 1px solid #00d4ff;
   border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 700;

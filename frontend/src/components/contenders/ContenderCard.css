@@ -4,20 +4,20 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem;
-  background-color: #222;
-  border: 2px solid #333;
+  background-color: #161d3a;
+  border: 2px solid #1e2a4a;
   border-radius: 8px;
   transition: all 0.2s ease;
 }
 
 .contender-card:hover {
-  border-color: #444;
+  border-color: #334155;
   background-color: #2d2d2d;
 }
 
 .contender-card.top-contender {
-  border-color: #d4af37;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.05), transparent);
+  border-color: #00d4ff;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.05), transparent);
 }
 
 /* Rank Section */
@@ -36,18 +36,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #1a1a1a;
-  border: 2px solid #444;
+  background-color: #0f1429;
+  border: 2px solid #334155;
   border-radius: 50%;
   font-size: 1.5rem;
   font-weight: bold;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .top-contender .rank-number {
-  border-color: #d4af37;
-  background-color: rgba(212, 175, 55, 0.1);
-  box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  border-color: #00d4ff;
+  background-color: rgba(0, 212, 255, 0.1);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
 }
 
 /* Movement Indicator */
@@ -65,9 +65,9 @@
 }
 
 .movement-badge.up {
-  background-color: rgba(74, 222, 128, 0.2);
-  color: #4ade80;
-  border: 1px solid #4ade80;
+  background-color: rgba(52, 211, 153, 0.2);
+  color: #34d399;
+  border: 1px solid #34d399;
 }
 
 .movement-badge.down {
@@ -77,16 +77,16 @@
 }
 
 .movement-badge.new {
-  background-color: rgba(212, 175, 55, 0.2);
-  color: #d4af37;
-  border: 1px solid #d4af37;
+  background-color: rgba(0, 212, 255, 0.2);
+  color: #00d4ff;
+  border: 1px solid #00d4ff;
   text-transform: uppercase;
 }
 
 .movement-badge.stable {
   background-color: rgba(136, 136, 136, 0.2);
-  color: #888;
-  border: 1px solid #888;
+  color: #64748b;
+  border: 1px solid #64748b;
 }
 
 /* Image */
@@ -101,7 +101,7 @@
   height: 100%;
   object-fit: cover;
   border-radius: 8px;
-  border: 2px solid #333;
+  border: 2px solid #1e2a4a;
 }
 
 .placeholder-image {
@@ -110,12 +110,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #333;
+  background-color: #1e2a4a;
   border-radius: 8px;
-  border: 2px solid #444;
+  border: 2px solid #334155;
   font-size: 1.5rem;
   font-weight: bold;
-  color: #666;
+  color: #475569;
 }
 
 /* Info */
@@ -136,7 +136,7 @@
 .contender-info .wrestler-name {
   margin: 0 0 0.75rem 0;
   font-size: 0.875rem;
-  color: #888;
+  color: #64748b;
 }
 
 /* Stats */
@@ -153,14 +153,14 @@
 
 .stat-label {
   font-size: 0.75rem;
-  color: #666;
+  color: #475569;
   text-transform: uppercase;
 }
 
 .stat-value {
   font-size: 1rem;
   font-weight: bold;
-  color: #bbb;
+  color: #94a3b8;
 }
 
 /* Streak */
@@ -172,8 +172,8 @@
 }
 
 .streak.positive {
-  background-color: rgba(74, 222, 128, 0.2);
-  color: #4ade80;
+  background-color: rgba(52, 211, 153, 0.2);
+  color: #34d399;
 }
 
 .streak.negative {
@@ -182,7 +182,7 @@
 }
 
 .streak.neutral {
-  color: #666;
+  color: #475569;
 }
 
 /* Top Contender Badge */
@@ -191,7 +191,7 @@
   top: 0.5rem;
   right: 0.5rem;
   padding: 0.25rem 0.75rem;
-  background-color: #d4af37;
+  background-color: #00d4ff;
   border-radius: 4px;
   font-size: 0.75rem;
   font-weight: bold;
@@ -225,7 +225,7 @@
     justify-content: space-between;
     margin-top: 0.5rem;
     padding-top: 0.5rem;
-    border-top: 1px solid #333;
+    border-top: 1px solid #1e2a4a;
   }
 
   .top-contender-badge {

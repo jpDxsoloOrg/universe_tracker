@@ -12,8 +12,8 @@
 .searchable-select-input {
   width: 100%;
   padding: 0.5rem 2rem 0.5rem 0.75rem;
-  background-color: #0f0f0f;
-  border: 1px solid #333;
+  background-color: #080c1a;
+  border: 1px solid #1e2a4a;
   border-radius: 4px;
   color: #e0e0e0;
   font-size: 0.9rem;
@@ -21,7 +21,7 @@
 
 .searchable-select-input:focus {
   outline: none;
-  border-color: #d4af37;
+  border-color: #00d4ff;
 }
 
 .searchable-select-clear {
@@ -29,7 +29,7 @@
   right: 0.5rem;
   background: none;
   border: none;
-  color: #888;
+  color: #64748b;
   font-size: 1.1rem;
   cursor: pointer;
   padding: 0 0.25rem;
@@ -37,7 +37,7 @@
 }
 
 .searchable-select-clear:hover {
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .searchable-select-dropdown {
@@ -47,8 +47,8 @@
   right: 0;
   max-height: 200px;
   overflow-y: auto;
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: #0f1429;
+  border: 1px solid #1e2a4a;
   border-top: none;
   border-radius: 0 0 4px 4px;
   z-index: 100;
@@ -62,19 +62,19 @@
 }
 
 .searchable-select-option:hover {
-  background-color: #2a2416;
-  color: #d4af37;
+  background-color: #0a1a2e;
+  color: #00d4ff;
 }
 
 .searchable-select-option.selected {
-  background-color: #2a2416;
-  color: #d4af37;
+  background-color: #0a1a2e;
+  color: #00d4ff;
   font-weight: bold;
 }
 
 .searchable-select-no-results {
   padding: 0.5rem 0.75rem;
-  color: #666;
+  color: #475569;
   font-style: italic;
   font-size: 0.9rem;
 }

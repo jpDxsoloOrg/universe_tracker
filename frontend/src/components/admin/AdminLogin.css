@@ -6,8 +6,8 @@
 }
 
 .admin-login-card {
-  background-color: #1a1a1a;
-  border: 2px solid #d4af37;
+  background-color: #0f1429;
+  border: 2px solid #00d4ff;
   border-radius: 8px;
   padding: 2rem;
   width: 100%;
@@ -26,21 +26,12 @@
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  color: #d4af37;
+  color: #00d4ff;
   font-weight: bold;
 }
 
 .form-group input {
   width: 100%;
-}
-
-.error-message {
-  background-color: #7f1d1d;
-  color: #fecaca;
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  border: 1px solid #991b1b;
 }
 
 .admin-login-card button {
@@ -51,7 +42,7 @@
 .login-note {
   text-align: center;
   margin-top: 1rem;
-  color: #888;
+  color: #64748b;
 }
 
 @media (max-width: 768px) {

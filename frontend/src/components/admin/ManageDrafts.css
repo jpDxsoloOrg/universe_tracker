@@ -21,8 +21,8 @@
 }
 
 .status-setup {
-  background-color: #555;
-  color: #ccc;
+  background-color: #334155;
+  color: #cbd5e1;
 }
 
 .status-active {
@@ -78,18 +78,18 @@
 .draft-list td {
   text-align: left;
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #1e2a4a;
 }
 
 .draft-list th {
-  color: #d4af37;
+  color: #00d4ff;
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .draft-list tr:hover td {
-  background-color: #222;
+  background-color: #161d3a;
 }
 
 .draft-actions {
@@ -111,11 +111,11 @@
 }
 
 .draft-edit-btn {
-  background-color: #d4af37;
-  color: #111;
+  background-color: #00d4ff;
+  color: #0a1128;
 }
 .draft-edit-btn:hover {
-  background-color: #c9a02e;
+  background-color: #00b8e6;
 }
 
 .draft-delete-btn {
@@ -140,8 +140,8 @@
 
 /* Draft form */
 .draft-form-container {
-  background-color: #1a1a1a;
-  border: 2px solid #d4af37;
+  background-color: #0f1429;
+  border: 2px solid #00d4ff;
   border-radius: 8px;
   padding: 2rem;
   margin-bottom: 2rem;
@@ -150,7 +150,7 @@
 .draft-form-container h3 {
   margin-top: 0;
   margin-bottom: 1.5rem;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .draft-form {
@@ -161,7 +161,7 @@
 .draft-form .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  color: #ccc;
+  color: #cbd5e1;
   font-weight: 600;
 }
 
@@ -169,8 +169,8 @@
 .draft-form input[type="number"] {
   width: 100%;
   padding: 0.75rem;
-  background-color: #222;
-  border: 2px solid #444;
+  background-color: #161d3a;
+  border: 2px solid #334155;
   border-radius: 4px;
   color: #fff;
   font-size: 1rem;
@@ -178,7 +178,7 @@
 
 .draft-form input:focus {
   outline: none;
-  border-color: #d4af37;
+  border-color: #00d4ff;
 }
 
 /* Radio buttons for type */
@@ -193,18 +193,18 @@
   gap: 0.5rem;
   cursor: pointer;
   padding: 0.5rem 1rem;
-  border: 2px solid #444;
+  border: 2px solid #334155;
   border-radius: 6px;
   transition: border-color 0.2s;
 }
 
 .type-selector label:has(input:checked) {
-  border-color: #d4af37;
-  background-color: #2a2200;
+  border-color: #00d4ff;
+  background-color: #0d1a33;
 }
 
 .type-selector input[type="radio"] {
-  accent-color: #d4af37;
+  accent-color: #00d4ff;
 }
 
 /* Company checkboxes */
@@ -219,7 +219,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #444;
+  border: 1px solid #334155;
   border-radius: 4px;
   cursor: pointer;
   font-weight: normal !important;
@@ -227,11 +227,11 @@
 }
 
 .company-checkboxes label:hover {
-  background-color: #2a2a2a;
+  background-color: #161d3a;
 }
 
 .company-checkboxes input[type="checkbox"] {
-  accent-color: #d4af37;
+  accent-color: #00d4ff;
 }
 
 .checkbox-row {
@@ -241,13 +241,13 @@
 }
 
 .checkbox-row input[type="checkbox"] {
-  accent-color: #d4af37;
+  accent-color: #00d4ff;
 }
 
 .help-text {
   display: block;
   margin-top: 0.35rem;
-  color: #888;
+  color: #64748b;
   font-size: 0.8rem;
 }
 
@@ -263,14 +263,14 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #444;
+  border: 1px solid #334155;
   border-radius: 4px;
   margin-bottom: 0.5rem;
-  background-color: #222;
+  background-color: #161d3a;
 }
 
 .draft-order-list .order-number {
-  color: #d4af37;
+  color: #00d4ff;
   font-weight: bold;
   min-width: 1.5rem;
 }
@@ -282,11 +282,11 @@
 .draft-order-list button {
   padding: 0.2rem 0.5rem;
   font-size: 0.75rem;
-  background-color: #444;
+  background-color: #334155;
 }
 
 .draft-order-list button:hover:not(:disabled) {
-  background-color: #555;
+  background-color: #334155;
 }
 
 .draft-order-list button:disabled {
@@ -308,10 +308,10 @@
 
 /* Inter-company conditional fields */
 .inter-company-fields {
-  border: 1px dashed #555;
+  border: 1px dashed #334155;
   border-radius: 6px;
   padding: 1rem;
-  background-color: #1e1e1e;
+  background-color: #0f1429;
 }
 
 .inter-company-fields h4 {
@@ -327,12 +327,12 @@
 }
 
 .cancel-btn {
-  background-color: #444 !important;
-  color: #ccc;
+  background-color: #334155 !important;
+  color: #cbd5e1;
 }
 
 .cancel-btn:hover {
-  background-color: #555 !important;
+  background-color: #334155 !important;
 }
 
 /* Draft detail view */
@@ -359,25 +359,25 @@
 }
 
 .back-btn {
-  background-color: #444;
-  color: #ccc;
+  background-color: #334155;
+  color: #cbd5e1;
 }
 
 .back-btn:hover {
-  background-color: #555;
+  background-color: #334155;
 }
 
 /* Current pick banner */
 .current-pick-banner {
-  background: linear-gradient(135deg, #2a2000, #1a1200);
-  border: 2px solid #d4af37;
+  background: linear-gradient(135deg, #0d1a33, #0d1a33);
+  border: 2px solid #00d4ff;
   border-radius: 8px;
   padding: 1rem 1.5rem;
   margin-bottom: 1.5rem;
   text-align: center;
   font-size: 1.1rem;
   font-weight: bold;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 /* Draft board */
@@ -388,7 +388,7 @@
 
 .draft-board h3 {
   margin-bottom: 1rem;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .draft-board table {
@@ -399,11 +399,11 @@
 
 .draft-board th {
   padding: 0.75rem;
-  background-color: #2a2a2a;
-  color: #d4af37;
+  background-color: #161d3a;
+  color: #00d4ff;
   font-size: 0.85rem;
   text-transform: uppercase;
-  border: 1px solid #444;
+  border: 1px solid #334155;
   text-align: center;
 }
 
@@ -414,28 +414,28 @@
 
 .draft-board td {
   padding: 0.6rem;
-  border: 1px solid #333;
+  border: 1px solid #1e2a4a;
   text-align: center;
   vertical-align: middle;
   min-width: 120px;
 }
 
 .draft-board td.current-pick {
-  border: 2px solid #d4af37;
-  background-color: #2a2000;
-  box-shadow: inset 0 0 8px rgba(212, 175, 55, 0.2);
+  border: 2px solid #00d4ff;
+  background-color: #0d1a33;
+  box-shadow: inset 0 0 8px rgba(0, 212, 255, 0.2);
 }
 
 .draft-board td.empty {
-  color: #555;
+  color: #334155;
   font-style: italic;
   font-size: 0.8rem;
 }
 
 .draft-board .round-label {
   font-weight: bold;
-  color: #999;
-  background-color: #1e1e1e;
+  color: #64748b;
+  background-color: #0f1429;
 }
 
 .pick-content {
@@ -450,7 +450,7 @@
 .pick-content .pick-source {
   display: block;
   font-size: 0.7rem;
-  color: #999;
+  color: #64748b;
   margin-top: 2px;
 }
 
@@ -461,14 +461,14 @@
 
 .available-wrestlers h3 {
   margin-bottom: 1rem;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .search-input {
   width: 100%;
   padding: 0.75rem;
-  background-color: #222;
-  border: 2px solid #444;
+  background-color: #161d3a;
+  border: 2px solid #334155;
   border-radius: 4px;
   color: #fff;
   font-size: 1rem;
@@ -477,7 +477,7 @@
 
 .search-input:focus {
   outline: none;
-  border-color: #d4af37;
+  border-color: #00d4ff;
 }
 
 .wrestlers-grid {
@@ -491,21 +491,21 @@
 
 .wrestler-card {
   padding: 0.75rem;
-  border: 2px solid #333;
+  border: 2px solid #1e2a4a;
   border-radius: 6px;
   cursor: pointer;
   transition: border-color 0.2s, background-color 0.2s;
-  background-color: #1a1a1a;
+  background-color: #0f1429;
 }
 
 .wrestler-card:hover {
-  border-color: #666;
-  background-color: #222;
+  border-color: #475569;
+  background-color: #161d3a;
 }
 
 .wrestler-card.selected {
-  border-color: #d4af37;
-  background-color: #2a2000;
+  border-color: #00d4ff;
+  background-color: #0d1a33;
 }
 
 .wrestler-card .wrestler-name {
@@ -516,7 +516,7 @@
 
 .wrestler-card .wrestler-company {
   font-size: 0.75rem;
-  color: #888;
+  color: #64748b;
   margin-top: 0.25rem;
 }
 
@@ -532,13 +532,13 @@
 }
 
 .pick-btn {
-  background-color: #d4af37;
-  color: #111;
+  background-color: #00d4ff;
+  color: #0a1128;
   font-weight: bold;
 }
 
 .pick-btn:hover:not(:disabled) {
-  background-color: #c9a02e;
+  background-color: #00b8e6;
 }
 
 .pick-btn:disabled {
@@ -549,24 +549,24 @@
 /* Protection section */
 .protection-section {
   margin-bottom: 2rem;
-  border: 2px solid #555;
+  border: 2px solid #334155;
   border-radius: 8px;
   padding: 1.5rem;
-  background-color: #1e1e1e;
+  background-color: #0f1429;
 }
 
 .protection-section h3 {
   margin-top: 0;
   margin-bottom: 1rem;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .protection-company {
   margin-bottom: 1.5rem;
   padding: 1rem;
-  border: 1px solid #444;
+  border: 1px solid #334155;
   border-radius: 6px;
-  background-color: #222;
+  background-color: #161d3a;
 }
 
 .protection-company h4 {
@@ -576,7 +576,7 @@
 
 .protection-count {
   font-size: 0.85rem;
-  color: #999;
+  color: #64748b;
   margin-bottom: 0.75rem;
 }
 
@@ -585,12 +585,12 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.3rem 0.7rem;
-  background-color: #2a2000;
-  border: 1px solid #d4af37;
+  background-color: #0d1a33;
+  border: 1px solid #00d4ff;
   border-radius: 4px;
   margin: 0.25rem;
   font-size: 0.8rem;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .protection-wrestlers-list {
@@ -603,11 +603,11 @@
 .protection-wrestlers-list button {
   padding: 0.3rem 0.6rem;
   font-size: 0.8rem;
-  background-color: #444;
+  background-color: #334155;
 }
 
 .protection-wrestlers-list button:hover:not(:disabled) {
-  background-color: #555;
+  background-color: #334155;
 }
 
 .protection-wrestlers-list button:disabled {
@@ -618,7 +618,7 @@
 .empty-state {
   text-align: center;
   padding: 2rem;
-  color: #888;
+  color: #64748b;
 }
 
 @media (max-width: 768px) {

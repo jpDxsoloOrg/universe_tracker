@@ -73,7 +73,7 @@ function Leaderboards() {
 
   function getMedalColor(rank: number): string | null {
     switch (rank) {
-      case 1: return '#d4af37';
+      case 1: return '#00d4ff';
       case 2: return '#c0c0c0';
       case 3: return '#cd7f32';
       default: return null;

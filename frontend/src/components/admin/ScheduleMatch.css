@@ -11,12 +11,12 @@
 }
 
 .schedule-match-help a {
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .match-form {
-  background-color: #1a1a1a;
-  border: 2px solid #333;
+  background-color: #0f1429;
+  border: 2px solid #1e2a4a;
   border-radius: 8px;
   padding: 2rem;
   margin-top: 1.5rem;
@@ -29,18 +29,6 @@
   margin-bottom: 1.5rem;
 }
 
-.form-group label[for] {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #d4af37;
-  font-weight: bold;
-}
-
-.form-group label input[type="checkbox"] {
-  margin-right: 0.5rem;
-  width: auto;
-}
-
 .participants-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -49,8 +37,8 @@
 }
 
 .participant-card {
-  background-color: #0f0f0f;
-  border: 2px solid #333;
+  background-color: #080c1a;
+  border: 2px solid #1e2a4a;
   border-radius: 4px;
   padding: 1rem;
   cursor: pointer;
@@ -58,11 +46,11 @@
 }
 
 .participant-card:hover {
-  border-color: #d4af37;
+  border-color: #00d4ff;
 }
 
 .participant-card.selected {
-  border-color: #d4af37;
+  border-color: #00d4ff;
   background-color: #2a2416;
 }
 
@@ -72,20 +60,20 @@
 }
 
 .participant-wrestler {
-  color: #888;
+  color: #64748b;
   font-size: 0.875rem;
 }
 
 .selected-count {
   margin-top: 0.5rem;
-  color: #d4af37;
+  color: #00d4ff;
   font-weight: bold;
 }
 
 .form-hint {
   display: block;
   margin-top: 0.5rem;
-  color: #888;
+  color: #64748b;
   font-size: 0.75rem;
 }
 
@@ -107,8 +95,8 @@
 }
 
 .team-section {
-  background-color: #0f0f0f;
-  border: 2px solid #333;
+  background-color: #080c1a;
+  border: 2px solid #1e2a4a;
   border-radius: 8px;
   padding: 1rem;
 }
@@ -122,7 +110,7 @@
 
 .team-header h4 {
   margin: 0;
-  color: #d4af37;
+  color: #00d4ff;
   font-size: 1rem;
 }
 
@@ -146,7 +134,7 @@
   gap: 0.5rem;
   min-height: 2rem;
   padding: 0.5rem;
-  background-color: #1a1a1a;
+  background-color: #0f1429;
   border-radius: 4px;
   margin-bottom: 0.75rem;
 }
@@ -155,7 +143,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  background-color: #d4af37;
+  background-color: #00d4ff;
   color: #000;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
@@ -179,7 +167,7 @@
 }
 
 .no-members {
-  color: #666;
+  color: #475569;
   font-style: italic;
   font-size: 0.875rem;
 }
@@ -198,19 +186,19 @@
 .participant-card.in-other-team {
   opacity: 0.5;
   cursor: not-allowed;
-  border-color: #444;
+  border-color: #334155;
 }
 
 .other-team-label {
   font-size: 0.7rem;
-  color: #888;
+  color: #64748b;
   margin-top: 0.25rem;
 }
 
 .add-team-btn {
-  background-color: #1a1a1a;
-  border: 2px dashed #333;
-  color: #888;
+  background-color: #0f1429;
+  border: 2px dashed #1e2a4a;
+  color: #64748b;
   padding: 1rem;
   border-radius: 8px;
   cursor: pointer;
@@ -218,8 +206,8 @@
 }
 
 .add-team-btn:hover {
-  border-color: #d4af37;
-  color: #d4af37;
+  border-color: #00d4ff;
+  color: #00d4ff;
 }
 
 .teams-summary {
@@ -237,7 +225,7 @@
 
 .team-count.valid {
   background-color: #14532d;
-  color: #4ade80;
+  color: #34d399;
 }
 
 .team-count.invalid {

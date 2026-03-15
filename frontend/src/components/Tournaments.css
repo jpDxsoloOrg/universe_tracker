@@ -10,15 +10,15 @@
 }
 
 .tournament-card {
-  background-color: #1a1a1a;
-  border: 2px solid #333;
+  background-color: #0f1429;
+  border: 2px solid #1e2a4a;
   border-radius: 8px;
   padding: 1.5rem;
   transition: border-color 0.3s;
 }
 
 .tournament-card:hover {
-  border-color: #d4af37;
+  border-color: #00d4ff;
 }
 
 .tournament-header {
@@ -30,7 +30,7 @@
 }
 
 .tournament-header h3 {
-  color: #d4af37;
+  color: #00d4ff;
   margin: 0;
   font-size: 1.25rem;
 }
@@ -54,7 +54,7 @@
 }
 
 .status-completed {
-  background-color: #4ade80;
+  background-color: #34d399;
   color: #000;
 }
 
@@ -64,11 +64,11 @@
 
 .tournament-info p {
   margin: 0.5rem 0;
-  color: #bbb;
+  color: #94a3b8;
 }
 
 .tournament-winner {
-  color: #d4af37 !important;
+  color: #00d4ff !important;
   font-weight: bold;
 }
 
@@ -92,8 +92,8 @@
 }
 
 .tournament-content {
-  background-color: #0f0f0f;
-  border: 2px solid #d4af37;
+  background-color: #080c1a;
+  border: 2px solid #00d4ff;
   border-radius: 8px;
   padding: 2rem;
   max-width: 900px;
@@ -111,13 +111,13 @@
 
 .modal-header h3 {
   margin: 0;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: #fff;
+  color: #e2e8f0;
   font-size: 2rem;
   cursor: pointer;
   padding: 0;
@@ -126,7 +126,7 @@
 }
 
 .close-btn:hover {
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .tournament-details {
@@ -143,14 +143,14 @@
 }
 
 .participants-list li {
-  background-color: #1a1a1a;
+  background-color: #0f1429;
   padding: 0.5rem 1rem;
   border-radius: 4px;
 }
 
 .round-robin-standings h4,
 .bracket h4 {
-  color: #d4af37;
+  color: #00d4ff;
   margin-bottom: 1rem;
 }
 
@@ -162,8 +162,8 @@
 }
 
 .summary-card {
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: #0f1429;
+  border: 1px solid #1e2a4a;
   border-radius: 6px;
   padding: 0.65rem 0.75rem;
   display: flex;
@@ -172,7 +172,7 @@
 }
 
 .summary-label {
-  color: #999;
+  color: #64748b;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -188,7 +188,7 @@
 }
 
 .round-robin-standings .wins {
-  color: #4ade80;
+  color: #34d399;
   font-weight: bold;
 }
 
@@ -202,7 +202,7 @@
 }
 
 .round-robin-standings .points {
-  color: #d4af37;
+  color: #00d4ff;
   font-weight: bold;
   font-size: 1.1rem;
 }
@@ -213,7 +213,7 @@
 
 .bracket-round h5,
 .bracket-round-column h5 {
-  color: #d4af37;
+  color: #00d4ff;
   margin-bottom: 1rem;
 }
 
@@ -237,8 +237,8 @@
 }
 
 .bracket-match {
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: #0f1429;
+  border: 1px solid #1e2a4a;
   border-radius: 4px;
   padding: 1rem;
 }
@@ -246,7 +246,7 @@
 .bracket-participant {
   padding: 0.5rem;
   margin: 0.25rem 0;
-  background-color: #0f0f0f;
+  background-color: #080c1a;
   border-radius: 4px;
   display: flex;
   justify-content: space-between;
@@ -254,14 +254,14 @@
 }
 
 .bracket-participant .winner-indicator {
-  color: #4ade80;
+  color: #34d399;
   font-weight: bold;
   font-size: 1.2rem;
 }
 
 .vs {
   text-align: center;
-  color: #888;
+  color: #64748b;
   font-size: 0.875rem;
   margin: 0.25rem 0;
 }

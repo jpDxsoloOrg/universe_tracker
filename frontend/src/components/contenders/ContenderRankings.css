@@ -18,7 +18,7 @@
 .rankings-header .subtitle {
   margin: 0;
   font-size: 1rem;
-  color: #888;
+  color: #64748b;
 }
 
 /* Championship Tabs */
@@ -27,7 +27,7 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 2rem;
-  border-bottom: 2px solid #333;
+  border-bottom: 2px solid #1e2a4a;
 }
 
 .championship-tabs .division-group {
@@ -41,7 +41,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #666;
+  color: #475569;
   padding: 0 0.5rem;
   white-space: nowrap;
 }
@@ -52,7 +52,7 @@
   background-color: transparent;
   border: none;
   border-bottom: 3px solid transparent;
-  color: #888;
+  color: #64748b;
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -62,14 +62,14 @@
 }
 
 .championship-tabs .tab:hover {
-  color: #bbb;
+  color: #94a3b8;
   background-color: rgba(255, 255, 255, 0.02);
 }
 
 .championship-tabs .tab.active {
-  color: #d4af37;
-  border-bottom-color: #d4af37;
-  background-color: rgba(212, 175, 55, 0.05);
+  color: #00d4ff;
+  border-bottom-color: #00d4ff;
+  background-color: rgba(0, 212, 255, 0.05);
 }
 
 /* Current Champion Section */
@@ -80,7 +80,7 @@
 .current-champion-section h3 {
   margin: 0 0 1rem 0;
   font-size: 1.25rem;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .champion-card {
@@ -88,10 +88,10 @@
   align-items: center;
   gap: 1.5rem;
   padding: 1.5rem;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), transparent);
-  border: 2px solid #d4af37;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), transparent);
+  border: 2px solid #00d4ff;
   border-radius: 8px;
-  box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
 }
 
 .champion-badge {
@@ -100,7 +100,7 @@
 
 .trophy-icon {
   font-size: 3rem;
-  filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+  filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5));
 }
 
 .champion-image {
@@ -114,7 +114,7 @@
   height: 100%;
   object-fit: cover;
   border-radius: 8px;
-  border: 3px solid #d4af37;
+  border: 3px solid #00d4ff;
 }
 
 .champion-image .placeholder-image {
@@ -123,12 +123,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #333;
+  background-color: #1e2a4a;
   border-radius: 8px;
-  border: 3px solid #d4af37;
+  border: 3px solid #00d4ff;
   font-size: 2rem;
   font-weight: bold;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .champion-info {
@@ -144,7 +144,7 @@
 .champion-wrestler-name {
   margin: 0;
   font-size: 1rem;
-  color: #888;
+  color: #64748b;
 }
 
 /* Contenders Section */
@@ -155,7 +155,7 @@
 .contenders-section h3 {
   margin: 0 0 1rem 0;
   font-size: 1.25rem;
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .contenders-list {
@@ -168,34 +168,34 @@
 .empty-state {
   padding: 3rem 2rem;
   text-align: center;
-  background-color: #1a1a1a;
-  border: 2px dashed #333;
+  background-color: #0f1429;
+  border: 2px dashed #1e2a4a;
   border-radius: 8px;
 }
 
 .empty-state p {
   margin: 0 0 0.5rem 0;
   font-size: 1.125rem;
-  color: #bbb;
+  color: #94a3b8;
 }
 
 .empty-state .hint {
   font-size: 0.875rem;
-  color: #666;
+  color: #475569;
 }
 
 /* Footer */
 .rankings-footer {
   padding: 1.5rem;
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: #0f1429;
+  border: 1px solid #1e2a4a;
   border-radius: 8px;
 }
 
 .last-calculated {
   margin: 0 0 0.75rem 0;
   font-size: 0.875rem;
-  color: #888;
+  color: #64748b;
 }
 
 .config-info {
@@ -204,11 +204,11 @@
   gap: 0.5rem;
   align-items: center;
   font-size: 0.875rem;
-  color: #666;
+  color: #475569;
 }
 
 .config-info .separator {
-  color: #444;
+  color: #334155;
 }
 
 /* Error Message */
@@ -239,11 +239,11 @@
   }
 
   .championship-tabs .tab {
-    border-bottom: 2px solid #333;
+    border-bottom: 2px solid #1e2a4a;
   }
 
   .championship-tabs .tab.active {
-    border-bottom-color: #d4af37;
+    border-bottom-color: #00d4ff;
   }
 
   .champion-card {

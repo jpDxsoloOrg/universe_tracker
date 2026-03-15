@@ -22,17 +22,17 @@
 }
 
 .lb-nav-links a {
-  color: #d4af37;
+  color: #00d4ff;
   text-decoration: none;
   font-size: 0.85rem;
   padding: 0.3rem 0.6rem;
-  border: 1px solid #333;
+  border: 1px solid #1e2a4a;
   border-radius: 4px;
   transition: background-color 0.3s;
 }
 
 .lb-nav-links a:hover {
-  background-color: #333;
+  background-color: #1e2a4a;
 }
 
 /* Category Tabs */
@@ -46,9 +46,9 @@
 
 .lb-tab {
   padding: 0.5rem 1rem;
-  background-color: #222;
-  color: #bbb;
-  border: 1px solid #333;
+  background-color: #161d3a;
+  color: #94a3b8;
+  border: 1px solid #1e2a4a;
   border-radius: 20px;
   cursor: pointer;
   font-size: 0.85rem;
@@ -56,14 +56,14 @@
 }
 
 .lb-tab:hover {
-  background-color: #333;
+  background-color: #1e2a4a;
   color: #fff;
 }
 
 .lb-tab-active {
-  background-color: #d4af37;
+  background-color: #00d4ff;
   color: #000;
-  border-color: #d4af37;
+  border-color: #00d4ff;
   font-weight: bold;
 }
 
@@ -81,21 +81,21 @@
 }
 
 .lb-filter label {
-  color: #bbb;
+  color: #94a3b8;
   font-size: 0.85rem;
 }
 
 .lb-filter select {
-  background-color: #1a1a1a;
+  background-color: #0f1429;
   color: #fff;
-  border: 1px solid #333;
+  border: 1px solid #1e2a4a;
   border-radius: 6px;
   padding: 0.45rem 0.6rem;
   font-size: 0.9rem;
 }
 
 .lb-filter-summary {
-  color: #d4af37;
+  color: #00d4ff;
   font-size: 0.9rem;
   margin-bottom: 1rem;
 }
@@ -112,19 +112,19 @@
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.25rem;
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: #0f1429;
+  border: 1px solid #1e2a4a;
   border-radius: 8px;
-  border-left: 4px solid #333;
+  border-left: 4px solid #1e2a4a;
   transition: background-color 0.2s;
 }
 
 .lb-entry:hover {
-  background-color: #222;
+  background-color: #161d3a;
 }
 
 .lb-entry-medal {
-  background-color: #222;
+  background-color: #161d3a;
 }
 
 .lb-rank {
@@ -144,7 +144,7 @@
 .lb-rank-num {
   font-size: 1.1rem;
   font-weight: bold;
-  color: #888;
+  color: #64748b;
 }
 
 .lb-wrestler-info {
@@ -161,18 +161,18 @@
 }
 
 .lb-wrestler-name:hover {
-  color: #d4af37;
+  color: #00d4ff;
 }
 
 .lb-wrestler-name {
   font-size: 0.8rem;
-  color: #bbb;
+  color: #94a3b8;
 }
 
 .lb-value {
   font-size: 1.4rem;
   font-weight: bold;
-  color: #d4af37;
+  color: #00d4ff;
   min-width: 80px;
   text-align: right;
 }

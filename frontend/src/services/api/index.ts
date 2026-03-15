@@ -42,3 +42,4 @@ export type {
   WrestlerMatchStatsResponse,
 } from './statistics.api';
 export type { SeasonAwardsResponse } from './seasonAwards.api';
+export type { BulkImportResponse } from './wrestlers.api';

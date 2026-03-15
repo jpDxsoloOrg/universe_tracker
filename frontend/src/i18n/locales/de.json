@@ -693,6 +693,33 @@
       "addMatch": "Kampf hinzufügen"
     }
   },
+  "wrestlers": {
+    "import": {
+      "title": "Wrestler importieren",
+      "description": "Laden Sie eine CSV- oder JSON-Datei hoch, um Wrestler in Massen zu importieren.",
+      "selectFile": "Datei auswählen",
+      "downloadTemplate": "CSV-Vorlage herunterladen",
+      "preview": "Vorschau",
+      "importButton": "Wrestler importieren",
+      "importing": "Importiere...",
+      "results": "Import-Ergebnisse",
+      "imported": "Importiert",
+      "failed": "Fehlgeschlagen",
+      "total": "Gesamt",
+      "errors": "Fehler",
+      "noFile": "Keine Datei ausgewählt",
+      "invalidFile": "Ungültiger Dateityp. Bitte laden Sie eine .csv- oder .json-Datei hoch.",
+      "parseError": "Datei konnte nicht gelesen werden",
+      "emptyFile": "Die Datei enthält keine Wrestler-Daten",
+      "assignToCompany": "Firma zuweisen (optional)",
+      "noCompany": "Keine Firma (globaler Pool)",
+      "clear": "Zurücksetzen",
+      "backToList": "Zurück zur Wrestler-Liste",
+      "missingName": "Name ist erforderlich",
+      "invalidAlignment": "Ungültige Gesinnung (muss Face, Heel oder Tweener sein)",
+      "duplicateName": "Doppelter Name im Import"
+    }
+  },
   "contenders": {
     "title": "Herausforderer-Rangliste",
     "subtitle": "Offizielle Rangliste zur Ermittlung der Meisterschafts-Herausforderer",

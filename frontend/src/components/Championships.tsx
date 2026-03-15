@@ -7,6 +7,7 @@ import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { type Division, type Championship, type ChampionshipReign, type Wrestler } from '../types';
 import DivisionFilter from './DivisionFilter';
 import Skeleton from './ui/Skeleton';
+import SkeletonMorph from './ui/SkeletonMorph';
 import EmptyState from './ui/EmptyState';
 import {
   DEFAULT_CHAMPIONSHIP_IMAGE,
@@ -14,6 +15,15 @@ import {
   resolveImageSrc,
 } from '../constants/imageFallbacks';
 import './Championships.css';
+
+type ChampionshipTier = 'world' | 'tag' | 'midcard';
+
+function getChampionshipTier(championship: Championship): ChampionshipTier {
+  const name = championship.name.toLowerCase();
+  if (/world|universal|undisputed|heavyweight/.test(name)) return 'world';
+  if (/tag/.test(name)) return 'tag';
+  return 'midcard';
+}
 
 export default function Championships() {
   const { t } = useTranslation();
@@ -135,10 +145,6 @@ export default function Championships() {
     return wrestler ? wrestler.name : t('common.unknown');
   };
 
-  if (loading) {
-    return <Skeleton variant="cards" />;
-  }
-
   if (error) {
     return (
       <div className="error">
@@ -148,7 +154,7 @@ export default function Championships() {
     );
   }
 
-  if (championships.length === 0) {
+  if (!loading && championships.length === 0) {
     return (
       <EmptyState
         title={t('championships.title')}
@@ -158,55 +164,56 @@ export default function Championships() {
   }
 
   return (
-    <div className="championships-container">
-      <h2>{t('championships.title')}</h2>
-        {divisions.length > 0 && (
-            <DivisionFilter
-              divisions={divisions}
-              selectedDivision={selectedDivision}
-              onSelect={setSelectedDivision}
-              labelKey="championships.filterByDivision"
-              showNoDivision
-            />
-          )}
-      <div className="championships-grid">
-        {filteredChampionships.map((championship) => (
-          <div key={championship.championshipId} className="championship-card">
-            <div className="championship-image-container">
-              <img
-                src={resolveImageSrc(championship.imageUrl, DEFAULT_CHAMPIONSHIP_IMAGE)}
-                onError={(event) => applyImageFallback(event, DEFAULT_CHAMPIONSHIP_IMAGE)}
-                alt={championship.name}
-                className="championship-image"
+    <SkeletonMorph loading={loading} skeleton={<Skeleton variant="cards" />}>
+      <div className="championships-container">
+        <h2>{t('championships.title')}</h2>
+          {divisions.length > 0 && (
+              <DivisionFilter
+                divisions={divisions}
+                selectedDivision={selectedDivision}
+                onSelect={setSelectedDivision}
+                labelKey="championships.filterByDivision"
+                showNoDivision
               />
-            </div>
-            <div className="championship-header">
-              <h3>{championship.name}</h3>
-              <span className="championship-type">
-                {championship.type === 'singles' ? t('championships.singles') : t('championships.tagTeam')}
-              </span>
-            </div>
+            )}
+        <div className="championships-grid">
+          {filteredChampionships.map((championship) => (
+            <div key={championship.championshipId} className={`championship-card tier-${getChampionshipTier(championship)}`}>
+              <div className="championship-image-container">
+                <img
+                  src={resolveImageSrc(championship.imageUrl, DEFAULT_CHAMPIONSHIP_IMAGE)}
+                  onError={(event) => applyImageFallback(event, DEFAULT_CHAMPIONSHIP_IMAGE)}
+                  alt={championship.name}
+                  className="championship-image"
+                />
+              </div>
+              <div className="championship-header">
+                <h3>{championship.name}</h3>
+                <span className="championship-type">
+                  {championship.type === 'singles' ? t('championships.singles') : t('championships.tagTeam')}
+                </span>
+              </div>
 
-            <div className="current-champion">
-              <label>{t('championships.currentChampion')}:</label>
-              <p>
-                {championship.currentChampion
-                  ? getWrestlerName(championship.currentChampion)
-                  : t('common.vacant')}
-              </p>
+              <div className="current-champion">
+                <label>{t('championships.currentChampion')}:</label>
+                <p>
+                  {championship.currentChampion
+                    ? getWrestlerName(championship.currentChampion)
+                    : t('common.vacant')}
+                </p>
+              </div>
+
+              <button
+                onClick={() => loadHistory(championship.championshipId)}
+                className="view-history-btn"
+              >
+                {t('championships.viewHistory')}
+              </button>
             </div>
+          ))}
+        </div>
 
-            <button
-              onClick={() => loadHistory(championship.championshipId)}
-              className="view-history-btn"
-            >
-              {t('championships.viewHistory')}
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {selectedChampionship && (
+        {selectedChampionship && (
         <div
           className="history-modal"
           role="dialog"
@@ -271,6 +278,7 @@ export default function Championships() {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </SkeletonMorph>
   );
 }

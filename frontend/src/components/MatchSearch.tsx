@@ -6,6 +6,8 @@ import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import type { Match, MatchFilters, Wrestler, Season, Championship, Stipulation, MatchType } from '../types';
 import Skeleton from './ui/Skeleton';
 import EmptyState from './ui/EmptyState';
+import StarRating from './ui/StarRating';
+import MatchTypeIcon from './ui/MatchTypeIcon';
 import './MatchSearch.css';
 
 const FILTER_KEYS: (keyof MatchFilters)[] = [
@@ -341,7 +343,7 @@ export default function MatchSearch() {
 
                 <div className="match-meta">
                   {match.matchFormat && (
-                    <span className="match-tag">{match.matchFormat}</span>
+                    <span className="match-tag"><MatchTypeIcon matchType={match.matchFormat} size={14} /> {match.matchFormat}</span>
                   )}
                   {match.stipulationId && stipulationMap.get(match.stipulationId) && (
                     <span className="match-tag">{stipulationMap.get(match.stipulationId)!.name}</span>
@@ -358,7 +360,7 @@ export default function MatchSearch() {
                   )}
                   {match.starRating != null && match.starRating > 0 && (
                     <span className="match-tag star-tag">
-                      {'★'.repeat(match.starRating)}
+                      <StarRating rating={match.starRating} size="sm" showValue={false} />
                     </span>
                   )}
                   {match.matchOfTheNight && (

@@ -1,0 +1,16 @@
+.match-type-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  transition: color 0.2s ease, filter 0.2s ease;
+  flex-shrink: 0;
+}
+
+.match-type-icon:hover {
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+.match-type-icon svg {
+  display: block;
+}

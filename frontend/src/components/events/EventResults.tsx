@@ -5,6 +5,8 @@ import { eventsApi } from '../../services/api';
 import type { MatchDesignation, EventWithMatches } from '../../types/event';
 import Skeleton from '../ui/Skeleton';
 import EmptyState from '../ui/EmptyState';
+import StarRating from '../ui/StarRating';
+import MatchTypeIcon from '../ui/MatchTypeIcon';
 import './EventResults.css';
 
 const designationLabels: Record<MatchDesignation, string> = {
@@ -85,20 +87,6 @@ export default function EventResults() {
     (m) => m.matchData.isChampionship && m.matchData.winners && m.matchData.winners.length > 0
   );
 
-  const renderStarRating = (rating: number) => {
-    const stars: string[] = [];
-    for (let i = 1; i <= 5; i++) {
-      if (i <= Math.floor(rating)) {
-        stars.push('\u2605');
-      } else if (i === Math.ceil(rating) && rating % 1 >= 0.5) {
-        stars.push('\u2605');
-      } else {
-        stars.push('\u2606');
-      }
-    }
-    return stars.join('');
-  };
-
   return (
     <div className="event-results-page">
       <Link to={`/events/${eventId}`} className="results-back-link">
@@ -112,8 +100,7 @@ export default function EventResults() {
 
         {eventData.rating && (
           <div className="results-rating">
-            <span className="results-stars">{renderStarRating(eventData.rating)}</span>
-            <span className="results-rating-value">{eventData.rating} / 5</span>
+            <StarRating rating={eventData.rating} size="lg" />
           </div>
         )}
 
@@ -162,7 +149,8 @@ export default function EventResults() {
                     {t(designationLabels[designation])}
                   </span>
                   <span className="results-match-type">
-                    {matchData.matchFormat}
+                    <MatchTypeIcon matchType={matchData.matchFormat} />
+                    {' '}{matchData.matchFormat}
                     {matchData.stipulationName && ` - ${matchData.stipulationName}`}
                   </span>
                   {matchData.isChampionship && (
@@ -192,8 +180,7 @@ export default function EventResults() {
                   <div className="results-match-awards">
                     {matchData.starRating != null && (
                       <span className="results-match-rating" title={t('match.starRating')}>
-                        {renderStarRating(matchData.starRating)}
-                        <span className="results-match-rating-value">{matchData.starRating}</span>
+                        <StarRating rating={matchData.starRating} />
                       </span>
                     )}
                     {matchData.matchOfTheNight && (

@@ -1,0 +1,103 @@
+.bracket-viz-scroll {
+  overflow-x: auto;
+  padding-bottom: 1rem;
+}
+
+.bracket-viz {
+  display: inline-block;
+  min-width: max-content;
+}
+
+/* Round labels */
+.bracket-viz-round-label {
+  fill: var(--color-primary);
+  font-size: 14px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+
+/* Match boxes */
+.bracket-viz-match-box {
+  fill: var(--color-surface);
+  stroke: var(--color-border);
+  stroke-width: 1.5;
+  rx: 6;
+  ry: 6;
+}
+
+/* Participant rows */
+.bracket-viz-participant-bg {
+  fill: var(--color-bg);
+  rx: 4;
+  ry: 4;
+}
+
+.bracket-viz-participant-bg--winner {
+  fill: var(--color-bg);
+}
+
+.bracket-viz-winner-accent {
+  fill: var(--color-success);
+  rx: 4;
+  ry: 4;
+}
+
+.bracket-viz-participant-name {
+  font-size: 12px;
+  fill: var(--color-text);
+  dominant-baseline: central;
+}
+
+.bracket-viz-participant-name--tbd {
+  fill: var(--color-text-muted);
+  font-style: italic;
+}
+
+.bracket-viz-participant-name--winner {
+  fill: var(--color-success);
+  font-weight: 600;
+}
+
+.bracket-viz-checkmark {
+  fill: var(--color-success);
+  font-size: 13px;
+  font-weight: 700;
+  dominant-baseline: central;
+  text-anchor: end;
+}
+
+/* Connector lines */
+.bracket-viz-connector {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-width: 1.5;
+  stroke-dasharray: 500;
+  stroke-dashoffset: 500;
+  animation: bracket-draw-line 0.8s ease-out forwards;
+}
+
+.bracket-viz-connector--winner {
+  stroke: var(--color-success);
+  stroke-width: 2;
+}
+
+@keyframes bracket-draw-line {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Divider between participants */
+.bracket-viz-divider {
+  stroke: var(--color-border);
+  stroke-width: 0.75;
+  opacity: 0.5;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .bracket-viz-scroll {
+    margin: 0 -1rem;
+    padding: 0 1rem 1rem;
+  }
+}

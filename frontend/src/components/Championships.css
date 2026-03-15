@@ -14,11 +14,67 @@
   border: 2px solid var(--color-border);
   border-radius: 8px;
   padding: 1.5rem;
-  transition: border-color 0.3s;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .championship-card:hover {
   border-color: var(--color-primary);
+}
+
+/* Championship tier styles */
+.championship-card.tier-world {
+  border-top: 3px solid #fbbf24;
+}
+
+.championship-card.tier-world:hover {
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+}
+
+.championship-card.tier-midcard {
+  border-top: 3px solid #94a3b8;
+}
+
+.championship-card.tier-midcard:hover {
+  box-shadow: 0 0 20px rgba(148, 163, 184, 0.3);
+}
+
+.championship-card.tier-tag {
+  border-top: 3px solid #d97706;
+}
+
+.championship-card.tier-tag:hover {
+  box-shadow: 0 0 20px rgba(217, 119, 6, 0.3);
+}
+
+/* Shimmer overlay for world-tier championship images */
+.tier-world .championship-image-container {
+  position: relative;
+}
+
+.tier-world .championship-image-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(251, 191, 36, 0.08) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  animation: championship-shimmer 3s ease-in-out infinite;
+}
+
+@keyframes championship-shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
 }
 
 .championship-image-container {

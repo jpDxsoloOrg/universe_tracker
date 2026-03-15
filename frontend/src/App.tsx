@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import './i18n';
+import { initRipple } from './utils/ripple';
 import { AuthProvider } from './contexts/AuthContext';
 import { SiteConfigProvider } from './contexts/SiteConfigContext';
 import { NavLayoutProvider } from './contexts/NavLayoutContext';
@@ -47,6 +49,11 @@ import ToastProvider from './components/ui/ToastProvider';
 import './App.css';
 
 function App() {
+  useEffect(() => {
+    const cleanup = initRipple();
+    return cleanup;
+  }, []);
+
   return (
     <ErrorBoundary>
       <Router>

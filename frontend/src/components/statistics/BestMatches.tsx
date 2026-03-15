@@ -6,6 +6,7 @@ import type { RatedMatchSummary } from '../../services/api';
 import type { Wrestler } from '../../types';
 import Skeleton from '../ui/Skeleton';
 import EmptyState from '../ui/EmptyState';
+import StarRating from '../ui/StarRating';
 import './BestMatches.css';
 
 export default function BestMatches() {
@@ -83,18 +84,11 @@ export default function BestMatches() {
       ) : (
         <ul className="best-matches-list">
           {matches.map((m) => {
-            const starDisplay = (() => {
-              const stars: string[] = [];
-              const r = m.starRating;
-              for (let i = 1; i <= 5; i++) stars.push(i <= r ? '\u2605' : '\u2606');
-              return stars.join('');
-            })();
             return (
               <li key={m.matchId} className="best-match-item">
                 <span className="best-match-awards">
                   <span className="best-match-stars" title={t('match.starRating')}>
-                    {starDisplay}
-                    <span className="best-match-rating-value">{m.starRating}</span>
+                    <StarRating rating={m.starRating} />
                   </span>
                   {m.matchOfTheNight && (
                     <span className="best-match-motn">{t('match.matchOfTheNightBadge')}</span>

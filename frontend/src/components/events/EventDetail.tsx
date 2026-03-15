@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { eventsApi } from '../../services/api';
 import type { MatchDesignation, EventWithMatches } from '../../types/event';
 import Skeleton from '../ui/Skeleton';
+import StarRating from '../ui/StarRating';
+import MatchTypeIcon from '../ui/MatchTypeIcon';
 import './EventDetail.css';
 
 const eventTypeColors: Record<string, string> = {
@@ -107,15 +109,6 @@ export default function EventDetail() {
     (m) => m.designation !== 'pre-show'
   );
 
-  const renderStarRating = (rating: number) => {
-    const full = Math.floor(rating);
-    const half = rating % 1 >= 0.5;
-    const stars: string[] = [];
-    for (let i = 0; i < full; i++) stars.push('\u2605');
-    if (half) stars.push('\u00BD');
-    return stars.join('');
-  };
-
   return (
     <div className="event-detail-page">
       <Link to="/events" className="back-link">
@@ -166,7 +159,7 @@ export default function EventDetail() {
             <div className="event-detail-info-item">
               <span className="info-label">{t('events.detail.rating')}:</span>
               <span className="event-rating">
-                {renderStarRating(eventData.rating)} ({eventData.rating}/5)
+                <StarRating rating={eventData.rating} size="md" />
               </span>
             </div>
           )}
@@ -268,14 +261,6 @@ interface MatchEntryProps {
   t: (key: string) => string;
 }
 
-function matchStarsDisplay(rating: number): string {
-  const stars: string[] = [];
-  for (let i = 1; i <= 5; i++) {
-    stars.push(i <= Math.floor(rating) ? '\u2605' : '\u2606');
-  }
-  return stars.join('');
-}
-
 function MatchEntry({ match, isCompleted, t }: MatchEntryProps) {
   const { designation, matchData } = match;
   const desColor = designationColors[designation];
@@ -291,7 +276,8 @@ function MatchEntry({ match, isCompleted, t }: MatchEntryProps) {
           {t(designationLabels[designation])}
         </span>
         <span className="match-type-label">
-          {matchData.matchFormat}
+          <MatchTypeIcon matchType={matchData.matchFormat} />
+          {' '}{matchData.matchFormat}
           {matchData.stipulationName && ` - ${matchData.stipulationName}`}
         </span>
         {matchData.isChampionship && (
@@ -303,8 +289,7 @@ function MatchEntry({ match, isCompleted, t }: MatchEntryProps) {
           <span className="match-awards">
             {matchData.starRating != null && (
               <span className="match-star-rating" title={t('match.starRating')}>
-                {matchStarsDisplay(matchData.starRating)}
-                <span className="match-star-value">{matchData.starRating}</span>
+                <StarRating rating={matchData.starRating} size="sm" />
               </span>
             )}
             {matchData.matchOfTheNight && (

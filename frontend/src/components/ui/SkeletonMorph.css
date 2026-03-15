@@ -1,0 +1,39 @@
+.skeleton-morph {
+  position: relative;
+}
+
+.skeleton-morph-layer {
+  will-change: opacity, transform;
+  transition: opacity 400ms ease, transform 400ms ease;
+}
+
+/* Skeleton layer */
+.skeleton-morph-layer.skeleton-morph-skeleton {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.skeleton-morph-layer.skeleton-morph-skeleton.skeleton-morph-exit {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+/* Content layer */
+.skeleton-morph-layer.skeleton-morph-content {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.skeleton-morph-layer.skeleton-morph-content.skeleton-morph-enter {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* When skeleton is exiting, overlay it absolutely so content can take its place */
+.skeleton-morph-layer.skeleton-morph-skeleton.skeleton-morph-exit {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}

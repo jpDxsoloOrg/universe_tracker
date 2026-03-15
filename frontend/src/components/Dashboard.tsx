@@ -11,7 +11,8 @@ import {
   resolveImageSrc,
 } from '../constants/imageFallbacks';
 import Skeleton from './ui/Skeleton';
-import AnimatedCounter from './ui/AnimatedCounter';
+import SkeletonMorph from './ui/SkeletonMorph';
+import Odometer from './ui/Odometer';
 import './Dashboard.css';
 
 function renderStarRating(rating: number): string {
@@ -168,15 +169,6 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  if (loading && !data) {
-    return (
-      <div className="dashboard-container dashboard-loading">
-        <h1 className="dashboard-title">{t('dashboard.title')}</h1>
-        <Skeleton variant="block" count={4} className="dashboard-skeleton" />
-      </div>
-    );
-  }
-
   if (error && !data) {
     return (
       <div className="dashboard-container">
@@ -191,9 +183,19 @@ export default function Dashboard() {
     );
   }
 
-  if (!data) return null;
+  const isLoading = loading && !data;
 
   return (
+    <SkeletonMorph
+      loading={isLoading}
+      skeleton={
+        <div className="dashboard-container dashboard-loading">
+          <h1 className="dashboard-title">{t('dashboard.title')}</h1>
+          <Skeleton variant="block" count={4} className="dashboard-skeleton" />
+        </div>
+      }
+    >
+    {data ? (
     <div className="dashboard-container">
       <h1 className="dashboard-title">{t('dashboard.title')}</h1>
 
@@ -290,20 +292,20 @@ export default function Dashboard() {
         <h3>{t('dashboard.quickStats')}</h3>
         <div className="dashboard-quick-stats">
           <div className="dashboard-stat-card">
-            <div className="stat-value"><AnimatedCounter value={data.quickStats.totalWrestlers} /></div>
+            <div className="stat-value"><Odometer value={data.quickStats.totalWrestlers} /></div>
             <div className="stat-label">{t('standings.table.wrestler')}</div>
           </div>
           <div className="dashboard-stat-card">
-            <div className="stat-value"><AnimatedCounter value={data.quickStats.totalMatches} /></div>
+            <div className="stat-value"><Odometer value={data.quickStats.totalMatches} /></div>
             <div className="stat-label">{t('dashboard.matchesPlayed')}</div>
           </div>
           <div className="dashboard-stat-card">
-            <div className="stat-value"><AnimatedCounter value={data.quickStats.activeChampionships} /></div>
+            <div className="stat-value"><Odometer value={data.quickStats.activeChampionships} /></div>
             <div className="stat-label">{t('dashboard.champions')}</div>
           </div>
           {data.quickStats.mostWinsWrestler && (
             <div className="dashboard-stat-card">
-              <div className="stat-value"><AnimatedCounter value={data.quickStats.mostWinsWrestler.wins} /></div>
+              <div className="stat-value"><Odometer value={data.quickStats.mostWinsWrestler.wins} /></div>
               <div className="stat-label">{t('dashboard.mostWins')}: {data.quickStats.mostWinsWrestler.name}</div>
             </div>
           )}
@@ -311,5 +313,7 @@ export default function Dashboard() {
       </section>
 
     </div>
+    ) : null}
+    </SkeletonMorph>
   );
 }

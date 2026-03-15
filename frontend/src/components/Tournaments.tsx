@@ -3,7 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { tournamentsApi, wrestlersApi } from '../services/api';
 import type { Tournament, Wrestler } from '../types';
 import Skeleton from './ui/Skeleton';
+import SkeletonMorph from './ui/SkeletonMorph';
 import EmptyState from './ui/EmptyState';
+import BracketVisualization from './ui/BracketVisualization';
 import './Tournaments.css';
 
 export default function Tournaments() {
@@ -157,37 +159,15 @@ export default function Tournaments() {
     if (!tournament.brackets) return null;
 
     return (
-      <div className="bracket bracket-march-madness">
+      <div className="bracket">
         <h4>{t('tournaments.bracket')}</h4>
-        <div className="bracket-rounds-grid">
-          {tournament.brackets.rounds.map((round) => (
-            <div key={round.roundNumber} className="bracket-round-column">
-              <h5>{t('tournaments.round')} {round.roundNumber}</h5>
-              <div className="bracket-matches">
-                {round.matches.map((match, idx) => (
-                  <div key={`round-${round.roundNumber}-match-${idx}`} className="bracket-match">
-                    <div className="bracket-participant">
-                      {match.participant1 ? getWrestlerName(match.participant1) : t('common.tbd')}
-                      {match.winner === match.participant1 && <span className="winner-indicator">✓</span>}
-                    </div>
-                    <div className="vs">{t('common.vs')}</div>
-                    <div className="bracket-participant">
-                      {match.participant2 ? getWrestlerName(match.participant2) : t('common.tbd')}
-                      {match.winner === match.participant2 && <span className="winner-indicator">✓</span>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+        <BracketVisualization
+          rounds={tournament.brackets.rounds}
+          getWrestlerName={getWrestlerName}
+        />
       </div>
     );
   };
-
-  if (loading) {
-    return <Skeleton variant="cards" />;
-  }
 
   if (error) {
     return (
@@ -198,7 +178,7 @@ export default function Tournaments() {
     );
   }
 
-  if (tournaments.length === 0) {
+  if (!loading && tournaments.length === 0) {
     return (
       <EmptyState
         title={t('tournaments.title')}
@@ -208,86 +188,88 @@ export default function Tournaments() {
   }
 
   return (
-    <div className="tournaments-container">
-      <h2>{t('tournaments.title')}</h2>
+    <SkeletonMorph loading={loading} skeleton={<Skeleton variant="cards" />}>
+      <div className="tournaments-container">
+        <h2>{t('tournaments.title')}</h2>
 
-      <div className="tournaments-grid">
-        {tournaments.map((tournament) => (
-          <div key={tournament.tournamentId} className="tournament-card">
-            <div className="tournament-header">
-              <h3>{tournament.name}</h3>
-              {getStatusBadge(tournament.status)}
-            </div>
+        <div className="tournaments-grid">
+          {tournaments.map((tournament) => (
+            <div key={tournament.tournamentId} className="tournament-card">
+              <div className="tournament-header">
+                <h3>{tournament.name}</h3>
+                {getStatusBadge(tournament.status)}
+              </div>
 
-            <div className="tournament-info">
-              <p>
-                <strong>{t('tournaments.type')}:</strong>{' '}
-                {tournament.type === 'single-elimination' ? t('tournaments.singleElimination') : t('tournaments.roundRobin')}
-              </p>
-              <p>
-                <strong>{t('tournaments.participants')}:</strong> {tournament.participants.length}
-              </p>
-              {tournament.winner && (
-                <p className="tournament-winner">
-                  <strong>{t('tournaments.winner')}:</strong> {getWrestlerName(tournament.winner)}
+              <div className="tournament-info">
+                <p>
+                  <strong>{t('tournaments.type')}:</strong>{' '}
+                  {tournament.type === 'single-elimination' ? t('tournaments.singleElimination') : t('tournaments.roundRobin')}
                 </p>
-              )}
-            </div>
+                <p>
+                  <strong>{t('tournaments.participants')}:</strong> {tournament.participants.length}
+                </p>
+                {tournament.winner && (
+                  <p className="tournament-winner">
+                    <strong>{t('tournaments.winner')}:</strong> {getWrestlerName(tournament.winner)}
+                  </p>
+                )}
+              </div>
 
-            <button
-              onClick={() => setSelectedTournament(tournament)}
-              className="view-details-btn"
-            >
-              {t('tournaments.viewDetails')}
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {selectedTournament && (
-        <div
-          className="tournament-modal"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="tournament-modal-title"
-          onClick={() => setSelectedTournament(null)}
-        >
-          <div className="tournament-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3 id="tournament-modal-title">{selectedTournament.name}</h3>
               <button
-                onClick={() => setSelectedTournament(null)}
-                className="close-btn"
-                aria-label={t('common.closeModal') || 'Close modal'}
+                onClick={() => setSelectedTournament(tournament)}
+                className="view-details-btn"
               >
-                ×
+                {t('tournaments.viewDetails')}
               </button>
             </div>
-
-            <div className="tournament-details">
-              <p>
-                <strong>{t('tournaments.type')}:</strong>{' '}
-                {selectedTournament.type === 'single-elimination' ? t('tournaments.singleElimination') : t('tournaments.roundRobin')}
-              </p>
-              <p>
-                <strong>{t('tournaments.status')}:</strong> {getStatusBadge(selectedTournament.status)}
-              </p>
-              <p>
-                <strong>{t('tournaments.participants')}:</strong>
-              </p>
-              <ul className="participants-list">
-                {selectedTournament.participants.map((wrestlerId) => (
-                  <li key={wrestlerId}>{getWrestlerName(wrestlerId)}</li>
-                ))}
-              </ul>
-            </div>
-
-            {selectedTournament.type === 'round-robin'
-              ? renderRoundRobinStandings(selectedTournament)
-              : renderBracket(selectedTournament)}
-          </div>
+          ))}
         </div>
-      )}
-    </div>
+
+        {selectedTournament && (
+          <div
+            className="tournament-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="tournament-modal-title"
+            onClick={() => setSelectedTournament(null)}
+          >
+            <div className="tournament-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3 id="tournament-modal-title">{selectedTournament.name}</h3>
+                <button
+                  onClick={() => setSelectedTournament(null)}
+                  className="close-btn"
+                  aria-label={t('common.closeModal') || 'Close modal'}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="tournament-details">
+                <p>
+                  <strong>{t('tournaments.type')}:</strong>{' '}
+                  {selectedTournament.type === 'single-elimination' ? t('tournaments.singleElimination') : t('tournaments.roundRobin')}
+                </p>
+                <p>
+                  <strong>{t('tournaments.status')}:</strong> {getStatusBadge(selectedTournament.status)}
+                </p>
+                <p>
+                  <strong>{t('tournaments.participants')}:</strong>
+                </p>
+                <ul className="participants-list">
+                  {selectedTournament.participants.map((wrestlerId) => (
+                    <li key={wrestlerId}>{getWrestlerName(wrestlerId)}</li>
+                  ))}
+                </ul>
+              </div>
+
+              {selectedTournament.type === 'round-robin'
+                ? renderRoundRobinStandings(selectedTournament)
+                : renderBracket(selectedTournament)}
+            </div>
+          </div>
+        )}
+      </div>
+    </SkeletonMorph>
   );
 }

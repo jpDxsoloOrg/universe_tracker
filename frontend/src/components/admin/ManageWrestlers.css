@@ -187,6 +187,142 @@
   border: 1px solid #334155;
 }
 
+/* Sortable Headers */
+.sortable-header {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.sortable-header:hover {
+  color: #00d4ff;
+}
+
+/* Wrestler Filters */
+.wrestler-filters {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-group label {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.filter-group select {
+  padding: 0.4rem 0.6rem;
+  background: #161d3a;
+  border: 1px solid #334155;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.filter-count {
+  color: #64748b;
+  font-size: 0.85rem;
+  margin-left: auto;
+}
+
+/* Bulk Selection */
+.checkbox-cell {
+  width: 40px;
+  text-align: center;
+}
+
+.checkbox-cell input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #00d4ff;
+}
+
+.wrestlers-table tr.row-selected {
+  background-color: rgba(0, 212, 255, 0.08);
+}
+
+.bulk-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: #0f1429;
+  border: 2px solid #00d4ff;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.bulk-selected-count {
+  color: #00d4ff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.bulk-assign-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bulk-assign-group select {
+  padding: 0.4rem 0.6rem;
+  background: #161d3a;
+  border: 1px solid #334155;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.bulk-assign-btn {
+  background-color: #3b82f6 !important;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.bulk-assign-btn:hover:not(:disabled) {
+  background-color: #2563eb !important;
+}
+
+.bulk-delete-btn {
+  background-color: #7f1d1d !important;
+  color: #fecaca;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.bulk-delete-btn:hover:not(:disabled) {
+  background-color: #991b1b !important;
+}
+
+.bulk-assign-btn:disabled,
+.bulk-delete-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
   .wrestlers-header {
     flex-direction: column;

@@ -28,6 +28,14 @@ export default function ManageWrestlers() {
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkAction, setBulkAction] = useState(false);
+  const [bulkAssignCompany, setBulkAssignCompany] = useState('');
+  const [bulkAssignDivision, setBulkAssignDivision] = useState('');
+  const [filterCompany, setFilterCompany] = useState<string>('__all__');
+  const [filterDivision, setFilterDivision] = useState<string>('__all__');
+  const [sortField, setSortField] = useState<'name' | 'company' | 'division' | 'record'>('name');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   // Form state
   const [formData, setFormData] = useState({
@@ -243,6 +251,169 @@ export default function ManageWrestlers() {
     }
   };
 
+  const toggleSelect = (wrestlerId: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(wrestlerId)) next.delete(wrestlerId);
+      else next.add(wrestlerId);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    const filteredIds = filteredWrestlers.map((w) => w.wrestlerId);
+    const allSelected = filteredIds.every((id) => selectedIds.has(id));
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredIds));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`Delete ${selectedIds.size} wrestler(s)? This cannot be undone.`)) return;
+
+    setBulkAction(true);
+    setError(null);
+    setSuccess(null);
+    const errors: string[] = [];
+    let deleted = 0;
+
+    for (const id of selectedIds) {
+      try {
+        await wrestlersApi.delete(id);
+        deleted++;
+      } catch (err) {
+        const name = wrestlers.find((w) => w.wrestlerId === id)?.name || id;
+        errors.push(`${name}: ${err instanceof Error ? err.message : 'Failed'}`);
+      }
+    }
+
+    setSelectedIds(new Set());
+    setBulkAction(false);
+    await loadData();
+
+    if (errors.length > 0) {
+      setError(`Deleted ${deleted}, failed ${errors.length}: ${errors.join('; ')}`);
+    } else {
+      setSuccess(`${deleted} wrestler(s) deleted successfully!`);
+    }
+  };
+
+  const handleBulkAssignCompany = async () => {
+    if (selectedIds.size === 0) return;
+    const companyName = bulkAssignCompany
+      ? companies.find((c) => c.companyId === bulkAssignCompany)?.name || 'selected company'
+      : 'No Company';
+    if (!confirm(`Assign ${selectedIds.size} wrestler(s) to ${companyName}?`)) return;
+
+    setBulkAction(true);
+    setError(null);
+    setSuccess(null);
+    let updated = 0;
+
+    for (const id of selectedIds) {
+      try {
+        await wrestlersApi.update(id, { companyId: bulkAssignCompany || undefined });
+        updated++;
+      } catch (_err) {
+        // continue with others
+      }
+    }
+
+    setSelectedIds(new Set());
+    setBulkAssignCompany('');
+    setBulkAction(false);
+    await loadData();
+    setSuccess(`${updated} wrestler(s) assigned to ${companyName}!`);
+  };
+
+  const handleBulkAssignDivision = async () => {
+    if (selectedIds.size === 0) return;
+    const divisionName = bulkAssignDivision
+      ? divisions.find((d) => d.divisionId === bulkAssignDivision)?.name || 'selected division'
+      : 'No Division';
+    if (!confirm(`Assign ${selectedIds.size} wrestler(s) to ${divisionName}?`)) return;
+
+    setBulkAction(true);
+    setError(null);
+    setSuccess(null);
+    let updated = 0;
+
+    for (const id of selectedIds) {
+      try {
+        await wrestlersApi.update(id, { divisionId: bulkAssignDivision || undefined });
+        updated++;
+      } catch (_err) {
+        // continue
+      }
+    }
+
+    setSelectedIds(new Set());
+    setBulkAssignDivision('');
+    setBulkAction(false);
+    await loadData();
+    setSuccess(`${updated} wrestler(s) assigned to ${divisionName}!`);
+  };
+
+  // Filter wrestlers
+  const filteredWrestlers = wrestlers.filter((w) => {
+    if (filterCompany === '__none__' && w.companyId) return false;
+    if (filterCompany === '__none__' && !w.companyId) { /* pass */ }
+    else if (filterCompany !== '__all__' && filterCompany !== '__none__' && w.companyId !== filterCompany) return false;
+
+    if (filterCompany !== '__all__' && filterCompany !== '__none__' && filterDivision !== '__all__') {
+      if (filterDivision === '__none__' && w.divisionId) return false;
+      if (filterDivision !== '__none__' && w.divisionId !== filterDivision) return false;
+    }
+    return true;
+  });
+
+  const toggleSort = (field: typeof sortField) => {
+    if (sortField === field) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortDir('asc');
+    }
+  };
+
+  const sortIndicator = (field: typeof sortField) =>
+    sortField === field ? (sortDir === 'asc' ? ' \u25B2' : ' \u25BC') : '';
+
+  const sortedWrestlers = [...filteredWrestlers].sort((a, b) => {
+    const dir = sortDir === 'asc' ? 1 : -1;
+    switch (sortField) {
+      case 'name':
+        return dir * a.name.localeCompare(b.name);
+      case 'company':
+        return dir * (getCompanyName(a.companyId)).localeCompare(getCompanyName(b.companyId));
+      case 'division':
+        return dir * (getDivisionName(a.divisionId)).localeCompare(getDivisionName(b.divisionId));
+      case 'record': {
+        const totalA = a.wins - a.losses;
+        const totalB = b.wins - b.losses;
+        return dir * (totalA - totalB);
+      }
+      default:
+        return 0;
+    }
+  });
+
+  // Divisions available for the filter (matching the selected company, or unassigned divisions)
+  const filterDivisionOptions = (filterCompany !== '__all__' && filterCompany !== '__none__')
+    ? divisions.filter((d) => d.companyId === filterCompany || !d.companyId)
+    : [];
+
+  // Determine if all selected wrestlers share the same company (for division assignment)
+  const selectedWrestlers = filteredWrestlers.filter((w) => selectedIds.has(w.wrestlerId));
+  const selectedCompanyIds = new Set(selectedWrestlers.map((w) => w.companyId || ''));
+  const sharedCompanyId = selectedCompanyIds.size === 1 ? [...selectedCompanyIds][0] : null;
+  const eligibleDivisions = sharedCompanyId
+    ? divisions.filter((d) => d.companyId === sharedCompanyId || !d.companyId)
+    : [];
+
   if (loading) {
     return <div className="loading">Loading wrestlers...</div>;
   }
@@ -367,24 +538,144 @@ export default function ManageWrestlers() {
 
       {!showImport && <div className="wrestlers-list">
         <h3>All Wrestlers ({wrestlers.length})</h3>
-        {wrestlers.length === 0 ? (
-          <p>No wrestlers yet. Add your first wrestler!</p>
+
+        <div className="wrestler-filters">
+          <div className="filter-group">
+            <label htmlFor="filter-company">Company</label>
+            <select
+              id="filter-company"
+              value={filterCompany}
+              onChange={(e) => {
+                setFilterCompany(e.target.value);
+                setFilterDivision('__all__');
+                setSelectedIds(new Set());
+              }}
+            >
+              <option value="__all__">All</option>
+              <option value="__none__">No Company</option>
+              {companies.map((c) => (
+                <option key={c.companyId} value={c.companyId}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+          {filterCompany !== '__all__' && filterCompany !== '__none__' && (
+            <div className="filter-group">
+              <label htmlFor="filter-division">Division</label>
+              <select
+                id="filter-division"
+                value={filterDivision}
+                onChange={(e) => {
+                  setFilterDivision(e.target.value);
+                  setSelectedIds(new Set());
+                }}
+              >
+                <option value="__all__">All</option>
+                <option value="__none__">No Division</option>
+                {filterDivisionOptions.map((d) => (
+                  <option key={d.divisionId} value={d.divisionId}>{d.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          {(filterCompany !== '__all__' || filterDivision !== '__all__') && (
+            <span className="filter-count">Showing {filteredWrestlers.length} of {wrestlers.length}</span>
+          )}
+        </div>
+
+        {selectedIds.size > 0 && (
+          <div className="bulk-action-bar">
+            <span className="bulk-selected-count">{selectedIds.size} selected</span>
+            <div className="bulk-actions">
+              <div className="bulk-assign-group">
+                <select
+                  value={bulkAssignCompany}
+                  onChange={(e) => setBulkAssignCompany(e.target.value)}
+                  disabled={bulkAction}
+                >
+                  <option value="">No Company</option>
+                  {companies.map((company) => (
+                    <option key={company.companyId} value={company.companyId}>
+                      {company.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={handleBulkAssignCompany}
+                  disabled={bulkAction}
+                  className="bulk-assign-btn"
+                >
+                  {bulkAction ? 'Assigning...' : 'Assign Company'}
+                </button>
+              </div>
+              {sharedCompanyId && (
+                <div className="bulk-assign-group">
+                  <select
+                    value={bulkAssignDivision}
+                    onChange={(e) => setBulkAssignDivision(e.target.value)}
+                    disabled={bulkAction}
+                  >
+                    <option value="">No Division</option>
+                    {eligibleDivisions.map((division) => (
+                      <option key={division.divisionId} value={division.divisionId}>
+                        {division.name}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleBulkAssignDivision}
+                    disabled={bulkAction}
+                    className="bulk-assign-btn"
+                  >
+                    Assign Division
+                  </button>
+                </div>
+              )}
+              <button
+                onClick={handleBulkDelete}
+                disabled={bulkAction}
+                className="bulk-delete-btn"
+              >
+                {bulkAction ? 'Deleting...' : `Delete ${selectedIds.size}`}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {filteredWrestlers.length === 0 ? (
+          <p>{wrestlers.length === 0 ? 'No wrestlers yet. Add your first wrestler!' : 'No wrestlers match the current filters.'}</p>
         ) : (
           <div className="wrestlers-table-wrapper">
           <table className="wrestlers-table">
             <thead>
               <tr>
+                <th className="checkbox-cell">
+                  <input
+                    type="checkbox"
+                    checked={sortedWrestlers.length > 0 && sortedWrestlers.every((w) => selectedIds.has(w.wrestlerId))}
+                    onChange={toggleSelectAll}
+                  />
+                </th>
                 <th>Image</th>
-                <th>Wrestler Name</th>
-                <th>Company</th>
-                <th>Division</th>
-                <th>Record</th>
+                <th className="sortable-header" onClick={() => toggleSort('name')}>Wrestler Name{sortIndicator('name')}</th>
+                <th className="sortable-header" onClick={() => toggleSort('company')}>Company{sortIndicator('company')}</th>
+                <th className="sortable-header" onClick={() => toggleSort('division')}>Division{sortIndicator('division')}</th>
+                <th className="sortable-header" onClick={() => toggleSort('record')}>Record{sortIndicator('record')}</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {wrestlers.map((wrestler) => (
-                <tr key={wrestler.wrestlerId}>
+              {sortedWrestlers.map((wrestler) => (
+                <tr
+                  key={wrestler.wrestlerId}
+                  className={selectedIds.has(wrestler.wrestlerId) ? 'row-selected' : ''}
+                >
+                  <td className="checkbox-cell">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(wrestler.wrestlerId)}
+                      onChange={() => toggleSelect(wrestler.wrestlerId)}
+                    />
+                  </td>
                   <td>
                     <img
                       src={resolveImageSrc(wrestler.imageUrl, DEFAULT_WRESTLER_IMAGE)}

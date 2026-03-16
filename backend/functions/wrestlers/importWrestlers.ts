@@ -63,9 +63,20 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       }
     }
 
+    // Fetch all existing wrestler names to skip duplicates
+    const existingWrestlers = await dynamoDb.scanAll({
+      TableName: TableNames.WRESTLERS,
+      ProjectionExpression: '#n',
+      ExpressionAttributeNames: { '#n': 'name' },
+    });
+    const existingNames = new Set(
+      existingWrestlers.map((w) => (w.name as string).toLowerCase())
+    );
+
     const errors: ImportError[] = [];
     const validItems: Record<string, unknown>[] = [];
     const seenNames = new Set<string>();
+    let skipped = 0;
     const now = new Date().toISOString();
 
     for (let index = 0; index < wrestlers.length; index++) {
@@ -81,9 +92,15 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       const trimmedName = rawName.trim();
       const lowerName = trimmedName.toLowerCase();
 
+      // Skip wrestlers that already exist in the database
+      if (existingNames.has(lowerName)) {
+        skipped++;
+        continue;
+      }
+
       // Check for duplicate names within batch
       if (seenNames.has(lowerName)) {
-        errors.push({ index, name: trimmedName, reason: 'Duplicate name in batch' });
+        skipped++;
         continue;
       }
 
@@ -129,6 +146,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     return created({
       imported: validItems.length,
       failed: errors.length,
+      skipped,
       total: wrestlers.length,
       errors,
     });

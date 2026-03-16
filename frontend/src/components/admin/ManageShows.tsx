@@ -1,9 +1,12 @@
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showsApi, companiesApi } from '../../services/api';
-import type { Show, Company } from '../../types';
+import { showsApi, companiesApi, imagesApi } from '../../services/api';
+import type { Show, Company, DayOfWeek } from '../../types';
+import { FILE_UPLOAD_LIMITS } from '../../constants';
 import Skeleton from '../ui/Skeleton';
 import './ManageShows.css';
+
+const DAYS_OF_WEEK: DayOfWeek[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
 export default function ManageShows() {
   const { t } = useTranslation();
@@ -15,12 +18,17 @@ export default function ManageShows() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingShow, setEditingShow] = useState<Show | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
     companyId: '',
     schedule: '' as '' | 'weekly' | 'ppv' | 'special',
+    dayOfWeek: '' as '' | DayOfWeek,
     description: '',
+    imageUrl: '',
   });
 
   useEffect(() => {
@@ -53,8 +61,57 @@ export default function ManageShows() {
     return t(`shows.${schedule}`);
   };
 
+  const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!FILE_UPLOAD_LIMITS.ALLOWED_TYPES.includes(file.type as typeof FILE_UPLOAD_LIMITS.ALLOWED_TYPES[number])) {
+        setError(`Invalid file type. Only ${FILE_UPLOAD_LIMITS.ALLOWED_EXTENSIONS} images are allowed.`);
+        return;
+      }
+      if (file.size > FILE_UPLOAD_LIMITS.MAX_SIZE) {
+        setError(`File too large. Maximum size is ${FILE_UPLOAD_LIMITS.MAX_SIZE_MB}MB.`);
+        return;
+      }
+      setSelectedFile(file);
+      setError(null);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const clearImage = () => {
+    setSelectedFile(null);
+    setImagePreview(null);
+    setFormData({ ...formData, imageUrl: '' });
+  };
+
+  const uploadImage = async (): Promise<string | null> => {
+    if (!selectedFile) return formData.imageUrl || null;
+    try {
+      setUploading(true);
+      const response = await imagesApi.generateUploadUrl(
+        selectedFile.name,
+        selectedFile.type,
+        'shows'
+      );
+      await imagesApi.uploadToS3(response.uploadUrl, selectedFile);
+      return response.imageUrl;
+    } catch (err) {
+      if (err instanceof Error && err.message.includes('401')) {
+        throw new Error('Session expired. Please log in again to upload images.');
+      }
+      throw new Error('Failed to upload image. Please try again.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (uploading) return;
     setError(null);
     setSuccess(null);
 
@@ -64,12 +121,16 @@ export default function ManageShows() {
     }
 
     try {
+      const imageUrl = await uploadImage();
+
       if (editingShow) {
         await showsApi.update(editingShow.showId, {
           name: formData.name,
           companyId: formData.companyId,
           schedule: formData.schedule || undefined,
+          dayOfWeek: (formData.schedule === 'weekly' && formData.dayOfWeek) ? formData.dayOfWeek : undefined,
           description: formData.description || undefined,
+          imageUrl: imageUrl || undefined,
         });
         setSuccess(t('shows.edit') + ' - OK');
       } else {
@@ -77,18 +138,26 @@ export default function ManageShows() {
           name: formData.name,
           companyId: formData.companyId,
           schedule: formData.schedule || undefined,
+          dayOfWeek: (formData.schedule === 'weekly' && formData.dayOfWeek) ? formData.dayOfWeek : undefined,
           description: formData.description || undefined,
+          imageUrl: imageUrl || undefined,
         });
         setSuccess(t('shows.create') + ' - OK');
       }
 
-      setFormData({ name: '', companyId: '', schedule: '', description: '' });
-      setShowAddForm(false);
-      setEditingShow(null);
+      resetForm();
       await loadData();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save show');
     }
+  };
+
+  const resetForm = () => {
+    setFormData({ name: '', companyId: '', schedule: '', dayOfWeek: '', description: '', imageUrl: '' });
+    setSelectedFile(null);
+    setImagePreview(null);
+    setShowAddForm(false);
+    setEditingShow(null);
   };
 
   const handleEdit = (show: Show) => {
@@ -97,8 +166,12 @@ export default function ManageShows() {
       name: show.name,
       companyId: show.companyId,
       schedule: show.schedule || '',
+      dayOfWeek: show.dayOfWeek || '',
       description: show.description || '',
+      imageUrl: show.imageUrl || '',
     });
+    setImagePreview(show.imageUrl || null);
+    setSelectedFile(null);
     setShowAddForm(true);
   };
 
@@ -123,9 +196,7 @@ export default function ManageShows() {
   };
 
   const handleCancel = () => {
-    setFormData({ name: '', companyId: '', schedule: '', description: '' });
-    setShowAddForm(false);
-    setEditingShow(null);
+    resetForm();
   };
 
   // Group shows by company
@@ -201,6 +272,24 @@ export default function ManageShows() {
               </select>
             </div>
 
+            {formData.schedule === 'weekly' && (
+              <div className="form-group">
+                <label htmlFor="show-day">{t('shows.dayOfWeek')}</label>
+                <select
+                  id="show-day"
+                  value={formData.dayOfWeek}
+                  onChange={(e) => setFormData({ ...formData, dayOfWeek: e.target.value as '' | DayOfWeek })}
+                >
+                  <option value="">{t('shows.selectDay')}</option>
+                  {DAYS_OF_WEEK.map((day) => (
+                    <option key={day} value={day}>
+                      {t(`shows.${day}`)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div className="form-group">
               <label htmlFor="show-description">{t('shows.description')}</label>
               <textarea
@@ -212,9 +301,35 @@ export default function ManageShows() {
               />
             </div>
 
+            <div className="form-group">
+              <label>{t('shows.image')}</label>
+              <div className="show-image-section">
+                {imagePreview ? (
+                  <div className="show-image-preview">
+                    <img src={imagePreview} alt="Preview" />
+                    <button type="button" onClick={clearImage} className="remove-image-btn">
+                      {t('shows.removeImage')}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="show-image-upload">
+                    <input
+                      type="file"
+                      id="show-image"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      onChange={handleFileSelect}
+                    />
+                    <label htmlFor="show-image" className="show-image-upload-btn">
+                      {t('shows.uploadImage')}
+                    </label>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="form-actions">
-              <button type="submit">
-                {editingShow ? t('shows.edit') : t('shows.create')}
+              <button type="submit" disabled={uploading}>
+                {uploading ? t('common.saving') : (editingShow ? t('shows.edit') : t('shows.create'))}
               </button>
               <button type="button" onClick={handleCancel} className="cancel-btn">
                 {t('common.cancel')}
@@ -239,11 +354,21 @@ export default function ManageShows() {
                 <div className="shows-grid">
                   {companyShows.map(show => (
                     <div key={show.showId} className="show-card">
+                      {show.imageUrl && (
+                        <div className="show-card-image">
+                          <img src={show.imageUrl} alt={show.name} />
+                        </div>
+                      )}
                       <h4>{show.name}</h4>
                       <div className="show-meta">
                         <span className="show-schedule-badge">
                           {getScheduleLabel(show.schedule)}
                         </span>
+                        {show.dayOfWeek && show.schedule === 'weekly' && (
+                          <span className="show-day-badge">
+                            {t(`shows.${show.dayOfWeek}`)}
+                          </span>
+                        )}
                       </div>
                       {show.description && (
                         <p className="show-description">{show.description}</p>

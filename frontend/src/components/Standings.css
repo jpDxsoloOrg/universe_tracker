@@ -4,6 +4,44 @@
 
 .standings-container {
   width: 100%;
+  transition: opacity 0.15s;
+}
+
+.standings-container.standings-refreshing {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.standings-loading-bar {
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+  background-size: 200% 100%;
+  animation: standings-shimmer 1.2s infinite;
+  border-radius: 2px;
+  margin-bottom: 0.5rem;
+}
+
+@keyframes standings-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.standings-show-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem 0;
+}
+
+.standings-show-more button {
+  padding: 0.5rem 1.5rem;
+  font-size: 0.9rem;
+}
+
+.standings-count {
+  color: var(--color-text-muted, #64748b);
+  font-size: 0.85rem;
 }
 
 .standings-header {
@@ -50,6 +88,33 @@
   margin-top: 0.1rem;
   color: var(--color-text-muted);
   font-size: 0.75rem;
+}
+
+.standings-company-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.standings-company-filter label {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+.standings-company-filter select {
+  padding: 0.5rem 1rem;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  color: var(--color-text);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.standings-company-filter select:focus {
+  outline: none;
+  border-color: var(--color-primary);
 }
 
 .season-badge {

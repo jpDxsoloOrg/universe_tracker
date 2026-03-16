@@ -77,19 +77,10 @@ function parseCsv(text: string): ParsedWrestler[] {
 
 function validateWrestlers(wrestlers: ParsedWrestler[]): ValidationError[] {
   const errors: ValidationError[] = [];
-  const namesSeen = new Map<string, number>();
 
   wrestlers.forEach((wrestler, index) => {
     if (!wrestler.name || wrestler.name.trim() === '') {
       errors.push({ index, message: 'wrestlers.import.missingName' });
-    } else {
-      const lowerName = wrestler.name.trim().toLowerCase();
-      const previousIndex = namesSeen.get(lowerName);
-      if (previousIndex !== undefined) {
-        errors.push({ index, message: 'wrestlers.import.duplicateName' });
-      } else {
-        namesSeen.set(lowerName, index);
-      }
     }
 
     if (wrestler.alignment && !VALID_ALIGNMENTS.includes(wrestler.alignment)) {
@@ -312,6 +303,11 @@ export default function ImportWrestlers({ onImportComplete }: ImportWrestlersPro
             <span className="result-imported">
               {t('wrestlers.import.imported')}: {importResult.imported}
             </span>
+            {importResult.skipped > 0 && (
+              <span className="result-skipped">
+                {t('wrestlers.import.skipped', 'Skipped (existing)')}: {importResult.skipped}
+              </span>
+            )}
             <span className="result-failed">
               {t('wrestlers.import.failed')}: {importResult.failed}
             </span>

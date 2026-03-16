@@ -121,6 +121,11 @@ export default function EventDetail() {
         style={{ borderTopColor: typeColor }}
       >
         <div className="event-detail-title-row">
+          {eventData.imageUrl && (
+            <div className="event-detail-image">
+              <img src={eventData.imageUrl} alt={eventData.name} />
+            </div>
+          )}
           <h2 className="event-detail-name">{eventData.name}</h2>
           <div className="event-detail-badges">
             <span

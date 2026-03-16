@@ -45,40 +45,50 @@ export default function EventCard({ event }: EventCardProps) {
         className={`event-card${event.status === 'completed' ? ' completed' : ''}`}
         style={{ borderLeftColor: typeColor }}
       >
-        <div className="event-card-header">
-          <h3 className="event-card-name">{event.name}</h3>
-          <span
-            className="event-type-badge"
-            style={{ backgroundColor: typeColor }}
-          >
-            {t(`events.types.${event.eventType}`)}
-          </span>
-        </div>
-
-        <div className="event-card-details">
-          <div className="event-card-date">
-            <span className="event-card-icon">&#128197;</span>
-            <span>{formattedDate} - {formattedTime}</span>
-          </div>
-
-          <div className="event-card-meta">
-            <span
-              className="event-status-badge"
-              style={{ color: statusColor, borderColor: statusColor }}
-            >
-              {t(`events.status.${event.status}`)}
-            </span>
-
-            <span className="event-match-count">
-              {event.matchCount} {t('events.card.matches', { count: event.matchCount })}
-            </span>
-
-            {event.championshipMatchCount > 0 && (
-              <span className="event-championship-count">
-                {event.championshipMatchCount} {t('events.card.titleMatches')}
+        <div className="event-card-body">
+          <div className="event-card-content">
+            <div className="event-card-header">
+              <h3 className="event-card-name">{event.name}</h3>
+              <span
+                className="event-type-badge"
+                style={{ backgroundColor: typeColor }}
+              >
+                {t(`events.types.${event.eventType}`)}
               </span>
-            )}
+            </div>
+
+            <div className="event-card-details">
+              <div className="event-card-date">
+                <span className="event-card-icon">&#128197;</span>
+                <span>{formattedDate} - {formattedTime}</span>
+              </div>
+
+              <div className="event-card-meta">
+                <span
+                  className="event-status-badge"
+                  style={{ color: statusColor, borderColor: statusColor }}
+                >
+                  {t(`events.status.${event.status}`)}
+                </span>
+
+                <span className="event-match-count">
+                  {event.matchCount} {t('events.card.matches', { count: event.matchCount })}
+                </span>
+
+                {event.championshipMatchCount > 0 && (
+                  <span className="event-championship-count">
+                    {event.championshipMatchCount} {t('events.card.titleMatches')}
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
+
+          {event.imageUrl && (
+            <div className="event-card-thumb">
+              <img src={event.imageUrl} alt={event.name} />
+            </div>
+          )}
         </div>
 
         {event.status === 'completed' && (

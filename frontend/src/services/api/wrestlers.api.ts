@@ -4,6 +4,7 @@ import { API_BASE_URL, fetchWithAuth } from './apiClient';
 export interface BulkImportResponse {
   imported: number;
   failed: number;
+  skipped: number;
   total: number;
   errors: Array<{ index: number; name: string; reason: string }>;
 }

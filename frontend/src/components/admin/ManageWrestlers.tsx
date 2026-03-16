@@ -34,6 +34,8 @@ export default function ManageWrestlers() {
   const [bulkAssignDivision, setBulkAssignDivision] = useState('');
   const [filterCompany, setFilterCompany] = useState<string>('__all__');
   const [filterDivision, setFilterDivision] = useState<string>('__all__');
+  const [sortField, setSortField] = useState<'name' | 'company' | 'division' | 'record'>('name');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   // Form state
   const [formData, setFormData] = useState({
@@ -368,9 +370,40 @@ export default function ManageWrestlers() {
     return true;
   });
 
-  // Divisions available for the filter (only those matching the selected company filter)
+  const toggleSort = (field: typeof sortField) => {
+    if (sortField === field) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortDir('asc');
+    }
+  };
+
+  const sortIndicator = (field: typeof sortField) =>
+    sortField === field ? (sortDir === 'asc' ? ' \u25B2' : ' \u25BC') : '';
+
+  const sortedWrestlers = [...filteredWrestlers].sort((a, b) => {
+    const dir = sortDir === 'asc' ? 1 : -1;
+    switch (sortField) {
+      case 'name':
+        return dir * a.name.localeCompare(b.name);
+      case 'company':
+        return dir * (getCompanyName(a.companyId)).localeCompare(getCompanyName(b.companyId));
+      case 'division':
+        return dir * (getDivisionName(a.divisionId)).localeCompare(getDivisionName(b.divisionId));
+      case 'record': {
+        const totalA = a.wins - a.losses;
+        const totalB = b.wins - b.losses;
+        return dir * (totalA - totalB);
+      }
+      default:
+        return 0;
+    }
+  });
+
+  // Divisions available for the filter (matching the selected company, or unassigned divisions)
   const filterDivisionOptions = (filterCompany !== '__all__' && filterCompany !== '__none__')
-    ? divisions.filter((d) => d.companyId === filterCompany)
+    ? divisions.filter((d) => d.companyId === filterCompany || !d.companyId)
     : [];
 
   // Determine if all selected wrestlers share the same company (for division assignment)
@@ -378,7 +411,7 @@ export default function ManageWrestlers() {
   const selectedCompanyIds = new Set(selectedWrestlers.map((w) => w.companyId || ''));
   const sharedCompanyId = selectedCompanyIds.size === 1 ? [...selectedCompanyIds][0] : null;
   const eligibleDivisions = sharedCompanyId
-    ? divisions.filter((d) => d.companyId === sharedCompanyId)
+    ? divisions.filter((d) => d.companyId === sharedCompanyId || !d.companyId)
     : [];
 
   if (loading) {
@@ -525,7 +558,7 @@ export default function ManageWrestlers() {
               ))}
             </select>
           </div>
-          {filterCompany !== '__all__' && filterCompany !== '__none__' && filterDivisionOptions.length > 0 && (
+          {filterCompany !== '__all__' && filterCompany !== '__none__' && (
             <div className="filter-group">
               <label htmlFor="filter-division">Division</label>
               <select
@@ -574,7 +607,7 @@ export default function ManageWrestlers() {
                   {bulkAction ? 'Assigning...' : 'Assign Company'}
                 </button>
               </div>
-              {sharedCompanyId && eligibleDivisions.length > 0 && (
+              {sharedCompanyId && (
                 <div className="bulk-assign-group">
                   <select
                     value={bulkAssignDivision}
@@ -618,20 +651,20 @@ export default function ManageWrestlers() {
                 <th className="checkbox-cell">
                   <input
                     type="checkbox"
-                    checked={filteredWrestlers.length > 0 && filteredWrestlers.every((w) => selectedIds.has(w.wrestlerId))}
+                    checked={sortedWrestlers.length > 0 && sortedWrestlers.every((w) => selectedIds.has(w.wrestlerId))}
                     onChange={toggleSelectAll}
                   />
                 </th>
                 <th>Image</th>
-                <th>Wrestler Name</th>
-                <th>Company</th>
-                <th>Division</th>
-                <th>Record</th>
+                <th className="sortable-header" onClick={() => toggleSort('name')}>Wrestler Name{sortIndicator('name')}</th>
+                <th className="sortable-header" onClick={() => toggleSort('company')}>Company{sortIndicator('company')}</th>
+                <th className="sortable-header" onClick={() => toggleSort('division')}>Division{sortIndicator('division')}</th>
+                <th className="sortable-header" onClick={() => toggleSort('record')}>Record{sortIndicator('record')}</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredWrestlers.map((wrestler) => (
+              {sortedWrestlers.map((wrestler) => (
                 <tr
                   key={wrestler.wrestlerId}
                   className={selectedIds.has(wrestler.wrestlerId) ? 'row-selected' : ''}

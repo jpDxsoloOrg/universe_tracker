@@ -187,6 +187,17 @@
   border: 1px solid #334155;
 }
 
+/* Sortable Headers */
+.sortable-header {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.sortable-header:hover {
+  color: #00d4ff;
+}
+
 /* Wrestler Filters */
 .wrestler-filters {
   display: flex;

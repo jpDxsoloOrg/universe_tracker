@@ -28,6 +28,10 @@ export default function ManageWrestlers() {
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkAction, setBulkAction] = useState(false);
+  const [bulkAssignCompany, setBulkAssignCompany] = useState('');
+  const [bulkAssignDivision, setBulkAssignDivision] = useState('');
 
   // Form state
   const [formData, setFormData] = useState({
@@ -243,6 +247,118 @@ export default function ManageWrestlers() {
     }
   };
 
+  const toggleSelect = (wrestlerId: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(wrestlerId)) next.delete(wrestlerId);
+      else next.add(wrestlerId);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === wrestlers.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(wrestlers.map((w) => w.wrestlerId)));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`Delete ${selectedIds.size} wrestler(s)? This cannot be undone.`)) return;
+
+    setBulkAction(true);
+    setError(null);
+    setSuccess(null);
+    const errors: string[] = [];
+    let deleted = 0;
+
+    for (const id of selectedIds) {
+      try {
+        await wrestlersApi.delete(id);
+        deleted++;
+      } catch (err) {
+        const name = wrestlers.find((w) => w.wrestlerId === id)?.name || id;
+        errors.push(`${name}: ${err instanceof Error ? err.message : 'Failed'}`);
+      }
+    }
+
+    setSelectedIds(new Set());
+    setBulkAction(false);
+    await loadData();
+
+    if (errors.length > 0) {
+      setError(`Deleted ${deleted}, failed ${errors.length}: ${errors.join('; ')}`);
+    } else {
+      setSuccess(`${deleted} wrestler(s) deleted successfully!`);
+    }
+  };
+
+  const handleBulkAssignCompany = async () => {
+    if (selectedIds.size === 0) return;
+    const companyName = bulkAssignCompany
+      ? companies.find((c) => c.companyId === bulkAssignCompany)?.name || 'selected company'
+      : 'No Company';
+    if (!confirm(`Assign ${selectedIds.size} wrestler(s) to ${companyName}?`)) return;
+
+    setBulkAction(true);
+    setError(null);
+    setSuccess(null);
+    let updated = 0;
+
+    for (const id of selectedIds) {
+      try {
+        await wrestlersApi.update(id, { companyId: bulkAssignCompany || undefined });
+        updated++;
+      } catch (_err) {
+        // continue with others
+      }
+    }
+
+    setSelectedIds(new Set());
+    setBulkAssignCompany('');
+    setBulkAction(false);
+    await loadData();
+    setSuccess(`${updated} wrestler(s) assigned to ${companyName}!`);
+  };
+
+  const handleBulkAssignDivision = async () => {
+    if (selectedIds.size === 0) return;
+    const divisionName = bulkAssignDivision
+      ? divisions.find((d) => d.divisionId === bulkAssignDivision)?.name || 'selected division'
+      : 'No Division';
+    if (!confirm(`Assign ${selectedIds.size} wrestler(s) to ${divisionName}?`)) return;
+
+    setBulkAction(true);
+    setError(null);
+    setSuccess(null);
+    let updated = 0;
+
+    for (const id of selectedIds) {
+      try {
+        await wrestlersApi.update(id, { divisionId: bulkAssignDivision || undefined });
+        updated++;
+      } catch (_err) {
+        // continue
+      }
+    }
+
+    setSelectedIds(new Set());
+    setBulkAssignDivision('');
+    setBulkAction(false);
+    await loadData();
+    setSuccess(`${updated} wrestler(s) assigned to ${divisionName}!`);
+  };
+
+  // Determine if all selected wrestlers share the same company (for division assignment)
+  const selectedWrestlers = wrestlers.filter((w) => selectedIds.has(w.wrestlerId));
+  const selectedCompanyIds = new Set(selectedWrestlers.map((w) => w.companyId || ''));
+  const sharedCompanyId = selectedCompanyIds.size === 1 ? [...selectedCompanyIds][0] : null;
+  const eligibleDivisions = sharedCompanyId
+    ? divisions.filter((d) => d.companyId === sharedCompanyId)
+    : [];
+
   if (loading) {
     return <div className="loading">Loading wrestlers...</div>;
   }
@@ -367,6 +483,66 @@ export default function ManageWrestlers() {
 
       {!showImport && <div className="wrestlers-list">
         <h3>All Wrestlers ({wrestlers.length})</h3>
+
+        {selectedIds.size > 0 && (
+          <div className="bulk-action-bar">
+            <span className="bulk-selected-count">{selectedIds.size} selected</span>
+            <div className="bulk-actions">
+              <div className="bulk-assign-group">
+                <select
+                  value={bulkAssignCompany}
+                  onChange={(e) => setBulkAssignCompany(e.target.value)}
+                  disabled={bulkAction}
+                >
+                  <option value="">No Company</option>
+                  {companies.map((company) => (
+                    <option key={company.companyId} value={company.companyId}>
+                      {company.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={handleBulkAssignCompany}
+                  disabled={bulkAction}
+                  className="bulk-assign-btn"
+                >
+                  {bulkAction ? 'Assigning...' : 'Assign Company'}
+                </button>
+              </div>
+              {sharedCompanyId && eligibleDivisions.length > 0 && (
+                <div className="bulk-assign-group">
+                  <select
+                    value={bulkAssignDivision}
+                    onChange={(e) => setBulkAssignDivision(e.target.value)}
+                    disabled={bulkAction}
+                  >
+                    <option value="">No Division</option>
+                    {eligibleDivisions.map((division) => (
+                      <option key={division.divisionId} value={division.divisionId}>
+                        {division.name}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={handleBulkAssignDivision}
+                    disabled={bulkAction}
+                    className="bulk-assign-btn"
+                  >
+                    Assign Division
+                  </button>
+                </div>
+              )}
+              <button
+                onClick={handleBulkDelete}
+                disabled={bulkAction}
+                className="bulk-delete-btn"
+              >
+                {bulkAction ? 'Deleting...' : `Delete ${selectedIds.size}`}
+              </button>
+            </div>
+          </div>
+        )}
+
         {wrestlers.length === 0 ? (
           <p>No wrestlers yet. Add your first wrestler!</p>
         ) : (
@@ -374,6 +550,13 @@ export default function ManageWrestlers() {
           <table className="wrestlers-table">
             <thead>
               <tr>
+                <th className="checkbox-cell">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.size === wrestlers.length && wrestlers.length > 0}
+                    onChange={toggleSelectAll}
+                  />
+                </th>
                 <th>Image</th>
                 <th>Wrestler Name</th>
                 <th>Company</th>
@@ -384,7 +567,17 @@ export default function ManageWrestlers() {
             </thead>
             <tbody>
               {wrestlers.map((wrestler) => (
-                <tr key={wrestler.wrestlerId}>
+                <tr
+                  key={wrestler.wrestlerId}
+                  className={selectedIds.has(wrestler.wrestlerId) ? 'row-selected' : ''}
+                >
+                  <td className="checkbox-cell">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(wrestler.wrestlerId)}
+                      onChange={() => toggleSelect(wrestler.wrestlerId)}
+                    />
+                  </td>
                   <td>
                     <img
                       src={resolveImageSrc(wrestler.imageUrl, DEFAULT_WRESTLER_IMAGE)}

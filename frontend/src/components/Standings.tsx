@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import { standingsApi, seasonsApi, divisionsApi } from '../services/api';
+import { standingsApi, seasonsApi, divisionsApi, companiesApi } from '../services/api';
 import { logger } from '../utils/logger';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
-import type { Standings as StandingsType, Season, Division, Wrestler } from '../types';
+import type { Standings as StandingsType, Season, Division, Company, Wrestler } from '../types';
 import WrestlerHoverCard from './WrestlerHoverCard';
 import DivisionFilter from './DivisionFilter';
 import Skeleton from './ui/Skeleton';
@@ -22,6 +22,8 @@ export default function Standings() {
   const navigate = useNavigate();
   const [standings, setStandings] = useState<StandingsType | null>(null);
   const [divisions, setDivisions] = useState<Division[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [selectedCompany, setSelectedCompany] = useState<string>('all');
   const [selectedDivision, setSelectedDivision] = useState<string>('all');
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [selectedSeasonId, setSelectedSeasonId] = useState<string>('');
@@ -47,13 +49,15 @@ export default function Standings() {
 
     const fetchInitialData = async () => {
       try {
-        const [seasonsData, divisionsData] = await Promise.all([
+        const [seasonsData, divisionsData, companiesData] = await Promise.all([
           seasonsApi.getAll(abortController.signal),
           divisionsApi.getAll(abortController.signal),
+          companiesApi.getAll(abortController.signal),
         ]);
         if (!abortController.signal.aborted) {
           setSeasons(seasonsData);
           setDivisions(divisionsData);
+          setCompanies(companiesData);
         }
       } catch (err) {
         if (err instanceof Error && err.name !== 'AbortError') {
@@ -92,20 +96,35 @@ export default function Standings() {
     return () => abortController.abort();
   }, [selectedSeasonId]);
 
+  // Divisions filtered to selected company
+  const visibleDivisions = useMemo(() => {
+    if (selectedCompany === 'all') return divisions;
+    if (selectedCompany === 'none') return [];
+    return divisions.filter((d) => d.companyId === selectedCompany || !d.companyId);
+  }, [divisions, selectedCompany]);
+
   // Memoize filtered wrestlers to avoid recalculation on every render
   const filteredWrestlers = useMemo((): Wrestler[] => {
     if (!standings) return [];
 
-    if (selectedDivision === 'all') {
-      return standings.wrestlers;
+    let result = standings.wrestlers;
+
+    // Company filter
+    if (selectedCompany === 'none') {
+      result = result.filter((w) => !w.companyId);
+    } else if (selectedCompany !== 'all') {
+      result = result.filter((w) => w.companyId === selectedCompany);
     }
 
+    // Division filter
     if (selectedDivision === 'none') {
-      return standings.wrestlers.filter(p => !p.divisionId);
+      result = result.filter((w) => !w.divisionId);
+    } else if (selectedDivision !== 'all') {
+      result = result.filter((w) => w.divisionId === selectedDivision);
     }
 
-    return standings.wrestlers.filter(p => p.divisionId === selectedDivision);
-  }, [standings, selectedDivision]);
+    return result;
+  }, [standings, selectedCompany, selectedDivision]);
 
   // Memoize wrestler data with calculated win percentages
   const wrestlersWithStats = useMemo(() => {
@@ -187,9 +206,29 @@ export default function Standings() {
         </div>
       )}
 
-      {divisions.length > 0 && (
+      {companies.length > 0 && (
+        <div className="standings-company-filter">
+          <label htmlFor="company-filter">{t('standings.filterByCompany', 'Company')}:</label>
+          <select
+            id="company-filter"
+            value={selectedCompany}
+            onChange={(e) => {
+              setSelectedCompany(e.target.value);
+              setSelectedDivision('all');
+            }}
+          >
+            <option value="all">{t('common.all')}</option>
+            <option value="none">{t('standings.noCompany', 'No Company')}</option>
+            {companies.map((c) => (
+              <option key={c.companyId} value={c.companyId}>{c.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      {(visibleDivisions.length > 0 || selectedCompany !== 'all') && selectedCompany !== 'none' && (
         <DivisionFilter
-          divisions={divisions}
+          divisions={visibleDivisions}
           selectedDivision={selectedDivision}
           onSelect={setSelectedDivision}
           labelKey="standings.filterByDivision"

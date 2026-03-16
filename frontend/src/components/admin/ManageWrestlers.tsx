@@ -32,6 +32,8 @@ export default function ManageWrestlers() {
   const [bulkAction, setBulkAction] = useState(false);
   const [bulkAssignCompany, setBulkAssignCompany] = useState('');
   const [bulkAssignDivision, setBulkAssignDivision] = useState('');
+  const [filterCompany, setFilterCompany] = useState<string>('__all__');
+  const [filterDivision, setFilterDivision] = useState<string>('__all__');
 
   // Form state
   const [formData, setFormData] = useState({
@@ -257,10 +259,12 @@ export default function ManageWrestlers() {
   };
 
   const toggleSelectAll = () => {
-    if (selectedIds.size === wrestlers.length) {
+    const filteredIds = filteredWrestlers.map((w) => w.wrestlerId);
+    const allSelected = filteredIds.every((id) => selectedIds.has(id));
+    if (allSelected) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(wrestlers.map((w) => w.wrestlerId)));
+      setSelectedIds(new Set(filteredIds));
     }
   };
 
@@ -351,8 +355,26 @@ export default function ManageWrestlers() {
     setSuccess(`${updated} wrestler(s) assigned to ${divisionName}!`);
   };
 
+  // Filter wrestlers
+  const filteredWrestlers = wrestlers.filter((w) => {
+    if (filterCompany === '__none__' && w.companyId) return false;
+    if (filterCompany === '__none__' && !w.companyId) { /* pass */ }
+    else if (filterCompany !== '__all__' && filterCompany !== '__none__' && w.companyId !== filterCompany) return false;
+
+    if (filterCompany !== '__all__' && filterCompany !== '__none__' && filterDivision !== '__all__') {
+      if (filterDivision === '__none__' && w.divisionId) return false;
+      if (filterDivision !== '__none__' && w.divisionId !== filterDivision) return false;
+    }
+    return true;
+  });
+
+  // Divisions available for the filter (only those matching the selected company filter)
+  const filterDivisionOptions = (filterCompany !== '__all__' && filterCompany !== '__none__')
+    ? divisions.filter((d) => d.companyId === filterCompany)
+    : [];
+
   // Determine if all selected wrestlers share the same company (for division assignment)
-  const selectedWrestlers = wrestlers.filter((w) => selectedIds.has(w.wrestlerId));
+  const selectedWrestlers = filteredWrestlers.filter((w) => selectedIds.has(w.wrestlerId));
   const selectedCompanyIds = new Set(selectedWrestlers.map((w) => w.companyId || ''));
   const sharedCompanyId = selectedCompanyIds.size === 1 ? [...selectedCompanyIds][0] : null;
   const eligibleDivisions = sharedCompanyId
@@ -484,6 +506,49 @@ export default function ManageWrestlers() {
       {!showImport && <div className="wrestlers-list">
         <h3>All Wrestlers ({wrestlers.length})</h3>
 
+        <div className="wrestler-filters">
+          <div className="filter-group">
+            <label htmlFor="filter-company">Company</label>
+            <select
+              id="filter-company"
+              value={filterCompany}
+              onChange={(e) => {
+                setFilterCompany(e.target.value);
+                setFilterDivision('__all__');
+                setSelectedIds(new Set());
+              }}
+            >
+              <option value="__all__">All</option>
+              <option value="__none__">No Company</option>
+              {companies.map((c) => (
+                <option key={c.companyId} value={c.companyId}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+          {filterCompany !== '__all__' && filterCompany !== '__none__' && filterDivisionOptions.length > 0 && (
+            <div className="filter-group">
+              <label htmlFor="filter-division">Division</label>
+              <select
+                id="filter-division"
+                value={filterDivision}
+                onChange={(e) => {
+                  setFilterDivision(e.target.value);
+                  setSelectedIds(new Set());
+                }}
+              >
+                <option value="__all__">All</option>
+                <option value="__none__">No Division</option>
+                {filterDivisionOptions.map((d) => (
+                  <option key={d.divisionId} value={d.divisionId}>{d.name}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          {(filterCompany !== '__all__' || filterDivision !== '__all__') && (
+            <span className="filter-count">Showing {filteredWrestlers.length} of {wrestlers.length}</span>
+          )}
+        </div>
+
         {selectedIds.size > 0 && (
           <div className="bulk-action-bar">
             <span className="bulk-selected-count">{selectedIds.size} selected</span>
@@ -543,8 +608,8 @@ export default function ManageWrestlers() {
           </div>
         )}
 
-        {wrestlers.length === 0 ? (
-          <p>No wrestlers yet. Add your first wrestler!</p>
+        {filteredWrestlers.length === 0 ? (
+          <p>{wrestlers.length === 0 ? 'No wrestlers yet. Add your first wrestler!' : 'No wrestlers match the current filters.'}</p>
         ) : (
           <div className="wrestlers-table-wrapper">
           <table className="wrestlers-table">
@@ -553,7 +618,7 @@ export default function ManageWrestlers() {
                 <th className="checkbox-cell">
                   <input
                     type="checkbox"
-                    checked={selectedIds.size === wrestlers.length && wrestlers.length > 0}
+                    checked={filteredWrestlers.length > 0 && filteredWrestlers.every((w) => selectedIds.has(w.wrestlerId))}
                     onChange={toggleSelectAll}
                   />
                 </th>
@@ -566,7 +631,7 @@ export default function ManageWrestlers() {
               </tr>
             </thead>
             <tbody>
-              {wrestlers.map((wrestler) => (
+              {filteredWrestlers.map((wrestler) => (
                 <tr
                   key={wrestler.wrestlerId}
                   className={selectedIds.has(wrestler.wrestlerId) ? 'row-selected' : ''}

@@ -187,6 +187,43 @@
   border: 1px solid #334155;
 }
 
+/* Wrestler Filters */
+.wrestler-filters {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-group label {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.filter-group select {
+  padding: 0.4rem 0.6rem;
+  background: #161d3a;
+  border: 1px solid #334155;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.filter-count {
+  color: #64748b;
+  font-size: 0.85rem;
+  margin-left: auto;
+}
+
 /* Bulk Selection */
 .checkbox-cell {
   width: 40px;

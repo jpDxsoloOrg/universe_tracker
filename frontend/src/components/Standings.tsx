@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useTransition, memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { standingsApi, seasonsApi, divisionsApi, companiesApi } from '../services/api';
@@ -16,6 +16,102 @@ import {
 } from '../constants/imageFallbacks';
 import './Standings.css';
 
+const PAGE_SIZE = 50;
+
+interface StandingsRowProps {
+  wrestler: Wrestler & { winPercentage: string };
+  index: number;
+  divisions: Division[];
+  showDivision: boolean;
+  getDivisionName: (id?: string) => string | null;
+  onNavigate: (id: string) => void;
+}
+
+const StandingsRow = memo(function StandingsRow({
+  wrestler,
+  index,
+  divisions,
+  showDivision,
+  getDivisionName,
+  onNavigate,
+}: StandingsRowProps) {
+  return (
+    <tr
+      className="standings-row-clickable"
+      role="button"
+      tabIndex={0}
+      onClick={() => onNavigate(wrestler.wrestlerId)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onNavigate(wrestler.wrestlerId);
+        }
+      }}
+    >
+      <td className="rank">{index + 1}</td>
+      <td className="wrestler-image-cell">
+        <img
+          src={resolveImageSrc(wrestler.imageUrl, DEFAULT_WRESTLER_IMAGE)}
+          onError={(event) => applyImageFallback(event, DEFAULT_WRESTLER_IMAGE)}
+          alt={wrestler.name}
+          className="wrestler-thumbnail"
+          loading="lazy"
+        />
+      </td>
+      <td className="wrestler-name">
+        <WrestlerHoverCard wrestler={wrestler} divisions={divisions}>
+          <Link
+            to={`/stats/wrestler/${wrestler.wrestlerId}`}
+            className="wrestler-name-link"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {wrestler.name}
+          </Link>
+        </WrestlerHoverCard>
+      </td>
+      {showDivision && (
+        <td className="division-name">
+          {getDivisionName(wrestler.divisionId) || <span className="no-division">-</span>}
+        </td>
+      )}
+      <td className="wins">{wrestler.wins}</td>
+      <td className="losses">{wrestler.losses}</td>
+      <td className="draws">{wrestler.draws}</td>
+      <td className="win-percentage">{wrestler.winPercentage}%</td>
+      <td className="form-cell">
+        {wrestler.recentForm && wrestler.recentForm.length > 0 ? (
+          <span className="form-dots" aria-label={wrestler.recentForm.join(', ')}>
+            {wrestler.recentForm.map((r, i) => (
+              <span
+                key={i}
+                className={`form-dot ${r === 'W' ? 'win' : r === 'L' ? 'loss' : 'draw'}`}
+                title={r === 'W' ? 'Win' : r === 'L' ? 'Loss' : 'Draw'}
+              />
+            ))}
+          </span>
+        ) : (
+          <span className="form-empty">-</span>
+        )}
+      </td>
+      <td className="streak-cell">
+        {wrestler.currentStreak && wrestler.currentStreak.count >= 3 ? (
+          <span
+            className={`streak-badge ${wrestler.currentStreak.type === 'W' ? 'hot' : wrestler.currentStreak.type === 'L' ? 'cold' : 'neutral'}`}
+          >
+            {wrestler.currentStreak.type === 'W' && '\u{1f525} '}
+            {wrestler.currentStreak.type === 'L' && '\u{2744}\u{fe0f} '}
+            {wrestler.currentStreak.type === 'D' && '\u{2796} '}
+            {wrestler.currentStreak.count}
+            {wrestler.currentStreak.type === 'W' ? 'W' : wrestler.currentStreak.type === 'L' ? 'L' : 'D'}
+          </span>
+        ) : (
+          <span className="streak-empty">-</span>
+        )}
+      </td>
+    </tr>
+  );
+});
+
 export default function Standings() {
   const { t } = useTranslation();
   useDocumentTitle(t('standings.title'));
@@ -27,20 +123,23 @@ export default function Standings() {
   const [selectedDivision, setSelectedDivision] = useState<string>('all');
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [selectedSeasonId, setSelectedSeasonId] = useState<string>('');
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [isPending, startTransition] = useTransition();
 
   // Reload standings when retry button is clicked
   const loadStandings = useCallback(async () => {
     try {
-      setLoading(true);
+      setInitialLoading(true);
       setError(null);
       const data = await standingsApi.get(selectedSeasonId || undefined);
       setStandings(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load standings');
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
     }
   }, [selectedSeasonId]);
 
@@ -74,9 +173,15 @@ export default function Standings() {
     const abortController = new AbortController();
 
     const fetchStandings = async () => {
+      // Use refreshing (not initialLoading) for season switches after first load
+      if (standings) {
+        setRefreshing(true);
+      } else {
+        setInitialLoading(true);
+      }
+      setError(null);
+
       try {
-        setLoading(true);
-        setError(null);
         const data = await standingsApi.get(selectedSeasonId || undefined, abortController.signal);
         if (!abortController.signal.aborted) {
           setStandings(data);
@@ -87,14 +192,21 @@ export default function Standings() {
         }
       } finally {
         if (!abortController.signal.aborted) {
-          setLoading(false);
+          setInitialLoading(false);
+          setRefreshing(false);
         }
       }
     };
 
     fetchStandings();
     return () => abortController.abort();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSeasonId]);
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [selectedCompany, selectedDivision, selectedSeasonId]);
 
   // Divisions filtered to selected company
   const visibleDivisions = useMemo(() => {
@@ -137,6 +249,20 @@ export default function Standings() {
     });
   }, [filteredWrestlers]);
 
+  // Paginated slice
+  const visibleWrestlers = useMemo(
+    () => wrestlersWithStats.slice(0, visibleCount),
+    [wrestlersWithStats, visibleCount]
+  );
+
+  const hasMore = visibleCount < wrestlersWithStats.length;
+
+  const handleShowMore = () => {
+    startTransition(() => {
+      setVisibleCount((c) => c + PAGE_SIZE);
+    });
+  };
+
   const getDivisionName = useCallback((divisionId?: string) => {
     if (!divisionId) return null;
     const division = divisions.find(d => d.divisionId === divisionId);
@@ -149,7 +275,24 @@ export default function Standings() {
     return season ? season.name : t('standings.allTime');
   }, [selectedSeasonId, seasons, t]);
 
-  if (loading) {
+  const handleNavigate = useCallback((wrestlerId: string) => {
+    navigate(`/stats/wrestler/${wrestlerId}`);
+  }, [navigate]);
+
+  const handleCompanyChange = useCallback((value: string) => {
+    startTransition(() => {
+      setSelectedCompany(value);
+      setSelectedDivision('all');
+    });
+  }, []);
+
+  const handleDivisionChange = useCallback((value: string) => {
+    startTransition(() => {
+      setSelectedDivision(value);
+    });
+  }, []);
+
+  if (initialLoading) {
     return <Skeleton variant="table" className="standings-skeleton" />;
   }
 
@@ -171,8 +314,10 @@ export default function Standings() {
     );
   }
 
+  const showDivision = selectedDivision === 'all';
+
   return (
-    <div className="standings-container">
+    <div className={`standings-container ${refreshing || isPending ? 'standings-refreshing' : ''}`}>
       <div className="standings-header">
         <h2>{t('standings.title')}</h2>
         {seasons.length > 0 && (
@@ -212,10 +357,7 @@ export default function Standings() {
           <select
             id="company-filter"
             value={selectedCompany}
-            onChange={(e) => {
-              setSelectedCompany(e.target.value);
-              setSelectedDivision('all');
-            }}
+            onChange={(e) => handleCompanyChange(e.target.value)}
           >
             <option value="all">{t('common.all')}</option>
             <option value="none">{t('standings.noCompany', 'No Company')}</option>
@@ -230,10 +372,14 @@ export default function Standings() {
         <DivisionFilter
           divisions={visibleDivisions}
           selectedDivision={selectedDivision}
-          onSelect={setSelectedDivision}
+          onSelect={handleDivisionChange}
           labelKey="standings.filterByDivision"
           showNoDivision
         />
+      )}
+
+      {refreshing && (
+        <div className="standings-loading-bar" />
       )}
 
       <div className="standings-table-wrapper">
@@ -243,7 +389,7 @@ export default function Standings() {
               <th>{t('standings.table.rank')}</th>
               <th className="image-header">{t('standings.table.image')}</th>
               <th>{t('standings.table.wrestler')}</th>
-              {selectedDivision === 'all' && <th>{t('standings.table.division')}</th>}
+              {showDivision && <th>{t('standings.table.division')}</th>}
               <th>{t('standings.table.wins')}</th>
               <th>{t('standings.table.losses')}</th>
               <th>{t('standings.table.draws')}</th>
@@ -253,92 +399,31 @@ export default function Standings() {
             </tr>
           </thead>
           <tbody>
-            {wrestlersWithStats.map((wrestler, index) => (
-              <tr
+            {visibleWrestlers.map((wrestler, index) => (
+              <StandingsRow
                 key={wrestler.wrestlerId}
-                className="standings-row-clickable"
-                role="button"
-                tabIndex={0}
-                onClick={() => navigate(`/stats/wrestler/${wrestler.wrestlerId}`)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    navigate(`/stats/wrestler/${wrestler.wrestlerId}`);
-                  }
-                }}
-                aria-label={t('standings.table.wrestler')}
-              >
-                <td className="rank">{index + 1}</td>
-                <td className="wrestler-image-cell">
-                  <img
-                    src={resolveImageSrc(wrestler.imageUrl, DEFAULT_WRESTLER_IMAGE)}
-                    onError={(event) => applyImageFallback(event, DEFAULT_WRESTLER_IMAGE)}
-                    alt={wrestler.name}
-                    className="wrestler-thumbnail"
-                  />
-                </td>
-                <td className="wrestler-name">
-                  <WrestlerHoverCard wrestler={wrestler} divisions={divisions}>
-                    <Link
-                      to={`/stats/wrestler/${wrestler.wrestlerId}`}
-                      className="wrestler-name-link"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {wrestler.name}
-                    </Link>
-                  </WrestlerHoverCard>
-                </td>
-                {selectedDivision === 'all' && (
-                  <td className="division-name">
-                    {getDivisionName(wrestler.divisionId) || <span className="no-division">-</span>}
-                  </td>
-                )}
-                <td className="wins">{wrestler.wins}</td>
-                <td className="losses">{wrestler.losses}</td>
-                <td className="draws">{wrestler.draws}</td>
-                <td className="win-percentage">{wrestler.winPercentage}%</td>
-                <td className="form-cell">
-                  {wrestler.recentForm && wrestler.recentForm.length > 0 ? (
-                    <span className="form-dots" aria-label={wrestler.recentForm.join(', ')}>
-                      {wrestler.recentForm.map((r, i) => (
-                        <span
-                          key={i}
-                          className={`form-dot ${r === 'W' ? 'win' : r === 'L' ? 'loss' : 'draw'}`}
-                          title={r === 'W' ? 'Win' : r === 'L' ? 'Loss' : 'Draw'}
-                        />
-                      ))}
-                    </span>
-                  ) : (
-                    <span className="form-empty">-</span>
-                  )}
-                </td>
-                <td className="streak-cell">
-                  {wrestler.currentStreak && wrestler.currentStreak.count >= 3 ? (
-                    <span
-                      className={`streak-badge ${wrestler.currentStreak.type === 'W' ? 'hot' : wrestler.currentStreak.type === 'L' ? 'cold' : 'neutral'}`}
-                      title={
-                        wrestler.currentStreak.type === 'W'
-                          ? t('standings.winStreak')
-                          : wrestler.currentStreak.type === 'L'
-                            ? t('standings.lossStreak')
-                            : t('standings.drawStreak')
-                      }
-                    >
-                      {wrestler.currentStreak.type === 'W' && '\u{1f525} '}
-                      {wrestler.currentStreak.type === 'L' && '\u{2744}\u{fe0f} '}
-                      {wrestler.currentStreak.type === 'D' && '\u{2796} '}
-                      {wrestler.currentStreak.count}
-                      {wrestler.currentStreak.type === 'W' ? 'W' : wrestler.currentStreak.type === 'L' ? 'L' : 'D'}
-                    </span>
-                  ) : (
-                    <span className="streak-empty">-</span>
-                  )}
-                </td>
-              </tr>
+                wrestler={wrestler}
+                index={index}
+                divisions={divisions}
+                showDivision={showDivision}
+                getDivisionName={getDivisionName}
+                onNavigate={handleNavigate}
+              />
             ))}
           </tbody>
         </table>
       </div>
+
+      {hasMore && (
+        <div className="standings-show-more">
+          <button onClick={handleShowMore} disabled={isPending}>
+            {isPending ? t('common.loading') : t('standings.showMore', `Show More (${wrestlersWithStats.length - visibleCount} remaining)`)}
+          </button>
+          <span className="standings-count">
+            {visibleCount} of {wrestlersWithStats.length}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

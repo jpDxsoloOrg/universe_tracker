@@ -126,6 +126,7 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  overflow: visible;
 }
 
 .calendar-day-cell.empty {
@@ -187,7 +188,7 @@
 
 .calendar-item-img {
   width: 100%;
-  height: auto;
+  max-height: 70px;
   object-fit: contain;
   display: block;
   border-radius: 2px;

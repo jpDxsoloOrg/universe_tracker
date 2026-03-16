@@ -354,56 +354,49 @@ export default function EventsCalendar() {
                 {day !== null && (
                   <>
                     <span className="calendar-day-number">{day}</span>
-                    {hasItems && (
-                      <div className="calendar-day-events">
-                        {dayEvents?.map((evt) =>
-                          evt.imageUrl ? (
-                            <Link
-                              key={evt.eventId}
-                              to={`/events/${evt.eventId}`}
-                              className="calendar-event-img"
-                              title={evt.name}
-                              aria-label={evt.name}
-                            >
-                              <img src={evt.imageUrl} alt={evt.name} />
-                            </Link>
+                    <div className="calendar-day-items">
+                      {dayEvents?.map((evt) => (
+                        <Link
+                          key={evt.eventId}
+                          to={`/events/${evt.eventId}`}
+                          className="calendar-item"
+                          title={evt.name}
+                          aria-label={evt.name}
+                        >
+                          {evt.imageUrl ? (
+                            <img src={evt.imageUrl} alt={evt.name} className="calendar-item-img" />
                           ) : (
-                            <Link
-                              key={evt.eventId}
-                              to={`/events/${evt.eventId}`}
-                              className="calendar-event-dot"
+                            <div
+                              className="calendar-item-bar"
                               style={{ backgroundColor: eventTypeColors[evt.eventType] }}
-                              title={evt.name}
-                              aria-label={evt.name}
-                            />
-                          )
-                        )}
-                        {dayShows?.map((entry) =>
-                          entry.show.imageUrl ? (
-                            <button
-                              key={`show-${entry.show.showId}`}
-                              className="calendar-show-img"
-                              title={`${entry.show.name} (${entry.companyName})`}
-                              aria-label={entry.show.name}
-                              disabled={creatingEvent === `${entry.show.showId}-${entry.date}`}
-                              onClick={() => handleShowClick(entry)}
                             >
-                              <img src={entry.show.imageUrl} alt={entry.show.name} />
-                            </button>
+                              <span className="calendar-item-label">{evt.name}</span>
+                            </div>
+                          )}
+                        </Link>
+                      ))}
+                      {dayShows?.map((entry) => (
+                        <button
+                          key={`show-${entry.show.showId}`}
+                          className="calendar-item"
+                          title={`${entry.show.name} (${entry.companyName})`}
+                          aria-label={entry.show.name}
+                          disabled={creatingEvent === `${entry.show.showId}-${entry.date}`}
+                          onClick={() => handleShowClick(entry)}
+                        >
+                          {entry.show.imageUrl ? (
+                            <img src={entry.show.imageUrl} alt={entry.show.name} className="calendar-item-img" />
                           ) : (
-                            <button
-                              key={`show-${entry.show.showId}`}
-                              className="calendar-show-dot"
+                            <div
+                              className="calendar-item-bar"
                               style={{ backgroundColor: showColor }}
-                              title={`${entry.show.name} (${entry.companyName})`}
-                              aria-label={entry.show.name}
-                              disabled={creatingEvent === `${entry.show.showId}-${entry.date}`}
-                              onClick={() => handleShowClick(entry)}
-                            />
-                          )
-                        )}
-                      </div>
-                    )}
+                            >
+                              <span className="calendar-item-label">{entry.show.name}</span>
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
                   </>
                 )}
               </div>
